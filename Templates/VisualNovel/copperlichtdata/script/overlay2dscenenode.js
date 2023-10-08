@@ -641,7 +641,7 @@ CL3D.Overlay2DSceneNode.prototype.parseCopperCubeFontString = function(fontStr)
 	//Face Name (Arial etc)
 	//Style (Normal|Slant|Italic)
 	//Weight (Normal|Light|Bold)
-	//Underlined (True|false)
+	//Underlined (True|False)
 	
 	var outSize = 12;
 	var outName = "Arial";

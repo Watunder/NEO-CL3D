@@ -2,6 +2,7 @@
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<!--CL3D-->
 	<script type="text/javascript" src="copperlichtdata/script/cl3dnamespace.js"></script>
 	<script type="text/javascript" src="copperlichtdata/script/debug.js"></script>
 	<script type="text/javascript" src="copperlichtdata/script/ccfileloader.js"></script>	
@@ -65,21 +66,92 @@
 	<script type="text/javascript" src="copperlichtdata/script/soundscenenode.js"></script>			
 	<script type="text/javascript" src="copperlichtdata/script/jsinflate.js"></script>
 	<script type="text/javascript" src="copperlichtdata/script/publicsymbols.js"></script>
-	<script type="text/javascript" src="copperlichtdata/script/module/global.js"></script>
-	<script type="module" src="copperlichtdata/script/module/start.mjs"></script>
+	<!--Extern-->
+	<script type="text/javascript" src="copperlichtdata/script/externs/colormatrix.js"></script>
+	<script type="text/javascript" src="copperlichtdata/script/externs/simplemesh.js"></script>
+	<!--WASM-->
+	<script type="text/javascript" src="copperlichtdata/script/wasm/effekseer.min.js"></script>
+	<!--Module-->
+	<script type="text/javascript" src="copperlichtdata/script/module/globalnamespace.js"></script>
+	<script type="module" src="copperlichtdata/script/module/global.mjs"></script>
 </head>
 <body>
 	<div align="center">
-		<canvas id="3darea">
-		</canvas>
+		<div id="top" style="position: fixed; left: 0; right: 0; top: 0; bottom: 0; pointer-events: none;"></div>
+		<canvas id="3darea"></canvas>
 	</div>
 	<script type="text/javascript">
 	<!--
 		var engine = startCopperLichtFromFile('3darea', 'copperlichtdata/dialoguetest_3d.ccbz', 'Loading $PROGRESS$...<br/><br/><img style="max-width:50%" src="copperlichtdata/coppercubeloadinglogo.png" />', 'Error: This browser does not support WebGL (or it is disabled).<br/>See <a href=\"http://www.ambiera.com/copperlicht/browsersupport.html\">here</a> for details.', true, true, "#000000");
+		
+		var context = null;
+		var effects = {};
+		effekseer.initRuntime('copperlichtdata/script/wasm/effekseer.wasm', () =>
+		{
+			effekseerMain();
+		});
+
+		function effekseerMain()
+		{
+			var gl = engine.getRenderer().getWebGL();
+
+			context = effekseer.createContext();
+			context.init(gl);
+
+			// Load effect data
+			effects["ToonHit"] = context.loadEffect("copperlichtdata/effect/sample/ToonHit.efkefc", 1.0, () =>
+			{
+				// Play the loaded effect
+				effects["ToonHit"]["handle"] = context.play(effects["ToonHit"]);
+				
+				// Change a position
+				effects["ToonHit"]["handle"].setLocation(10.0, 0.0, 30.0);
+				effects["ToonHit"]["handle"].setRotation(0,0,0);
+			});
+
+			// fast rendering by skipping state fetching.
+			// If there is a problem with the drawing, please set this flag to false.
+			var fastRenderMode = false;
+			if (fastRenderMode)
+				context.setRestorationOfStatesFlag(false);
+
+			(function effekseerLoop()
+			{
+    			requestAnimationFrame(effekseerLoop);
+
+				if(effects.hasOwnProperty('ToonHit'))
+				{
+					if(effects["ToonHit"].hasOwnProperty('handle'))
+					{
+						if(!effects["ToonHit"]["handle"].exists)
+						{
+							effects["ToonHit"]["handle"] = context.play(effects["ToonHit"]);
+							effects["ToonHit"]["handle"].setLocation(10.0, 0.0, 30.0);
+							effects["ToonHit"]["handle"].setRotation(0,0,0);
+						}
+					}
+				}
+
+				// Effekseer Update
+				context.update(0.016 * 60.0);
+
+				// Rendering Settings
+				if(engine.getScene().getActiveCamera() != null)
+				{
+					var camera = engine.getScene().getActiveCamera();
+					context.setProjectionMatrix(camera.Projection.asArray());
+					context.setCameraMatrix(camera.ViewMatrix.asArray());
+				}
+
+				// Effekseer Rendering
+				context.draw();
+			})();
+		};
 	-->
 	</script>
 	<br/>
 	<div align="center">
-		<small>Created using <a href="http://www.ambiera.com/coppercube/index.html">CopperCube</a></small>	</div>
+		<small>Created using <a href="http://www.ambiera.com/coppercube/index.html">CopperCube</a></small>
+	</div>
 </body>
 </html>

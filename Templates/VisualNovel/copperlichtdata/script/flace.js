@@ -305,6 +305,8 @@ CL3D.CopperLicht.prototype.createRenderer = function()
 		
 	this.registerEventHandlers();
 	
+	// TODO: Decoupling logic and render loop
+
 	// redraw every few seconds
 	var me = this;
 	var interval = 1000.0 / this.FPS;
@@ -320,19 +322,20 @@ CL3D.CopperLicht.prototype.createRenderer = function()
 	else
 	{
 		var lastUpdate = CL3D.CLTimer.getTime();
-		var func = function()
+		var func = function(now)
 			{
-				var now = CL3D.CLTimer.getTime();
+				//var now = CL3D.CLTimer.getTime();
 				var elapsed = now - lastUpdate;
-				
-				if (elapsed > interval)
-				{
-					lastUpdate = now - (elapsed % interval);  // also adjusts for your interval not being 
-					                                          // a multiple of requestAnimationFrame's interval (usually 16.7ms)
-					me.draw3DIntervalHandler(); 
-				}	
-				
 				window.requestAnimationFrame(func);
+				
+				if (elapsed >= interval)
+				{
+					me.draw3DIntervalHandler();
+
+					lastUpdate = now - (elapsed % interval);
+					// also adjusts for your interval not being 
+					// a multiple of requestAnimationFrame's interval (usually 16.7ms)
+				}
 			};
 			
 		window.requestAnimationFrame(func);
@@ -360,7 +363,7 @@ CL3D.CopperLicht.prototype.makeWholePageSize = function()
 {
 	var w = window.innerWidth || window.clientWidth;
 	var h = window.innerHeight || window.clientHeight;
-
+	
 	this.MainElement.style.width = w + "px";
 	this.MainElement.style.height = h + "px";
 
@@ -1545,6 +1548,9 @@ CL3D.CopperLicht.prototype.createTextDialog = function(forLoadingDlg, text, load
 {
 	if (this.MainElement == null)
 		return;	
+
+	this.MainElement.setAttribute("width", window.innerWidth || window.clientWidth);
+	this.MainElement.setAttribute("height", window.innerHeight || window.clientHeight);
 	
 	var dlg_div = document.createElement("div");
 	this.MainElement.parentNode.appendChild(dlg_div);	

@@ -16,6 +16,7 @@
 	 */
 	CL3D.CLTimer.getTime = function()
 	{
-		var d = new Date();
-		return d.getTime();
+		//var d = new Date();
+		//return d.getTime();
+		return performance.now();
 	}
