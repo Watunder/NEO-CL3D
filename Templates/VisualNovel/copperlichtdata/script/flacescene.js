@@ -10,7 +10,10 @@
 //public static const REGISTER_MODE_CAMERA:int = 2;
 //public static const REGISTER_MODE_LIGHTS:int = 3;
 //public static const REGISTER_MODE_2DOVERLAY:int = 4;
-		
+
+if(!this.GLSL)
+	this.GLSL = String.raw;
+
 CL3D.DebugPostEffects = false;
 
 /**
@@ -1849,111 +1852,131 @@ CL3D.Scene.prototype.runPostProcessEffect = function(type, rttSizeFactor)
 }
 
 
-CL3D.Scene.prototype.POSTPROCESS_SHADER_COLORIZE = "			\n\
-uniform vec4	PARAM_Colorize_Color;							\n\
-uniform sampler2D	texture1;									\n\
-varying vec2 v_texCoord1;     									\n\
-																\n\
-void main()														\n\
-{																\n\
-	vec4 col = texture2D( texture1, v_texCoord1.xy );			\n\
-	gl_FragColor = col * PARAM_Colorize_Color;					\n\
-}																\n";
+CL3D.Scene.prototype.POSTPROCESS_SHADER_COLORIZE = GLSL`
+#version 100
+precision mediump float;
 
-CL3D.Scene.prototype.POSTPROCESS_SHADER_BLUR_HORIZONTAL = "		\n\
-uniform sampler2D	texture1;									\n\
-uniform float PARAM_SCREENX;									\n\
-varying vec2 v_texCoord1;     									\n\
-																\n\
-void main()														\n\
-{																\n\
-	const int sampleCount = 4; 									\n\
-	const float sampleFactor = 2.0; 							\n\
-	const float sampleStart = (float(sampleCount)*sampleFactor) / -2.0;			\n\
-	vec2 halfPixel = vec2(0.5 / PARAM_SCREENX, 0.5 / PARAM_SCREENX); \n\
-	vec4 col = vec4(0.0, 0.0, 0.0, 0.0);						\n\
-	for(int i=0; i<sampleCount; ++i)							\n\
-	{															\n\
-		vec2 tcoord = v_texCoord1.xy + vec2((sampleStart + float(i)*sampleFactor) / PARAM_SCREENX, 0.0) + halfPixel; \n\
-		col += texture2D( texture1, clamp(tcoord, vec2(0.0, 0.0), vec2(1.0, 1.0) ) ); \n\
-	}															\n\
-	col /= float(sampleCount);											\n\
-	gl_FragColor = col;											\n\
-}																";
+uniform vec4 PARAM_Colorize_Color;
+uniform sampler2D texture1;
+varying vec2 v_texCoord1;
 
-CL3D.Scene.prototype.POSTPROCESS_SHADER_BLUR_VERTICAL = "		\n\
-uniform sampler2D	texture1;									\n\
-uniform float PARAM_SCREENY;									\n\
-varying vec2 v_texCoord1;     									\n\
-																\n\
-void main()														\n\
-{																\n\
-	const int sampleCount = 4; 									\n\
-	const float sampleFactor = 2.0; 							\n\
-	const float sampleStart = (float(sampleCount)*sampleFactor) / -2.0;			\n\
-	vec2 halfPixel = vec2(0.5 / PARAM_SCREENY, 0.5 / PARAM_SCREENY); \n\
-	vec4 col = vec4(0.0, 0.0, 0.0, 0.0);						\n\
-	for(int i=0; i<sampleCount; ++i)							\n\
-	{															\n\
-		vec2 tcoord = v_texCoord1.xy + vec2(0.0, (sampleStart + float(i)*sampleFactor) / PARAM_SCREENY) + halfPixel; \n\
-		col += texture2D( texture1, clamp(tcoord, vec2(0.0, 0.0), vec2(1.0, 1.0) ) ); \n\
-	}															\n\
-	col /= float(sampleCount);											\n\
-	gl_FragColor = col;											\n\
-}																\n";
+void main()
+{
+	vec4 col = texture2D( texture1, v_texCoord1.xy );
+	gl_FragColor = col * PARAM_Colorize_Color;
+}`;
 
-CL3D.Scene.prototype.POSTPROCESS_SHADER_LIGHT_TRESHOLD = "		\n\
-uniform sampler2D	texture1;									\n\
-uniform float PARAM_LightTreshold_Treshold;						\n\
-varying vec2 v_texCoord1;     									\n\
-																\n\
-void main()														\n\
-{																\n\
-	vec4 col = texture2D( texture1, v_texCoord1.xy );			\n\
-	float lum = 0.3*col.r + 0.59*col.g + 0.11*col.b;			\n\
-	if (lum > PARAM_LightTreshold_Treshold)						\n\
-		gl_FragColor = col;										\n\
-	else														\n\
-		gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);				\n\
-}																\n";
+CL3D.Scene.prototype.POSTPROCESS_SHADER_BLUR_HORIZONTAL = GLSL`
+#version 100
+precision mediump float;
 
-CL3D.Scene.prototype.POSTPROCESS_SHADER_BLACK_AND_WHITE = "		\n\
-uniform sampler2D	texture1;									\n\
-varying vec2 v_texCoord1;     									\n\
-																\n\
-void main()														\n\
-{																\n\
-	vec4 col = texture2D( texture1, v_texCoord1.xy );			\n\
-	float lum = 0.3*col.r + 0.59*col.g + 0.11*col.b;			\n\
-	gl_FragColor = vec4(lum, lum, lum, 1.0);					\n\
-}																\n";
+uniform sampler2D texture1;
+uniform float PARAM_SCREENX;
+varying vec2 v_texCoord1;
 
-CL3D.Scene.prototype.POSTPROCESS_SHADER_VIGNETTE = "			\n\
-uniform float PARAM_Vignette_Intensity;							\n\
-uniform float PARAM_Vignette_RadiusA;							\n\
-uniform float PARAM_Vignette_RadiusB;							\n\
-uniform sampler2D	texture1;									\n\
-varying vec2 v_texCoord1;     									\n\
-																\n\
-void main()														\n\
-{																\n\
-	vec4 col = texture2D( texture1, v_texCoord1.xy );			\n\
-	float e1 =  ( v_texCoord1.x - 0.5 ) / ( PARAM_Vignette_RadiusA );	\n\
-	float e2 =  ( v_texCoord1.y - 0.5 ) / ( PARAM_Vignette_RadiusB ); \n\
-	float d  = clamp(2.0 - ((e1 * e1) + (e2 * e2)), 0.0, 1.0);	\n\
-	gl_FragColor = col * ((1.0 - PARAM_Vignette_Intensity) + (PARAM_Vignette_Intensity * d));	\n\
-}																\n";
+void main()
+{
+	const int sampleCount = 4;
+	const float sampleFactor = 2.0;
+	const float sampleStart = (float(sampleCount)*sampleFactor) / -2.0;
+	vec2 halfPixel = vec2(0.5 / PARAM_SCREENX, 0.5 / PARAM_SCREENX);
+	vec4 col = vec4(0.0, 0.0, 0.0, 0.0);
+	for(int i=0; i<sampleCount; ++i)
+	{
+		vec2 tcoord = v_texCoord1.xy + vec2((sampleStart + float(i)*sampleFactor) / PARAM_SCREENX, 0.0) + halfPixel;
+		col += texture2D( texture1, clamp(tcoord, vec2(0.0, 0.0), vec2(1.0, 1.0) ) );
+	}
+	col /= float(sampleCount);
+	gl_FragColor = col;
+}`;
 
-CL3D.Scene.prototype.POSTPROCESS_SHADER_INVERT = "				\n\
-uniform sampler2D texture1;										\n\
-varying vec2 v_texCoord1;     									\n\
-																\n\
-void main()														\n\
-{																\n\
-	vec4 col = texture2D( texture1, v_texCoord1 );				\n\
-	gl_FragColor = vec4(1.0 - col.rgb, 1.0);					\n\
-}																\n\
-";
+CL3D.Scene.prototype.POSTPROCESS_SHADER_BLUR_VERTICAL = GLSL`
+#version 100
+precision mediump float;
+
+uniform sampler2D texture1;
+uniform float PARAM_SCREENY;
+varying vec2 v_texCoord1;
+
+void main()
+{
+	const int sampleCount = 4;
+	const float sampleFactor = 2.0;
+	const float sampleStart = (float(sampleCount)*sampleFactor) / -2.0;
+	vec2 halfPixel = vec2(0.5 / PARAM_SCREENY, 0.5 / PARAM_SCREENY);
+	vec4 col = vec4(0.0, 0.0, 0.0, 0.0);
+	for(int i=0; i<sampleCount; ++i)
+	{
+		vec2 tcoord = v_texCoord1.xy + vec2(0.0, (sampleStart + float(i)*sampleFactor) / PARAM_SCREENY) + halfPixel;
+		col += texture2D( texture1, clamp(tcoord, vec2(0.0, 0.0), vec2(1.0, 1.0) ) );
+	}
+	col /= float(sampleCount);
+	gl_FragColor = col;
+}`;
+
+CL3D.Scene.prototype.POSTPROCESS_SHADER_LIGHT_TRESHOLD = GLSL`
+#version 100
+precision mediump float;
+
+uniform sampler2D texture1;
+uniform float PARAM_LightTreshold_Treshold;
+varying vec2 v_texCoord1;
+
+void main()
+{
+	vec4 col = texture2D( texture1, v_texCoord1.xy );
+	float lum = 0.3*col.r + 0.59*col.g + 0.11*col.b;
+	if (lum > PARAM_LightTreshold_Treshold)
+		gl_FragColor = col;
+	else
+		gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+}`;
+
+CL3D.Scene.prototype.POSTPROCESS_SHADER_BLACK_AND_WHITE = GLSL`
+#version 100
+precision mediump float;
+
+uniform sampler2D texture1;
+varying vec2 v_texCoord1;
+
+void main()
+{
+	vec4 col = texture2D( texture1, v_texCoord1.xy );
+	float lum = 0.3*col.r + 0.59*col.g + 0.11*col.b;
+	gl_FragColor = vec4(lum, lum, lum, 1.0);
+}`;
+
+CL3D.Scene.prototype.POSTPROCESS_SHADER_VIGNETTE = GLSL`
+#version 100
+precision mediump float;
+
+uniform float PARAM_Vignette_Intensity;
+uniform float PARAM_Vignette_RadiusA;
+uniform float PARAM_Vignette_RadiusB;
+uniform sampler2D texture1;
+varying vec2 v_texCoord1;
+
+void main()
+{
+	vec4 col = texture2D( texture1, v_texCoord1.xy );
+	float e1 =  ( v_texCoord1.x - 0.5 ) / ( PARAM_Vignette_RadiusA );
+	float e2 =  ( v_texCoord1.y - 0.5 ) / ( PARAM_Vignette_RadiusB );
+	float d  = clamp(2.0 - ((e1 * e1) + (e2 * e2)), 0.0, 1.0);
+	gl_FragColor = col * ((1.0 - PARAM_Vignette_Intensity) + (PARAM_Vignette_Intensity * d));
+}`;
+
+CL3D.Scene.prototype.POSTPROCESS_SHADER_INVERT = GLSL`
+#version 100
+precision mediump float;
+
+uniform sampler2D texture1;
+varying vec2 v_texCoord1;
+
+void main()
+{
+	vec4 col = texture2D( texture1, v_texCoord1 );
+	gl_FragColor = vec4(1.0 - col.rgb, 1.0);
+}`;
 
 /** 
  @private

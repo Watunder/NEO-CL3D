@@ -50,6 +50,7 @@ CL3D.CopperLicht = function(elementIdOfCanvas, showInfoTexts, fps, showFPSCounte
 	
 	this.DPR = window.devicePixelRatio || 1.0;
 	this.ElementIdOfCanvas = elementIdOfCanvas;
+	this.VideoElement = document.getElementById("video");
 	this.MainElement = document.getElementById(this.ElementIdOfCanvas);
 	this.Document = new CL3D.CCDocument();
 	this.TheRenderer = null;	
@@ -369,6 +370,12 @@ CL3D.CopperLicht.prototype.makeWholePageSize = function()
 
 	this.MainElement.setAttribute("width", Math.floor(w * this.DPR));
 	this.MainElement.setAttribute("height", Math.floor(h * this.DPR));
+
+	this.VideoElement.style.width = w + "px";
+	this.VideoElement.style.height = h + "px";
+
+	this.VideoElement.setAttribute("width", Math.floor(w * this.DPR));
+	this.VideoElement.setAttribute("height", Math.floor(h * this.DPR));
 }
 
 

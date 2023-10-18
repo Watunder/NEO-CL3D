@@ -10,9 +10,16 @@ Global.Rekapi = Rekapi;
 
 //
 
-import * as fgui from './dist/fairygui.mjs'
+import * as FairyGUI from './dist/fairygui.mjs'
 
-Global.fgui = fgui;
+Global.FairyGUI = FairyGUI;
+
+//
+
+import { VideoContext } from './dist/videocontext.mjs'
+
+let canvas = document.getElementById("video");
+Global.VideoContext = new VideoContext(canvas);
 
 //
 
@@ -22,9 +29,17 @@ Global.SS6PlayerInstanceKeyParam = SS6PlayerInstanceKeyParam;
 Global.SS6Project = SS6Project;
 Global.SS6Player = SS6Player;
 
+import { CreaturePackage, CreaturePlayer } from './dist/creature-cl3d.mjs';
+
+Global.CreaturePackage = CreaturePackage;
+Global.CreaturePlayer = CreaturePlayer;
+
 //
 
-import Sparticles from './dist/sparticles.mjs';
+import { YukaManager } from './dist/yuka-cl3d.mjs'
 
-Global.Sparticles = new Sparticles(document.getElementById("top"));
-Global.Sparticles.start();
+Global.YukaManager = new YukaManager();
+
+import './src/behavior3-cl3d/main.js';
+
+//

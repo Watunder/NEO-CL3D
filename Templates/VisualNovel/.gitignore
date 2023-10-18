@@ -1,2 +1,7 @@
 dist/
 node_modules/
+
+fmodstudio.js
+fmodstudio.wasm
+fmodstudioL.js
+fmodstudioL.wasm

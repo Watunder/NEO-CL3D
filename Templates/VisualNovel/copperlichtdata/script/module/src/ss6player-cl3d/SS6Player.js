@@ -991,7 +991,7 @@ export class SS6Player
               // ローカル不透明度が使われている場合は255以下の値になるので、255以下の場合にローカル不透明度で上書き
               opacity = data.localopacity / 255.0;
             
-            //mesh.alpha = opacity * this.parentAlpha; // 255*255
+            mesh.Alpha = opacity * this.parentAlpha; // 255*255
             mesh.Visible = !data.f_hide;
 
             // if (data.h_hide) console.log('hide ! ' + data.cellIndex);
@@ -1010,7 +1010,7 @@ export class SS6Player
               mesh.tint = data.tint;
               // パーツカラーのAを不透明度に乗算して処理する
               const ca = ((data.partsColorARGB & 0xff000000) >>> 24) / 255;
-              mesh.alpha = mesh.alpha * ca;
+              mesh.Alpha = mesh.Alpha * ca;
             }
 
             // TODO:
@@ -1022,7 +1022,7 @@ export class SS6Player
 
             const blendMode = this.#alphaBlendType[i];
             if (blendMode === 1 || blendMode === 5)
-              mesh.alpha = 1.0; // 不透明度を固定にする
+              mesh.Alpha = 1.0; // 不透明度を固定にする
 
             if (partType !== SsPartType.Mask)
               this.node.addChild(mesh);

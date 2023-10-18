@@ -70,22 +70,183 @@
 	<script type="text/javascript" src="copperlichtdata/script/externs/colormatrix.js"></script>
 	<script type="text/javascript" src="copperlichtdata/script/externs/simplemesh.js"></script>
 	<!--WASM-->
+	<script type="text/javascript" src="copperlichtdata/script/wasm/fmodstudioL.js"></script>
 	<script type="text/javascript" src="copperlichtdata/script/wasm/effekseer.min.js"></script>
+	<script type="text/javascript" src="copperlichtdata/script/wasm/dist/index.js"></script>
+	<script type="text/javascript" async src="copperlichtdata/script/wasm/dist/creaturepack.js"></script>
 	<!--Module-->
 	<script type="text/javascript" src="copperlichtdata/script/module/globalnamespace.js"></script>
 	<script type="module" src="copperlichtdata/script/module/global.mjs"></script>
 </head>
 <body>
 	<div align="center">
-		<div id="top" style="position: fixed; left: 0; right: 0; top: 0; bottom: 0; pointer-events: none;"></div>
+		<div id="top" style="position: fixed; left: 0; right: 0; top: 0; bottom: 0; opacity: 0; pointer-events: none;">
+			<canvas id="video"></canvas>
+		</div>
 		<canvas id="3darea"></canvas>
 	</div>
 	<script type="text/javascript">
-	<!--
-		var engine = startCopperLichtFromFile('3darea', 'copperlichtdata/dialoguetest_3d.ccbz', 'Loading $PROGRESS$...<br/><br/><img style="max-width:50%" src="copperlichtdata/coppercubeloadinglogo.png" />', 'Error: This browser does not support WebGL (or it is disabled).<br/>See <a href=\"http://www.ambiera.com/copperlicht/browsersupport.html\">here</a> for details.', true, true, "#000000");
+		// CL3D
+		var canvas = '3darea';
+		var file = 'copperlichtdata/dialoguetest_3d.ccbz';
+		var loading = '\
+		Loading $PROGRESS$...<br/><br/>\
+		<img style="max-width:50%" src="copperlichtdata/coppercubeloadinglogo.png" />';
+		var error = '\
+		Error: This browser does not support WebGL (or it is disabled).<br/>\
+		See <a href=\"http://www.ambiera.com/copperlicht/browsersupport.html\">here</a> for details.';
 		
-		var context = null;
-		var effects = {};
+		CL3D.engine = startCopperLichtFromFile(canvas, file, loading, error, true, true, "#000000");
+		
+		// Wasmoon
+		var Wasmoon = {};
+		Wasmoon.getFactory = function(env)
+		{
+			return new wasmoon.LuaFactory(undefined, env);
+		}
+
+		Wasmoon.getEngine = function(config = {})
+		{
+			return new wasmoon.LuaFactory().createEngine(
+			{
+				injectObjects: true,
+				...config,
+			});
+		}
+
+		// FMOD
+		var FMOD = {};
+		FMOD.core = null;
+		FMOD.system = null;
+		FMOD['INITIAL_MEMORY'] = 64*1024*1024;
+
+		FMOD.onRuntimeInitialized = function()
+		{
+			fmodMain();
+		};
+
+		// Simple error checking function for all FMOD return values.
+		FMOD.CHECK_RESULT = function(result)
+		{
+			if (result != FMOD.OK)
+			{
+				var msg = "Error!!! '" + FMOD.ErrorString(result) + "'";
+
+				alert(msg);
+
+				throw msg;
+			}
+		}
+
+		FMOD.prerun = function()
+		{
+			var fileUrl = "/copperlichtdata/sound/bank/";
+			var fileName;
+			var folderName = "/";
+			var canRead = true;
+			var canWrite = false;
+
+			fileName =
+			[
+				"Dialogue_CN.bank",
+				"Dialogue_EN.bank",
+				"Dialogue_JP.bank",
+			];
+
+			for (var count = 0; count < fileName.length; count++)
+				FMOD.FS_createPreloadedFile(folderName, fileName[count], fileUrl + fileName[count], canRead, canWrite);
+		};
+		FMODModule(FMOD);
+
+		function fmodMain()
+		{
+			// A temporary empty object to hold our FMOD.system
+			var outObj = {};
+			var result;
+
+			console.log("Creating FMOD System object\n");
+
+			// Create the FMOD.system and check the result
+			result = FMOD.Studio_System_Create(outObj);
+			FMOD.CHECK_RESULT(result);
+
+			console.log("grabbing FMOD.system object from temporary and storing it\n");
+
+		    // Take out our System object
+			FMOD.system = outObj.val;
+
+			result = FMOD.system.getCoreSystem(outObj);
+			FMOD.CHECK_RESULT(result);
+
+		    FMOD.core = outObj.val;
+
+			// Optional.  Setting DSP Buffer size can affect latency and stability.
+			// Processing is currently done in the main thread so anything lower than 2048 samples can cause stuttering on some devices.
+			console.log("set DSP Buffer size.\n");
+			result = FMOD.core.setDSPBufferSize(2048, 2);
+			FMOD.CHECK_RESULT(result);
+
+			// Optional.  Set sample rate of mixer to be the same as the OS output rate.
+			// This can save CPU time and latency by avoiding the automatic insertion of a resampler at the output stage.
+			// console.log("Set mixer sample rate");
+			// result = gSystemCore.getDriverInfo(0, null, null, outObj, null, null);
+			// FMOD.CHECK_RESULT(result);
+			// result = gSystemCore.setSoftwareFormat(outObj.val, FMOD.SPEAKERMODE_DEFAULT, 0)
+			// FMOD.CHECK_RESULT(result);
+
+			console.log("initialize FMOD\n");
+
+			// 1024 virtual channels
+			result = FMOD.system.initialize(1024, FMOD.STUDIO_INIT_NORMAL, FMOD.INIT_NORMAL, null);
+			FMOD.CHECK_RESULT(result);
+
+			// Starting up your typical JavaScript application loop
+			console.log("initialize Application\n");
+
+			(function fmodLoop()
+			{
+				requestAnimationFrame(fmodLoop);
+			})
+
+			return FMOD.OK;
+		};
+
+		// Creature
+		var CreatureModule = {};
+		CreatureModule.packageMgr = null;
+
+		CreatureModule.loadFile = function(filePath, callback)
+		{
+			var xhr = new XMLHttpRequest();
+			xhr.onload = function () { return callback(this.response); };
+			xhr.open("GET", filePath, true);
+			xhr.responseType = "arraybuffer";
+			xhr.send();
+		};
+
+		CreatureModule.heapBytes = function(wasmModule, typedArray)
+		{
+			var numBytes = typedArray.length * typedArray.BYTES_PER_ELEMENT;
+			var ptr = wasmModule._malloc(numBytes);
+			var heapBytes = new Uint8Array(wasmModule.HEAPU8.buffer, ptr, numBytes);
+			heapBytes.set(new Uint8Array(typedArray.buffer));
+			return heapBytes;
+		};
+
+		CreatureModule.onRuntimeInitialized = function()
+		{
+			CreatureMain();
+		};
+
+		function CreatureMain()
+		{
+			CreatureModule.packageMgr = new CreatureModule.PackManager();
+			console.log("initialize Creature\n");
+		};
+
+		// Effekseer
+		var EFK = {};
+		EFK.context = null;
 		effekseer.initRuntime('copperlichtdata/script/wasm/effekseer.wasm', () =>
 		{
 			effekseerMain();
@@ -93,61 +254,61 @@
 
 		function effekseerMain()
 		{
-			var gl = engine.getRenderer().getWebGL();
+			var gl = CL3D.engine.getRenderer().getWebGL();
 
-			context = effekseer.createContext();
-			context.init(gl);
+			EFK.context = effekseer.createContext();
+			EFK.context.init(gl);
 
 			// Load effect data
-			effects["ToonHit"] = context.loadEffect("copperlichtdata/effect/sample/ToonHit.efkefc", 1.0, () =>
+			EFK["ToonHit"] = EFK.context.loadEffect("copperlichtdata/effect/sample/ToonHit.efkefc", 1.0, () =>
 			{
 				// Play the loaded effect
-				effects["ToonHit"]["handle"] = context.play(effects["ToonHit"]);
+				var handle = EFK["ToonHit"]["handle"] = EFK.context.play(EFK["ToonHit"]);
 				
 				// Change a position
-				effects["ToonHit"]["handle"].setLocation(10.0, 0.0, 30.0);
-				effects["ToonHit"]["handle"].setRotation(0,0,0);
+				handle.setLocation(10.0, 0.0, 30.0);
+				handle.setRotation(0,0,0);
 			});
 
 			// fast rendering by skipping state fetching.
 			// If there is a problem with the drawing, please set this flag to false.
 			var fastRenderMode = false;
 			if (fastRenderMode)
-				context.setRestorationOfStatesFlag(false);
+				EFK.context.setRestorationOfStatesFlag(false);
 
 			(function effekseerLoop()
 			{
     			requestAnimationFrame(effekseerLoop);
 
-				if(effects.hasOwnProperty('ToonHit'))
+				if(EFK.hasOwnProperty('ToonHit'))
 				{
-					if(effects["ToonHit"].hasOwnProperty('handle'))
+					if(EFK["ToonHit"].hasOwnProperty('handle'))
 					{
-						if(!effects["ToonHit"]["handle"].exists)
+						if(!EFK["ToonHit"]["handle"].exists)
 						{
-							effects["ToonHit"]["handle"] = context.play(effects["ToonHit"]);
-							effects["ToonHit"]["handle"].setLocation(10.0, 0.0, 30.0);
-							effects["ToonHit"]["handle"].setRotation(0,0,0);
+							var handle = EFK["ToonHit"]["handle"] = EFK.context.play(EFK["ToonHit"]);
+
+							handle.setLocation(10.0, 0.0, 30.0);
+							handle.setRotation(0,0,0);
 						}
 					}
 				}
 
 				// Effekseer Update
-				context.update(0.016 * 60.0);
+				EFK.context.update(0.016 * 60.0);
 
 				// Rendering Settings
-				if(engine.getScene().getActiveCamera() != null)
+				if(CL3D.engine.getScene().getActiveCamera() != null)
 				{
-					var camera = engine.getScene().getActiveCamera();
-					context.setProjectionMatrix(camera.Projection.asArray());
-					context.setCameraMatrix(camera.ViewMatrix.asArray());
+					var camera = CL3D.engine.getScene().getActiveCamera();
+					EFK.context.setProjectionMatrix(camera.Projection.asArray());
+					EFK.context.setCameraMatrix(camera.ViewMatrix.asArray());
 				}
 
 				// Effekseer Rendering
-				context.draw();
+				EFK.context.draw();
 			})();
 		};
-	-->
 	</script>
 	<br/>
 	<div align="center">

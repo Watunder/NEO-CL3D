@@ -2,6 +2,9 @@
 // This file is part of the CopperLicht library, copyright by Nikolaus Gebhardt
 // This file is part of the CopperLicht engine, (c) by N.Gebhardt
 
+if(!this.GLSL)
+	this.GLSL = String.raw;
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Renderer
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1569,16 +1572,16 @@ CL3D.Renderer.prototype.createShaderProgram = function(vertexShaderSource, fragm
 	var finalVertexShader = vertexShaderSource;
 	var finalFramentShader = fragmentShaderSource;
 	
-	var midump_append = 
-	"#ifdef GL_ES												\n\
-	precision mediump float;									\n\
-	#endif														\n";
+	var head_append = GLSL`
+		#version 100
+		precision mediump float;
+	`;
 	
-	if ( finalVertexShader.indexOf('precision ') == -1 )
-		finalVertexShader = midump_append + vertexShaderSource;
+	if ( finalVertexShader.indexOf('#version 100') == -1 )
+		finalVertexShader = head_append + vertexShaderSource;
 		
-	if ( finalFramentShader.indexOf('precision ') == -1 )
-		finalFramentShader = midump_append + fragmentShaderSource;
+	if ( finalFramentShader.indexOf('#version 100') == -1 )
+		finalFramentShader = head_append + fragmentShaderSource;
 		
 	var vertexShader = this.loadShader(gl.VERTEX_SHADER, finalVertexShader);
 	var fragmentShader = this.loadShader(gl.FRAGMENT_SHADER, finalFramentShader);
@@ -1718,7 +1721,6 @@ CL3D.Renderer.prototype.createMaterialType = function(vertexShaderSource, fragme
 	
 	return this.MinExternalMaterialTypeId;
 }
-
 
 
 /**
@@ -2745,106 +2747,118 @@ CL3D.Renderer.prototype.enableShadowMap = function(enable,
 // when running under validation, because the translator implements GLSL ES.  Note that the precision qualifiers will have // no effect on the desktop (I believe they're just ignored by the translator), but may have an impact on mobile.
 
 // drawing 2d rectangles with a color and a position only
-CL3D.Renderer.prototype.vs_shader_2ddrawing_coloronly = "			\
-	attribute vec4 vPosition;									\
-																\
-    void main()													\
-    {															\
-        gl_Position = vPosition;								\
-    }															\
-	";
+CL3D.Renderer.prototype.vs_shader_2ddrawing_coloronly = GLSL`
+	#version 100
+	precision mediump float;
+
+	attribute vec4 vPosition;
+
+    void main()
+    {
+        gl_Position = vPosition;
+    }`;
 	
 // drawing 2d rectangles with an image only
-CL3D.Renderer.prototype.vs_shader_2ddrawing_texture = "				\
-	attribute vec4 vPosition;									\
-	attribute vec4 vTexCoord1;									\
-	varying vec2 v_texCoord1;									\
-																\
-    void main()													\
-    {															\
-        gl_Position = vPosition;								\
-		v_texCoord1 = vTexCoord1.st;							\
-    }															\
-	";	
+CL3D.Renderer.prototype.vs_shader_2ddrawing_texture = GLSL`
+	#version 100
+	precision mediump float;
+
+	attribute vec4 vPosition;
+	attribute vec4 vTexCoord1;
+	varying vec2 v_texCoord1;
+
+    void main()
+    {
+        gl_Position = vPosition;
+		v_texCoord1 = vTexCoord1.st;
+    }`;
 	
 // 2D Fragment shader: simply set the color from a shader parameter (used for 2d drawing rectangles)
-CL3D.Renderer.prototype.fs_shader_simplecolor = "					\
-	uniform vec4 vColor;										\
-																\
-    void main()													\
-    {															\
-         gl_FragColor = vColor;									\
-    }															\
-	";								
+CL3D.Renderer.prototype.fs_shader_simplecolor = GLSL`
+	#version 100
+	precision mediump float;
+
+	uniform vec4 vColor;
+	
+    void main()
+    {
+        gl_FragColor = vColor;
+	}`;
 	
 // 2D fragment shader for drawing fonts: The font texture is white/gray on black. Draw the font using the white as alpha,
 // multiplied by a color as parameter
-CL3D.Renderer.prototype.fs_shader_2ddrawing_canvasfont = "			\
-	uniform vec4 vColor;										\
-	uniform sampler2D texture1;									\
-	uniform sampler2D texture2;									\
-																\
-    varying vec2 v_texCoord1;									\
-																\
-    void main()													\
-    {															\
-	    vec2 texCoord = vec2(v_texCoord1.s, v_texCoord1.t);		\
-        float alpha = texture2D(texture1, texCoord).r;		\
-        gl_FragColor = vec4(vColor.rgb, alpha);						\
-    }															\
-	";								
+CL3D.Renderer.prototype.fs_shader_2ddrawing_canvasfont = GLSL`
+	#version 100
+	precision mediump float;
+
+	uniform vec4 vColor;
+	uniform sampler2D texture1;
+	uniform sampler2D texture2;
+	
+    varying vec2 v_texCoord1;
+
+    void main()
+    {
+	    vec2 texCoord = vec2(v_texCoord1.s, v_texCoord1.t);
+        float alpha = texture2D(texture1, texCoord).r;
+        gl_FragColor = vec4(vColor.rgb, alpha);
+    }`;								
 
 
 // simple normal 3d world 3d transformation shader
-CL3D.Renderer.prototype.vs_shader_normaltransform = "				\
-	uniform mat4 worldviewproj;									\
-																\
-	attribute vec4 vPosition;									\
-    attribute vec4 vNormal;										\
-	attribute vec4 vColor;										\
-    attribute vec2 vTexCoord1;									\
-	attribute vec2 vTexCoord2;									\
-																\
-	varying vec4 v_color;										\
-    varying vec2 v_texCoord1;									\
-	varying vec2 v_texCoord2;									\
-																\
-    void main()													\
-    {															\
-		v_color = vColor;										\
-        gl_Position = worldviewproj * vPosition;				\
-        v_texCoord1 = vTexCoord1.st;							\
-		v_texCoord2 = vTexCoord2.st;							\
-    }															\
-	";
+CL3D.Renderer.prototype.vs_shader_normaltransform = GLSL`
+	#version 100
+	precision mediump float;
+	
+	uniform mat4 worldviewproj;
+
+	attribute vec4 vPosition;
+    attribute vec4 vNormal;
+	attribute vec4 vColor;
+    attribute vec2 vTexCoord1;
+	attribute vec2 vTexCoord2;
+
+	varying vec4 v_color;
+    varying vec2 v_texCoord1;
+	varying vec2 v_texCoord2;
+	
+    void main()
+    {
+		v_color = vColor;
+        gl_Position = worldviewproj * vPosition;
+        v_texCoord1 = vTexCoord1.st;
+		v_texCoord2 = vTexCoord2.st;
+    }`;
 	
 // just like vs_shader_normaltransform but moves the positions a bit, like grass by the wind
-CL3D.Renderer.prototype.vs_shader_normaltransform_movegrass = "				\
-	uniform mat4 worldviewproj;									\
-	uniform mat4 worldtransform;								\n\
-	uniform float grassMovement;								\n\
-	uniform float windStrength;									\n\
-																\
-	attribute vec4 vPosition;									\
-    attribute vec4 vNormal;										\
-	attribute vec4 vColor;										\
-    attribute vec2 vTexCoord1;									\
-	attribute vec2 vTexCoord2;									\
-																\
-	varying vec4 v_color;										\
-    varying vec2 v_texCoord1;									\
-	varying vec2 v_texCoord2;									\
-																\
-    void main()													\
-    {															\
-		v_color = vColor;										\
-		vec4 grasspos = vPosition;							\
-		grasspos.x += sin(grassMovement + ((worldtransform[3].x + vPosition.x) / 10.0)) * (1.0 - vTexCoord1.y) * windStrength;	\
-        gl_Position = worldviewproj * grasspos;					\
-        v_texCoord1 = vTexCoord1.st;							\
-		v_texCoord2 = vTexCoord2.st;							\
-    }															\
-	";
+CL3D.Renderer.prototype.vs_shader_normaltransform_movegrass = GLSL`
+	#version 100
+	precision mediump float;
+
+	uniform mat4 worldviewproj;
+	uniform mat4 worldtransform;
+	uniform float grassMovement;
+	uniform float windStrength;
+
+	attribute vec4 vPosition;
+    attribute vec4 vNormal;
+	attribute vec4 vColor;
+    attribute vec2 vTexCoord1;
+	attribute vec2 vTexCoord2;
+
+	varying vec4 v_color;
+    varying vec2 v_texCoord1;
+	varying vec2 v_texCoord2;
+
+    void main()
+    {
+		v_color = vColor;
+		vec4 grasspos = vPosition;
+		grasspos.x += sin(grassMovement + ((worldtransform[3].x + vPosition.x) / 10.0)) * (1.0 - vTexCoord1.y) * windStrength;
+        gl_Position = worldviewproj * grasspos;
+        v_texCoord1 = vTexCoord1.st;
+		v_texCoord2 = vTexCoord2.st;
+    }`;
 
 // reusable part of vertex shaders calculating the light from directional, ambient and up to 4 point lights	
 // our lighting works like this:
@@ -2856,88 +2870,93 @@ CL3D.Renderer.prototype.vs_shader_normaltransform_movegrass = "				\
 // if (angle < 0) angle = 0;
 // intensity = angle * distanceFact;
 // color = intensity * lightcolor;		
-CL3D.Renderer.prototype.vs_shader_light_part = "				\
-		vec3 n = normalize(vec3(vNormal.xyz));					\
-		vec4 currentLight = vec4(0, 0, 0, 1.0);					\
-		for(int i=0; i<4; ++i)									\
-		{														\
-			vec3 lPos = vec3(arrLightPositions[i].xyz);			\
-			vec3 vertexToLight = lPos - vec3(vPosition.xyz);	\
-			float distance = length( vertexToLight );			\
-			float distanceFact = 1.0 / (arrLightPositions[i].w * distance); \
-			vertexToLight = normalize(vertexToLight); 			\
-			float angle = max(0.0, dot(n, vertexToLight));		\
-			float intensity = angle * distanceFact * 0.25;				\
-			currentLight = currentLight + vec4(arrLightColors[i].x*intensity, arrLightColors[i].y*intensity, arrLightColors[i].z*intensity, 1.0);		\
-		}														\
-																\
-		// directional light									\n\
-		float dirlight = max(0.0, dot(n, vecDirLight));			\
-		currentLight = currentLight + vec4(colorDirLight.x*dirlight, colorDirLight.y*dirlight, colorDirLight.z*dirlight, 1.0) * vec4(0.25, 0.25, 0.25, 1.0);		\
-																\
-		// ambient light										\n\
-		//currentLight = max(currentLight,arrLightColors[4]);		\n\
-		//currentLight = min(currentLight, vec4(1.0,1.0,1.0,1.0));\n\
-		currentLight = currentLight + arrLightColors[4];\n\
-																\
-		// backface value for shadow map back culling			\n\
-		v_backfaceValue = dirlight;							\n\
-		";
+CL3D.Renderer.prototype.vs_shader_light_part = GLSL`
+	vec3 n = normalize(vec3(vNormal.xyz));
+	vec4 currentLight = vec4(0, 0, 0, 1.0);
+	for(int i=0; i<4; ++i)
+	{
+		vec3 lPos = vec3(arrLightPositions[i].xyz);
+		vec3 vertexToLight = lPos - vec3(vPosition.xyz);
+		float distance = length( vertexToLight );
+		float distanceFact = 1.0 / (arrLightPositions[i].w * distance);
+		vertexToLight = normalize(vertexToLight);
+		float angle = max(0.0, dot(n, vertexToLight));
+		float intensity = angle * distanceFact * 0.25;
+		currentLight = currentLight + vec4(arrLightColors[i].x*intensity, arrLightColors[i].y*intensity, arrLightColors[i].z*intensity, 1.0);
+	}
+
+	// directional light
+	float dirlight = max(0.0, dot(n, vecDirLight));
+	currentLight = currentLight + vec4(colorDirLight.x*dirlight, colorDirLight.y*dirlight, colorDirLight.z*dirlight, 1.0) * vec4(0.25, 0.25, 0.25, 1.0);
+
+	// ambient light
+	//currentLight = max(currentLight,arrLightColors[4]);
+	//currentLight = min(currentLight, vec4(1.0,1.0,1.0,1.0));
+	currentLight = currentLight + arrLightColors[4];
+
+	// backface value for shadow map back culling
+	v_backfaceValue = dirlight;
+	`;
 
 // simple normal 3d world 3d transformation shader, which also calculates the light of up to 4 point light sources
-CL3D.Renderer.prototype.vs_shader_normaltransform_with_light = "				\
-	uniform mat4 worldviewproj;									\n\
-	uniform vec4 arrLightPositions[4];							\n\
-	uniform vec4 arrLightColors[5]; 							\n\
-	uniform vec3 vecDirLight; 									\n\
-	uniform vec4 colorDirLight; 								\n\
-																\
-	attribute vec4 vPosition;									\
-    attribute vec4 vNormal;										\
-	attribute vec4 vColor;										\
-    attribute vec2 vTexCoord1;									\
-	attribute vec2 vTexCoord2;									\
-																\
-	varying vec4 v_color;										\
-    varying vec2 v_texCoord1;									\
-	varying vec2 v_texCoord2;									\
-	varying float v_backfaceValue;								\
-																\
-    void main()													\
-    {															\
-        gl_Position = worldviewproj * vPosition;				\
-        v_texCoord1 = vTexCoord1.st;							\
-		v_texCoord2 = vTexCoord2.st;							\
-																\n"
-		+ CL3D.Renderer.prototype.vs_shader_light_part + 		
-	"	currentLight = currentLight * vec4(vColor.x, vColor.y, vColor.z, 1.0) * 4.0;	\
-		v_color = min(currentLight, vec4(1.0,1.0,1.0,1.0));		\
-		v_color.a = vColor.a;	// preserve vertex alpha \n\
-    }															\
-	";
+CL3D.Renderer.prototype.vs_shader_normaltransform_with_light = GLSL`
+	#version 100
+	precision mediump float;
+
+	uniform mat4 worldviewproj;
+	uniform vec4 arrLightPositions[4];
+	uniform vec4 arrLightColors[5];
+	uniform vec3 vecDirLight;
+	uniform vec4 colorDirLight;
+
+	attribute vec4 vPosition;
+    attribute vec4 vNormal;
+	attribute vec4 vColor;
+    attribute vec2 vTexCoord1;
+	attribute vec2 vTexCoord2;
+
+	varying vec4 v_color;
+    varying vec2 v_texCoord1;
+	varying vec2 v_texCoord2;
+	varying float v_backfaceValue;
+
+    void main()
+    {
+        gl_Position = worldviewproj * vPosition;
+        v_texCoord1 = vTexCoord1.st;
+		v_texCoord2 = vTexCoord2.st;
+
+		${CL3D.Renderer.prototype.vs_shader_light_part}
+
+		currentLight = currentLight * vec4(vColor.x, vColor.y, vColor.z, 1.0) * 4.0;
+		v_color = min(currentLight, vec4(1.0,1.0,1.0,1.0));
+		v_color.a = vColor.a;	// preserve vertex alpha
+    }`;
 	
 // simple normal 3d world 3d transformation shader
-CL3D.Renderer.prototype.vs_shader_normaltransform_gouraud = "				\
-	uniform mat4 worldviewproj;									\
-																\
-	attribute vec4 vPosition;									\
-    attribute vec2 vTexCoord1;									\
-	attribute vec2 vTexCoord2;									\
-	attribute vec4 vNormal;										\
-	attribute vec4 vColor;										\
-																\
-	varying vec4 v_color;										\
-    varying vec2 v_texCoord1;									\
-	varying vec2 v_texCoord2;									\
-																\
-    void main()													\
-    {															\
-        gl_Position = worldviewproj * vPosition;				\
-        v_texCoord1 = vTexCoord1.st;							\
-		v_texCoord2 = vTexCoord2.st;							\
-		v_color = vColor;										\
-    }															\
-	";
+CL3D.Renderer.prototype.vs_shader_normaltransform_gouraud = GLSL`
+	#version 100
+	precision mediump float;
+	
+	uniform mat4 worldviewproj;
+
+	attribute vec4 vPosition;
+    attribute vec2 vTexCoord1;
+	attribute vec2 vTexCoord2;
+	attribute vec4 vNormal;
+	attribute vec4 vColor;
+
+	varying vec4 v_color;
+    varying vec2 v_texCoord1;
+	varying vec2 v_texCoord2;
+
+    void main()
+    {
+        gl_Position = worldviewproj * vPosition;
+        v_texCoord1 = vTexCoord1.st;
+		v_texCoord2 = vTexCoord2.st;
+		v_color = vColor;
+    }`;
 
 	
  // 3d world 3d transformation shader generating a reflection in texture coordinate 2
@@ -2947,338 +2966,363 @@ CL3D.Renderer.prototype.vs_shader_normaltransform_gouraud = "				\
  // D3DTSS_TCI_CAMERASPACEREFLECTIONVECTOR from D3D9:
  // Use the reflection vector, transformed to camera space, as input texture coordinates. 
  // The reflection vector is computed from the input vertex position and normal vector.
-CL3D.Renderer.prototype.vs_shader_reflectiontransform = "		\
-	uniform mat4 worldviewproj;									\n\
-	uniform mat4 normaltransform;								\n\
-	uniform mat4 modelviewtransform;							\n\
-	uniform mat4 worldtransform;								\n\
-																\
-	attribute vec4 vPosition;									\
-    attribute vec3 vNormal;										\
-    attribute vec2 vTexCoord1;									\
-	attribute vec2 vTexCoord2;									\
-																\
-    varying vec2 v_texCoord1;									\
-	varying vec2 v_texCoord2;									\
-																\
-    void main()													\
-    {															\n\
-		gl_Position = worldviewproj * vPosition;					\n\
-																	\n\
-		//	use reflection											\n\
-		vec3 pos = normalize((modelviewtransform * vPosition).xyz);					\n\
-		vec3 n = normalize((normaltransform * vec4(vNormal, 1)).xyz);		\n\
-		vec3 r = reflect( pos.xyz, n.xyz );							\n\
-		float m = sqrt( r.x*r.x + r.y*r.y + (r.z+1.0)*(r.z+1.0) ); \n\
-															\n\
-		//	texture coordinates								\n\
-		v_texCoord1 = vTexCoord1.st;						\n\
-		v_texCoord2.x = (r.x / (2.0 * m)  + 0.5);						\n\
-		v_texCoord2.y = (r.y / (2.0 * m)  + 0.5);						\n\
-    }														\n\
-	";	
+CL3D.Renderer.prototype.vs_shader_reflectiontransform = GLSL`
+	#version 100
+	precision mediump float;
+
+	uniform mat4 worldviewproj;
+	uniform mat4 normaltransform;
+	uniform mat4 modelviewtransform;
+	uniform mat4 worldtransform;
+
+	attribute vec4 vPosition;
+    attribute vec3 vNormal;
+    attribute vec2 vTexCoord1;
+	attribute vec2 vTexCoord2;
+
+    varying vec2 v_texCoord1;
+	varying vec2 v_texCoord2;
+
+    void main()
+    {
+		gl_Position = worldviewproj * vPosition;
+
+		//	use reflection
+		vec3 pos = normalize((modelviewtransform * vPosition).xyz);
+		vec3 n = normalize((normaltransform * vec4(vNormal, 1)).xyz);
+		vec3 r = reflect( pos.xyz, n.xyz );
+		float m = sqrt( r.x*r.x + r.y*r.y + (r.z+1.0)*(r.z+1.0) );
+
+		//	texture coordinates
+		v_texCoord1 = vTexCoord1.st;
+		v_texCoord2.x = (r.x / (2.0 * m)  + 0.5);
+		v_texCoord2.y = (r.y / (2.0 * m)  + 0.5);
+	}`;
 	
 	
 	// same shader as before, but now with light
-CL3D.Renderer.prototype.vs_shader_reflectiontransform_with_light = "		\
-	uniform mat4 worldviewproj;									\n\
-	uniform mat4 normaltransform;								\n\
-	uniform mat4 modelviewtransform;							\n\
-	uniform vec4 arrLightPositions[4];							\n\
-	uniform vec4 arrLightColors[5]; 							\n\
-	uniform vec3 vecDirLight; 									\n\
-	uniform vec4 colorDirLight; 								\n\
-																\
-	attribute vec4 vPosition;									\
-    attribute vec3 vNormal;										\
-    attribute vec2 vTexCoord1;									\
-	attribute vec2 vTexCoord2;									\
-																\
-	varying vec4 v_color;										\
-    varying vec2 v_texCoord1;									\
-	varying vec2 v_texCoord2;									\
-	varying float v_backfaceValue;								\
-																\
-    void main()													\
-    {															\
-        gl_Position = worldviewproj * vPosition;					\n\
-																	\n\
-		//	use reflection											\n\
-		vec3 pos = normalize((modelviewtransform * vPosition).xyz);					\n\
-		vec3 nt = normalize((normaltransform * vec4(vNormal, 1)).xyz);		\n\
-		vec3 r = reflect( pos.xyz, nt.xyz );							\n\
-		float m = sqrt( r.x*r.x + r.y*r.y + (r.z+1.0)*(r.z+1.0) ); \n\
-		//	texture coordinates								\n\
-		v_texCoord1 = vTexCoord1.st;						\n\
-		v_texCoord2.x = r.x / (2.0 * m)  + 0.5;						\n\
-		v_texCoord2.y = r.y / (2.0 * m)  + 0.5;						\n\
-															\n\n"
-		+ CL3D.Renderer.prototype.vs_shader_light_part + 
-		"\
-		v_color = min(currentLight, vec4(1.0,1.0,1.0,1.0));		\
-																\
-    }														\n\
-	";	
+CL3D.Renderer.prototype.vs_shader_reflectiontransform_with_light = GLSL`
+	#version 100
+	precision mediump float;
+
+	uniform mat4 worldviewproj;
+	uniform mat4 normaltransform;
+	uniform mat4 modelviewtransform;
+	uniform vec4 arrLightPositions[4];
+	uniform vec4 arrLightColors[5];
+	uniform vec3 vecDirLight;
+	uniform vec4 colorDirLight;
+
+	attribute vec4 vPosition;
+    attribute vec3 vNormal;
+    attribute vec2 vTexCoord1;
+	attribute vec2 vTexCoord2;
+
+	varying vec4 v_color;
+    varying vec2 v_texCoord1;
+	varying vec2 v_texCoord2;
+	varying float v_backfaceValue;
+
+    void main()
+    {
+        gl_Position = worldviewproj * vPosition;
+
+		//	use reflection
+		vec3 pos = normalize((modelviewtransform * vPosition).xyz);
+		vec3 nt = normalize((normaltransform * vec4(vNormal, 1)).xyz);
+		vec3 r = reflect( pos.xyz, nt.xyz );
+		float m = sqrt( r.x*r.x + r.y*r.y + (r.z+1.0)*(r.z+1.0) );
+		//	texture coordinates
+		v_texCoord1 = vTexCoord1.st;
+		v_texCoord2.x = r.x / (2.0 * m)  + 0.5;
+		v_texCoord2.y = r.y / (2.0 * m)  + 0.5;
+
+		${CL3D.Renderer.prototype.vs_shader_light_part}
+		
+		v_color = min(currentLight, vec4(1.0,1.0,1.0,1.0));
+    }`;	
 	
 // same as vs_shader_normaltransform_with_light but alsow with grass movement
-CL3D.Renderer.prototype.vs_shader_normaltransform_with_light_movegrass = "				\
-	uniform mat4 worldviewproj;									\n\
-	uniform mat4 worldtransform;								\n\
-	uniform vec4 arrLightPositions[4];							\n\
-	uniform vec4 arrLightColors[5]; 							\n\
-	uniform vec3 vecDirLight; 									\n\
-	uniform vec4 colorDirLight; 								\n\
-	uniform float grassMovement;								\n\
-	uniform float windStrength;									\n\
-																\
-	attribute vec4 vPosition;									\
-    attribute vec4 vNormal;										\
-	attribute vec4 vColor;										\
-    attribute vec2 vTexCoord1;									\
-	attribute vec2 vTexCoord2;									\
-																\
-	varying vec4 v_color;										\
-    varying vec2 v_texCoord1;									\
-	varying vec2 v_texCoord2;									\
-	varying float v_backfaceValue;								\
-																\
-    void main()													\
-    {															\
-		vec4 grasspos = vPosition;							\
-		grasspos.x += sin(grassMovement + ((worldtransform[3].x + vPosition.x) / 10.0)) * (1.0 - vTexCoord1.y) * windStrength;	\
-        gl_Position = worldviewproj * grasspos;					\
-        v_texCoord1 = vTexCoord1.st;							\
-		v_texCoord2 = vTexCoord2.st;							\
-																\n"
-		+ CL3D.Renderer.prototype.vs_shader_light_part + 		
-	"	currentLight = currentLight * vec4(vColor.x, vColor.y, vColor.z, 1.0);	\
-		v_color = min(currentLight * 4.0, vec4(1.0,1.0,1.0,1.0));		\
-		v_color.a = vColor.a;	// preserve vertex alpha \n\
-    }															\
-	";
+CL3D.Renderer.prototype.vs_shader_normaltransform_with_light_movegrass = GLSL`
+	#version 100
+	precision mediump float;
+
+	uniform mat4 worldviewproj;
+	uniform mat4 worldtransform;
+	uniform vec4 arrLightPositions[4];
+	uniform vec4 arrLightColors[5];
+	uniform vec3 vecDirLight;
+	uniform vec4 colorDirLight;
+	uniform float grassMovement;
+	uniform float windStrength;
+
+	attribute vec4 vPosition;
+    attribute vec4 vNormal;
+	attribute vec4 vColor;
+    attribute vec2 vTexCoord1;
+	attribute vec2 vTexCoord2;
+
+	varying vec4 v_color;
+    varying vec2 v_texCoord1;
+	varying vec2 v_texCoord2;
+	varying float v_backfaceValue;
+
+    void main()
+    {
+		vec4 grasspos = vPosition;
+		grasspos.x += sin(grassMovement + ((worldtransform[3].x + vPosition.x) / 10.0)) * (1.0 - vTexCoord1.y) * windStrength;
+        gl_Position = worldviewproj * grasspos;
+        v_texCoord1 = vTexCoord1.st;
+		v_texCoord2 = vTexCoord2.st;
+
+		${CL3D.Renderer.prototype.vs_shader_light_part}
+
+		currentLight = currentLight * vec4(vColor.x, vColor.y, vColor.z, 1.0);
+		
+		v_color = min(currentLight * 4.0, vec4(1.0,1.0,1.0,1.0));
+		v_color.a = vColor.a;	// preserve vertex alpha
+    }`;
 
 // normal mapped material		
-CL3D.Renderer.prototype.vs_shader_normalmappedtransform = "				\
-	uniform mat4 worldviewproj;									\n\
-	uniform mat4 normaltransform;								\n\
-	uniform mat4 worldtransform;								\n\
-	uniform vec4 arrLightPositions[4];							\n\
-	uniform vec4 arrLightColors[5]; 							\n\
-																\n\
-	attribute vec4 vPosition;									\n\
-    attribute vec3 vNormal;										\n\
-	attribute vec4 vColor;										\n\
-    attribute vec2 vTexCoord1;									\n\
-	attribute vec2 vTexCoord2;									\n\
-	attribute vec3 vBinormal;									\n\
-	attribute vec3 vTangent;									\n\
-																\n\
-	// Output:													\n\
-    varying vec2 v_texCoord1;									\n\
-	varying vec2 v_texCoord2;									\n\
-	varying vec3 v_lightVector[4];								\n\
-	varying vec3 v_lightColor[4];								\n\
-	varying vec3 ambientLight;									\n\
-																\n\
-    void main()													\n\
-    {															\n\
-        gl_Position = worldviewproj * vPosition;				\n\
-        v_texCoord1 = vTexCoord1.st;							\n\
-		v_texCoord2 = vTexCoord2.st;							\n\
-																\n\
-		vec4 pos = vec4(dot(vPosition, worldtransform[0]), dot(vPosition, worldtransform[1]), dot(vPosition, worldtransform[2]), dot(vPosition, worldtransform[3]));							\n\
-																\n\
-		// transform normal, binormal and tangent					\n\
-		vec3 normal = vec3(dot(vNormal.xyz, worldtransform[0].xyz), dot(vNormal.xyz, worldtransform[1].xyz), dot(vNormal.xyz, worldtransform[2].xyz));		\n\
-		vec3 tangent = vec3(dot(vTangent.xyz, worldtransform[0].xyz), dot(vTangent.xyz, worldtransform[1].xyz), dot(vTangent.xyz, worldtransform[2].xyz));     \n\
-		vec3 binormal = vec3(dot(vBinormal.xyz, worldtransform[0].xyz), dot(vBinormal.xyz, worldtransform[1].xyz), dot(vBinormal.xyz, worldtransform[2].xyz));     \n\
-																\n\
-		vec3 temp = vec3(0.0, 0.0, 0.0);						\n\
-		for(int i=0; i<4; ++i) 									\n\
-		{														\n\
-			vec3 lightPos = vec3(arrLightPositions[i].xyz);		\n\
-			vec3 vertexToLight = lightPos - vec3(pos.xyz); \n\
-																\
-			// transform the light vector 1 with U, V, W		\n\
-			temp.x = dot(tangent.xyz, vertexToLight);				\n\
-			temp.y = dot(binormal.xyz, vertexToLight);				\n\
-			temp.z = dot(normal.xyz, vertexToLight);				\n\
-																\n\
-			// normalize light vector					\n\
-			temp = normalize(temp); 					\n\
-																\n\
-			// move from -1..1 to 0..1 and put into output		\n\
-			temp = temp * 0.5;							\n\
-			temp = temp + vec3(0.5,0.5,0.5);			\n\
-			v_lightVector[i] = temp;				\n\
-														\n\
-			// calculate attenuation					\n\
-			float distanceFact = 1.0 / sqrt(dot(vertexToLight, vertexToLight) * arrLightPositions[i].w); \n\
-			v_lightColor[i] = min(vec3(arrLightColors[i].x*distanceFact, arrLightColors[i].y*distanceFact, arrLightColors[i].z*distanceFact), vec3(1,1,1));		\n\
-		}														\n\
-		// ambient light\n\
-		ambientLight = arrLightColors[4].xyz;				\n\
-    }															\n\
-	";	
-	
-CL3D.Renderer.prototype.fs_shader_onlyfirsttexture = "				\
-	uniform sampler2D texture1;									\
-	uniform sampler2D texture2;									\
-																\
-    varying vec2 v_texCoord1;									\
-	varying vec2 v_texCoord2;									\
-																\
-    void main()													\
-    {															\
-        vec2 texCoord = vec2(v_texCoord1.s, v_texCoord1.t);		\
-        gl_FragColor = texture2D(texture1, texCoord);			\
-    }															\
-	";							
+CL3D.Renderer.prototype.vs_shader_normalmappedtransform = GLSL`
+	#version 100
+	precision mediump float;
 
-CL3D.Renderer.prototype.fs_shader_onlyfirsttexture_gouraud	 = "	\
-	uniform sampler2D texture1;									\
-	uniform sampler2D texture2;									\
-																\
-	varying vec4 v_color;										\
-    varying vec2 v_texCoord1;									\
-	varying vec2 v_texCoord2;									\
-																\
-    void main()													\
-    {															\
-        vec2 texCoord = vec2(v_texCoord1.s, v_texCoord1.t);		\
-        gl_FragColor = texture2D(texture1, texCoord) * v_color * 4.0;	\n\
-    }															\
-	";			
+	uniform mat4 worldviewproj;
+	uniform mat4 normaltransform;
+	uniform mat4 worldtransform;
+	uniform vec4 arrLightPositions[4];
+	uniform vec4 arrLightColors[5];
 
-CL3D.Renderer.prototype.fs_shader_onlyfirsttexture_gouraud_alpharef	= "		\
-	uniform sampler2D texture1;									\
-	uniform sampler2D texture2;									\
-																\
-	varying vec4 v_color;										\
-    varying vec2 v_texCoord1;									\
-	varying vec2 v_texCoord2;									\
-																\
-    void main()													\
-    {															\
-        vec2 texCoord = vec2(v_texCoord1.s, v_texCoord1.t);		\
-		vec4 clr = texture2D(texture1, texCoord) * v_color;	\
-		if(clr.a < 0.5)								\
-			discard;											\
-        gl_FragColor = clr * 4.0;										\
-    }															\
-	";
-	
-CL3D.Renderer.prototype.fs_shader_lightmapcombine = "				\
-	uniform sampler2D texture1;									\
-	uniform sampler2D texture2;									\
-																\
-    varying vec2 v_texCoord1;									\
-	varying vec2 v_texCoord2;									\
-																\
-    void main()													\
-    {															\
-        vec2 texCoord1 = vec2(v_texCoord1.s, v_texCoord1.t);	\
-		vec2 texCoord2 = vec2(v_texCoord2.s, v_texCoord2.t);	\
-        vec4 col1 = texture2D(texture1, texCoord1);				\
-		vec4 col2 = texture2D(texture2, texCoord2);				\
-		gl_FragColor = col1 * col2 * 4.0;						\
-    }															\
-	";		
+	attribute vec4 vPosition;
+    attribute vec3 vNormal;
+	attribute vec4 vColor;
+    attribute vec2 vTexCoord1;
+	attribute vec2 vTexCoord2;
+	attribute vec3 vBinormal;
+	attribute vec3 vTangent;
 
-CL3D.Renderer.prototype.fs_shader_lightmapcombine_m4 = "		\
-	uniform sampler2D texture1;									\
-	uniform sampler2D texture2;									\
-																\
-    varying vec2 v_texCoord1;									\
-	varying vec2 v_texCoord2;									\
-																\
-    void main()													\
-    {															\
-        vec2 texCoord1 = vec2(v_texCoord1.s, v_texCoord1.t);	\
-		vec2 texCoord2 = vec2(v_texCoord2.s, v_texCoord2.t);	\
-        vec4 col1 = texture2D(texture1, texCoord1);				\
-		vec4 col2 = texture2D(texture2, texCoord2);				\
-		gl_FragColor = col1 * col2 * 3.0;						\
-    }															\
-	";			
+	// Output:
+    varying vec2 v_texCoord1;
+	varying vec2 v_texCoord2;
+	varying vec3 v_lightVector[4];
+	varying vec3 v_lightColor[4];
+	varying vec3 ambientLight;
+
+    void main()
+    {
+        gl_Position = worldviewproj * vPosition;
+        v_texCoord1 = vTexCoord1.st;
+		v_texCoord2 = vTexCoord2.st;
+
+		vec4 pos = vec4(dot(vPosition, worldtransform[0]), dot(vPosition, worldtransform[1]), dot(vPosition, worldtransform[2]), dot(vPosition, worldtransform[3]));
+
+		// transform normal, binormal and tangent
+		vec3 normal = vec3(dot(vNormal.xyz, worldtransform[0].xyz), dot(vNormal.xyz, worldtransform[1].xyz), dot(vNormal.xyz, worldtransform[2].xyz));
+		vec3 tangent = vec3(dot(vTangent.xyz, worldtransform[0].xyz), dot(vTangent.xyz, worldtransform[1].xyz), dot(vTangent.xyz, worldtransform[2].xyz));
+		vec3 binormal = vec3(dot(vBinormal.xyz, worldtransform[0].xyz), dot(vBinormal.xyz, worldtransform[1].xyz), dot(vBinormal.xyz, worldtransform[2].xyz));
+
+		vec3 temp = vec3(0.0, 0.0, 0.0);
+		for(int i=0; i<4; ++i)
+		{
+			vec3 lightPos = vec3(arrLightPositions[i].xyz);
+			vec3 vertexToLight = lightPos - vec3(pos.xyz);
+
+			// transform the light vector 1 with U, V, W
+			temp.x = dot(tangent.xyz, vertexToLight);
+			temp.y = dot(binormal.xyz, vertexToLight);
+			temp.z = dot(normal.xyz, vertexToLight);
+
+			// normalize light vector
+			temp = normalize(temp);
+
+			// move from -1..1 to 0..1 and put into output
+			temp = temp * 0.5;
+			temp = temp + vec3(0.5,0.5,0.5);
+			v_lightVector[i] = temp;
+
+			// calculate attenuation
+			float distanceFact = 1.0 / sqrt(dot(vertexToLight, vertexToLight) * arrLightPositions[i].w);
+			v_lightColor[i] = min(vec3(arrLightColors[i].x*distanceFact, arrLightColors[i].y*distanceFact, arrLightColors[i].z*distanceFact), vec3(1,1,1));
+		}
+		// ambient light
+		ambientLight = arrLightColors[4].xyz;
+    }`;
 	
-CL3D.Renderer.prototype.fs_shader_lightmapcombine_gouraud = "	\
-	uniform sampler2D texture1;									\
-	uniform sampler2D texture2;									\
-																\
-	varying vec4 v_color;										\
-    varying vec2 v_texCoord1;									\
-	varying vec2 v_texCoord2;									\
-																\
-    void main()													\
-    {															\
-        vec2 texCoord1 = vec2(v_texCoord1.s, v_texCoord1.t);	\
-		vec2 texCoord2 = vec2(v_texCoord2.s, v_texCoord2.t);	\
-        vec4 col1 = texture2D(texture1, texCoord1);				\
-		vec4 col2 = texture2D(texture2, texCoord2);				\
-		vec4 final = col1 * col2 * v_color * 4.0;				\
-		gl_FragColor = vec4(final.x, final.y, final.z, col1.w);	\
-    }															\
-	";		
+CL3D.Renderer.prototype.fs_shader_onlyfirsttexture = GLSL`
+	#version 100
+	precision mediump float;
+
+	uniform sampler2D texture1;
+	uniform sampler2D texture2;
+
+    varying vec2 v_texCoord1;
+	varying vec2 v_texCoord2;
+
+    void main()
+    {
+        vec2 texCoord = vec2(v_texCoord1.s, v_texCoord1.t);
+        gl_FragColor = texture2D(texture1, texCoord);
+    }`;
+
+CL3D.Renderer.prototype.fs_shader_onlyfirsttexture_gouraud = GLSL`
+	#version 100
+	precision mediump float;
+
+	uniform sampler2D texture1;
+	uniform sampler2D texture2;
+
+	varying vec4 v_color;
+    varying vec2 v_texCoord1;
+	varying vec2 v_texCoord2;
+
+    void main()
+    {
+        vec2 texCoord = vec2(v_texCoord1.s, v_texCoord1.t);
+        gl_FragColor = texture2D(texture1, texCoord) * v_color * 4.0;
+	}`;
+
+CL3D.Renderer.prototype.fs_shader_onlyfirsttexture_gouraud_alpharef	= GLSL`
+	#version 100
+	precision mediump float;
+
+	uniform sampler2D texture1;
+	uniform sampler2D texture2;
+
+	varying vec4 v_color;
+    varying vec2 v_texCoord1;
+	varying vec2 v_texCoord2;
+
+    void main()
+    {
+        vec2 texCoord = vec2(v_texCoord1.s, v_texCoord1.t);
+		vec4 clr = texture2D(texture1, texCoord) * v_color;
+		if(clr.a < 0.5)
+			discard;
+        gl_FragColor = clr * 4.0;
+    }`;
 	
-CL3D.Renderer.prototype.fs_shader_normalmapped	 = "	\
-	uniform sampler2D texture1;									\
-	uniform sampler2D texture2;									\
-																\
-    varying vec2 v_texCoord1;									\
-	varying vec2 v_texCoord2;									\
-	varying vec3 v_lightVector[4];								\
-	varying vec3 v_lightColor[4];								\
-	varying vec3 ambientLight;									\
-																\
-    void main()													\
-    {															\
-		vec4 colorMapSample = texture2D(texture1, v_texCoord1);	\
-		vec3 normalMapVector = texture2D(texture2, v_texCoord1).xyz;\
-		//normalMapVector -= vec3(0.5, 0.5, 0.5);					\n\
-		//normalMapVector = normalize(normalMapVector); 			\n\
-		normalMapVector *= vec3(2.0, 2.0, 2.0);					\n\
-		normalMapVector -= vec3(1.0, 1.0, 1.0);					\n\
-																\n\
-		vec3 totallight = vec3(0.0, 0.0, 0.0);						\n\
-		for(int i=0; i<4; ++i) 									\n\
-		{														\n\
-			// process light									\n\
-			//vec3 lightvect = v_lightVector[i] + vec3(-0.5, -0.5, -0.5); \n\
-			vec3 lightvect = (v_lightVector[i] * vec3(2.0, 2.0, 2.0)) - vec3(1.0, 1.0, 1.0); \n\
-			lightvect = normalize(lightvect);					\n\
-			float luminance = dot(lightvect, normalMapVector); // normal DOT light		\n\
-			luminance = clamp(luminance, 0.0, 1.0);	// clamp result to positive numbers		\n\
-			lightvect = luminance * v_lightColor[i];	// luminance * light color \n\
-																\n\
-			// add to previously calculated lights				\n\
-			totallight = totallight + lightvect;				\n\
-		}														\n\
-																\n\
-		totallight = totallight + ambientLight;					\n\
-		// 0.25 because of new modulatex4 mode					\n\
-		gl_FragColor = colorMapSample * 0.25 * vec4(totallight.x, totallight.y, totallight.z, 0.0) * 4.0;	\n\
-    }															\n\
-	";
+CL3D.Renderer.prototype.fs_shader_lightmapcombine = GLSL`
+	#version 100
+	precision mediump float;
+
+	uniform sampler2D texture1;
+	uniform sampler2D texture2;
 	
-CL3D.Renderer.prototype.fs_shader_vertex_alpha_two_textureblend	 = "	\
-	uniform sampler2D texture1;									\
-	uniform sampler2D texture2;									\
-																\
-	varying vec4 v_color;										\
-    varying vec2 v_texCoord1;									\
-	varying vec2 v_texCoord2;									\
-																\
-    void main()													\
-    {															\
-        vec2 texCoord = vec2(v_texCoord1.s, v_texCoord1.t);		\
-		vec4 color1 = texture2D(texture1, texCoord);			\
-		vec4 color2 = texture2D(texture2, texCoord);			\
-		color1 = ((1.0 - v_color.w) * color1) + (v_color.w * color2);	// interpolate texture colors based on vertex alpha	 \n\
-		gl_FragColor = color1 * v_color * 4.0;		\n\
-    }															\
-	";	
+    varying vec2 v_texCoord1;
+	varying vec2 v_texCoord2;
+
+    void main()
+    {
+        vec2 texCoord1 = vec2(v_texCoord1.s, v_texCoord1.t);
+		vec2 texCoord2 = vec2(v_texCoord2.s, v_texCoord2.t);
+        vec4 col1 = texture2D(texture1, texCoord1);
+		vec4 col2 = texture2D(texture2, texCoord2);
+		gl_FragColor = col1 * col2 * 4.0;
+    }`;
+
+CL3D.Renderer.prototype.fs_shader_lightmapcombine_m4 = GLSL`
+	#version 100
+	precision mediump float;
+
+	uniform sampler2D texture1;
+	uniform sampler2D texture2;
+
+    varying vec2 v_texCoord1;
+	varying vec2 v_texCoord2;
+
+    void main()
+    {
+        vec2 texCoord1 = vec2(v_texCoord1.s, v_texCoord1.t);
+		vec2 texCoord2 = vec2(v_texCoord2.s, v_texCoord2.t);
+        vec4 col1 = texture2D(texture1, texCoord1);
+		vec4 col2 = texture2D(texture2, texCoord2);
+		gl_FragColor = col1 * col2 * 3.0;
+    }`;			
 	
+CL3D.Renderer.prototype.fs_shader_lightmapcombine_gouraud = GLSL`
+	#version 100
+	precision mediump float;
+
+	uniform sampler2D texture1;
+	uniform sampler2D texture2;
+
+	varying vec4 v_color;
+    varying vec2 v_texCoord1;
+	varying vec2 v_texCoord2;
+
+    void main()
+    {
+        vec2 texCoord1 = vec2(v_texCoord1.s, v_texCoord1.t);
+		vec2 texCoord2 = vec2(v_texCoord2.s, v_texCoord2.t);
+        vec4 col1 = texture2D(texture1, texCoord1);
+		vec4 col2 = texture2D(texture2, texCoord2);
+		vec4 final = col1 * col2 * v_color * 4.0;
+		gl_FragColor = vec4(final.x, final.y, final.z, col1.w);
+    }`;
+	
+CL3D.Renderer.prototype.fs_shader_normalmapped = GLSL`
+	#version 100
+	precision mediump float;
+
+	uniform sampler2D texture1;
+	uniform sampler2D texture2;
+
+    varying vec2 v_texCoord1;
+	varying vec2 v_texCoord2;
+	varying vec3 v_lightVector[4];
+	varying vec3 v_lightColor[4];
+	varying vec3 ambientLight;
+
+    void main()
+    {
+		vec4 colorMapSample = texture2D(texture1, v_texCoord1);
+		vec3 normalMapVector = texture2D(texture2, v_texCoord1).xyz;
+		//normalMapVector -= vec3(0.5, 0.5, 0.5);
+		//normalMapVector = normalize(normalMapVector);
+		normalMapVector *= vec3(2.0, 2.0, 2.0);
+		normalMapVector -= vec3(1.0, 1.0, 1.0);
+
+		vec3 totallight = vec3(0.0, 0.0, 0.0);
+		for(int i=0; i<4; ++i)
+		{
+			// process light
+			//vec3 lightvect = v_lightVector[i] + vec3(-0.5, -0.5, -0.5);
+			vec3 lightvect = (v_lightVector[i] * vec3(2.0, 2.0, 2.0)) - vec3(1.0, 1.0, 1.0);
+			lightvect = normalize(lightvect);
+			float luminance = dot(lightvect, normalMapVector); // normal DOT light
+			luminance = clamp(luminance, 0.0, 1.0);	// clamp result to positive numbers
+			lightvect = luminance * v_lightColor[i];	// luminance * light color
+			
+			// add to previously calculated lights
+			totallight = totallight + lightvect;
+		}
+
+		totallight = totallight + ambientLight;
+		// 0.25 because of new modulatex4 mode
+		gl_FragColor = colorMapSample * 0.25 * vec4(totallight.x, totallight.y, totallight.z, 0.0) * 4.0;
+    }`;
+	
+CL3D.Renderer.prototype.fs_shader_vertex_alpha_two_textureblend	= GLSL`
+	#version 100
+	precision mediump float;
+
+	uniform sampler2D texture1;
+	uniform sampler2D texture2;
+
+	varying vec4 v_color;
+    varying vec2 v_texCoord1;
+	varying vec2 v_texCoord2;
+
+    void main()
+    {
+        vec2 texCoord = vec2(v_texCoord1.s, v_texCoord1.t);
+		vec4 color1 = texture2D(texture1, texCoord);
+		vec4 color2 = texture2D(texture2, texCoord);
+		color1 = ((1.0 - v_color.w) * color1) + (v_color.w * color2);	// interpolate texture colors based on vertex alpha
+		gl_FragColor = color1 * v_color * 4.0;
+    }`;
+
 // ----------------------------------------------------------------------------
 // Same shaders as above, but with fog
 // ----------------------------------------------------------------------------
@@ -3289,325 +3333,341 @@ CL3D.Renderer.prototype.fs_shader_vertex_alpha_two_textureblend	 = "	\
 //   fog = exp2(-gl_Fog.density * gl_FogFragCoord * LOG2E);
 // Exponantial squared fog:
 //   fog = exp2(-gl_Fog.density * gl_Fog.density * gl_FogFragCoord * gl_FogFragCoord * LOG2E);
-CL3D.Renderer.prototype.fs_shader_onlyfirsttexture_gouraud_fog	 = "	\
-	uniform sampler2D texture1;									\
-	uniform sampler2D texture2;									\
-	uniform vec4 fogColor;										\
-	uniform float fogDensity;									\
-																\
-	varying vec4 v_color;										\
-    varying vec2 v_texCoord1;									\
-	varying vec2 v_texCoord2;									\
-																\
-    void main()													\
-    {															\
-        vec2 texCoord = vec2(v_texCoord1.s, v_texCoord1.t);		\
-		vec4 tmpFragColor = texture2D(texture1, texCoord) * v_color;							\
-		float z = gl_FragCoord.z / gl_FragCoord.w; 												\n\
-		float fogFactor = clamp(exp2( -fogDensity * z * 1.442695), 0.0, 1.0); 	\n\
-		gl_FragColor = mix(fogColor, tmpFragColor * 4.0, fogFactor);									\n\
-		gl_FragColor.a = tmpFragColor.a;														\n\
-    }																							\
-	";		
-	
-// see fs_shader_onlyfirsttexture_gouraud_fog for details
-CL3D.Renderer.prototype.fs_shader_lightmapcombine_fog = "				\
-	uniform sampler2D texture1;									\
-	uniform sampler2D texture2;									\
-	uniform vec4 fogColor;										\
-	uniform float fogDensity;									\
-																\
-    varying vec2 v_texCoord1;									\
-	varying vec2 v_texCoord2;									\
-																\
-    void main()													\
-    {															\
-        vec2 texCoord1 = vec2(v_texCoord1.s, v_texCoord1.t);	\
-		vec2 texCoord2 = vec2(v_texCoord2.s, v_texCoord2.t);	\
-        vec4 col1 = texture2D(texture1, texCoord1);				\
-		vec4 col2 = texture2D(texture2, texCoord2);				\
-		vec4 tmpFragColor = col1 * col2;					\
-		float z = gl_FragCoord.z / gl_FragCoord.w; 												\n\
-		float fogFactor = clamp(exp2( -fogDensity * z * 1.442695), 0.0, 1.0); 	\n\
-		gl_FragColor = mix(fogColor, tmpFragColor * 4.0, fogFactor);									\n\
-		gl_FragColor.a = tmpFragColor.a;														\n\
-    }															\
-	";	
-	
-CL3D.Renderer.prototype.fs_shader_onlyfirsttexture_gouraud_alpharef_fog	= "		\
-	uniform sampler2D texture1;									\
-	uniform vec4 fogColor;										\
-	uniform float fogDensity;									\
-																\
-	varying vec4 v_color;										\
-    varying vec2 v_texCoord1;									\
-																\
-    void main()													\
-    {															\
-        vec2 texCoord = vec2(v_texCoord1.s, v_texCoord1.t);		\
-		vec4 tmpFragColor = texture2D(texture1, texCoord) * v_color;							\
-		if(tmpFragColor.a < 0.5)								\
-			discard;											\
-		float z = gl_FragCoord.z / gl_FragCoord.w; 												\n\
-		float fogFactor = clamp(exp2( -fogDensity * z * 1.442695), 0.0, 1.0); 	\n\
-		gl_FragColor = mix(fogColor, tmpFragColor * 4.0, fogFactor);									\n\
-		gl_FragColor.a = tmpFragColor.a;														\n\
-    }															\
-	";
+CL3D.Renderer.prototype.fs_shader_onlyfirsttexture_gouraud_fog = GLSL`
+	#version 100
+	precision mediump float;
 
-CL3D.Renderer.prototype.fs_shader_lightmapcombine_m4_fog = "		\
-	uniform sampler2D texture1;									\
-	uniform sampler2D texture2;									\
-	uniform vec4 fogColor;										\
-	uniform float fogDensity;									\
-																\
-    varying vec2 v_texCoord1;									\
-	varying vec2 v_texCoord2;									\
-																\
-    void main()													\
-    {															\
-        vec2 texCoord1 = vec2(v_texCoord1.s, v_texCoord1.t);	\
-		vec2 texCoord2 = vec2(v_texCoord2.s, v_texCoord2.t);	\
-        vec4 col1 = texture2D(texture1, texCoord1);				\
-		vec4 col2 = texture2D(texture2, texCoord2);				\
-		vec4 tmpFragColor = col1 * col2 * 3.0;							\
-		float z = gl_FragCoord.z / gl_FragCoord.w; 												\n\
-		float fogFactor = clamp(exp2( -fogDensity * z * 1.442695), 0.0, 1.0); 	\n\
-		gl_FragColor = mix(fogColor, tmpFragColor * 4.0, fogFactor);									\n\
-		gl_FragColor.a = tmpFragColor.a;														\n\
-    }															\
-	";			
+	uniform sampler2D texture1;
+	uniform sampler2D texture2;
+	uniform vec4 fogColor;
+	uniform float fogDensity;
+
+	varying vec4 v_color;
+    varying vec2 v_texCoord1;
+	varying vec2 v_texCoord2;
+
+    void main()
+    {
+        vec2 texCoord = vec2(v_texCoord1.s, v_texCoord1.t);
+		vec4 tmpFragColor = texture2D(texture1, texCoord) * v_color;
+		float z = gl_FragCoord.z / gl_FragCoord.w;
+		float fogFactor = clamp(exp2( -fogDensity * z * 1.442695), 0.0, 1.0);
+		gl_FragColor = mix(fogColor, tmpFragColor * 4.0, fogFactor);
+		gl_FragColor.a = tmpFragColor.a;
+    }`;
+
+// see fs_shader_onlyfirsttexture_gouraud_fog for details
+CL3D.Renderer.prototype.fs_shader_lightmapcombine_fog = GLSL`
+	#version 100
+	precision mediump float;
+
+	uniform sampler2D texture1;
+	uniform sampler2D texture2;
+	uniform vec4 fogColor;
+	uniform float fogDensity;
+
+    varying vec2 v_texCoord1;
+	varying vec2 v_texCoord2;
+
+    void main()
+    {
+        vec2 texCoord1 = vec2(v_texCoord1.s, v_texCoord1.t);
+		vec2 texCoord2 = vec2(v_texCoord2.s, v_texCoord2.t);
+        vec4 col1 = texture2D(texture1, texCoord1);
+		vec4 col2 = texture2D(texture2, texCoord2);
+		vec4 tmpFragColor = col1 * col2;
+		float z = gl_FragCoord.z / gl_FragCoord.w;
+		float fogFactor = clamp(exp2( -fogDensity * z * 1.442695), 0.0, 1.0);
+		gl_FragColor = mix(fogColor, tmpFragColor * 4.0, fogFactor);
+		gl_FragColor.a = tmpFragColor.a;
+    }`;
+
+CL3D.Renderer.prototype.fs_shader_onlyfirsttexture_gouraud_alpharef_fog	= GLSL`
+	#version 100
+	precision mediump float;
+
+	uniform sampler2D texture1;
+	uniform vec4 fogColor;
+	uniform float fogDensity;
+
+	varying vec4 v_color;
+    varying vec2 v_texCoord1;
+
+    void main()
+    {
+        vec2 texCoord = vec2(v_texCoord1.s, v_texCoord1.t);
+		vec4 tmpFragColor = texture2D(texture1, texCoord) * v_color;
+		if(tmpFragColor.a < 0.5)
+			discard;
+		float z = gl_FragCoord.z / gl_FragCoord.w;
+		float fogFactor = clamp(exp2( -fogDensity * z * 1.442695), 0.0, 1.0);
+		gl_FragColor = mix(fogColor, tmpFragColor * 4.0, fogFactor);
+		gl_FragColor.a = tmpFragColor.a;
+    }`;
+
+CL3D.Renderer.prototype.fs_shader_lightmapcombine_m4_fog = GLSL`
+	#version 100
+	precision mediump float;
+
+	uniform sampler2D texture1;
+	uniform sampler2D texture2;
+	uniform vec4 fogColor;
+	uniform float fogDensity;
+
+    varying vec2 v_texCoord1;
+	varying vec2 v_texCoord2;
+
+    void main()
+    {
+        vec2 texCoord1 = vec2(v_texCoord1.s, v_texCoord1.t);
+		vec2 texCoord2 = vec2(v_texCoord2.s, v_texCoord2.t);
+        vec4 col1 = texture2D(texture1, texCoord1);
+		vec4 col2 = texture2D(texture2, texCoord2);
+		vec4 tmpFragColor = col1 * col2 * 3.0;
+		float z = gl_FragCoord.z / gl_FragCoord.w;
+		float fogFactor = clamp(exp2( -fogDensity * z * 1.442695), 0.0, 1.0);
+		gl_FragColor = mix(fogColor, tmpFragColor * 4.0, fogFactor);
+		gl_FragColor.a = tmpFragColor.a;
+    }`;		
 	
-CL3D.Renderer.prototype.fs_shader_vertex_alpha_two_textureblend_fog	 = "	\
-	uniform sampler2D texture1;									\
-	uniform sampler2D texture2;									\
-	uniform vec4 fogColor;										\
-	uniform float fogDensity;									\
-																\
-	varying vec4 v_color;										\
-    varying vec2 v_texCoord1;									\
-	varying vec2 v_texCoord2;									\
-																\
-    void main()													\
-    {															\
-        vec2 texCoord = vec2(v_texCoord1.s, v_texCoord1.t);		\
-		vec4 color1 = texture2D(texture1, texCoord);			\
-		vec4 color2 = texture2D(texture2, texCoord);			\
-		color1 = ((1.0 - v_color.w) * color1) + (v_color.w * color2);	// interpolate texture colors based on vertex alpha	 \n\
-		vec4 tmpFragColor = color1 * v_color;							\
-		float z = gl_FragCoord.z / gl_FragCoord.w; 												\n\
-		float fogFactor = clamp(exp2( -fogDensity * z * 1.442695), 0.0, 1.0); 	\n\
-		gl_FragColor = mix(fogColor, tmpFragColor * 4.0, fogFactor);									\n\
-		gl_FragColor.a = tmpFragColor.a;														\n\
-    }															\
-	";	
+CL3D.Renderer.prototype.fs_shader_vertex_alpha_two_textureblend_fog	= GLSL`
+	#version 100
+	precision mediump float;
+
+	uniform sampler2D texture1;
+	uniform sampler2D texture2;
+	uniform vec4 fogColor;
+	uniform float fogDensity;
+
+	varying vec4 v_color;
+    varying vec2 v_texCoord1;
+	varying vec2 v_texCoord2;
+
+    void main()
+    {
+        vec2 texCoord = vec2(v_texCoord1.s, v_texCoord1.t);
+		vec4 color1 = texture2D(texture1, texCoord);
+		vec4 color2 = texture2D(texture2, texCoord);
+		color1 = ((1.0 - v_color.w) * color1) + (v_color.w * color2);	// interpolate texture colors based on vertex alpha
+		vec4 tmpFragColor = color1 * v_color;
+		float z = gl_FragCoord.z / gl_FragCoord.w;
+		float fogFactor = clamp(exp2( -fogDensity * z * 1.442695), 0.0, 1.0);
+		gl_FragColor = mix(fogColor, tmpFragColor * 4.0, fogFactor);
+		gl_FragColor.a = tmpFragColor.a;
+    }`;
 	
-CL3D.Renderer.prototype.fs_shader_lightmapcombine_gouraud_fog = "	\
-	uniform sampler2D texture1;									\
-	uniform sampler2D texture2;									\
-	uniform vec4 fogColor;										\
-	uniform float fogDensity;									\
-																\
-	varying vec4 v_color;										\
-    varying vec2 v_texCoord1;									\
-	varying vec2 v_texCoord2;									\
-																\
-    void main()													\
-    {															\
-        vec2 texCoord1 = vec2(v_texCoord1.s, v_texCoord1.t);	\
-		vec2 texCoord2 = vec2(v_texCoord2.s, v_texCoord2.t);	\
-        vec4 col1 = texture2D(texture1, texCoord1);				\
-		vec4 col2 = texture2D(texture2, texCoord2);				\
-		vec4 final = col1 * col2 * v_color;						\
-		vec4 tmpFragColor = vec4(final.x, final.y, final.z, col1.w);							\
-		float z = gl_FragCoord.z / gl_FragCoord.w; 												\n\
-		float fogFactor = clamp(exp2( -fogDensity * z * 1.442695), 0.0, 1.0); 	\n\
-		gl_FragColor = mix(fogColor, tmpFragColor * 4.0, fogFactor);									\n\
-		gl_FragColor.a = tmpFragColor.a;														\n\
-    }															\
-	";	
-	
-	
+CL3D.Renderer.prototype.fs_shader_lightmapcombine_gouraud_fog = GLSL`
+	#version 100
+	precision mediump float;
+
+	uniform sampler2D texture1;
+	uniform sampler2D texture2;
+	uniform vec4 fogColor;
+	uniform float fogDensity;
+
+	varying vec4 v_color;
+    varying vec2 v_texCoord1;
+	varying vec2 v_texCoord2;
+
+    void main()
+    {
+        vec2 texCoord1 = vec2(v_texCoord1.s, v_texCoord1.t);
+		vec2 texCoord2 = vec2(v_texCoord2.s, v_texCoord2.t);
+        vec4 col1 = texture2D(texture1, texCoord1);
+		vec4 col2 = texture2D(texture2, texCoord2);
+		vec4 final = col1 * col2 * v_color;
+		vec4 tmpFragColor = vec4(final.x, final.y, final.z, col1.w);
+		float z = gl_FragCoord.z / gl_FragCoord.w;
+		float fogFactor = clamp(exp2( -fogDensity * z * 1.442695), 0.0, 1.0);
+		gl_FragColor = mix(fogColor, tmpFragColor * 4.0, fogFactor);
+		gl_FragColor.a = tmpFragColor.a;
+    }`;
 	
 // ----------------------------------------------------------------------------
 // Shadow map related shaders
 // ----------------------------------------------------------------------------
 
 // normal 3d world 3d transformation shader for drawing depth into a shadow map texture
-CL3D.Renderer.prototype.vs_shader_normaltransform_for_shadowmap = "		\
-	precision highp float;										\n\
-																\n\
-	uniform mat4 worldviewproj;									\
-	attribute vec4 vPosition;									\
-																\
-    void main()													\
-    {															\
-        gl_Position = worldviewproj * vPosition;				\
-    }															\
-	";
+CL3D.Renderer.prototype.vs_shader_normaltransform_for_shadowmap = GLSL`
+	#version 100
+	precision highp float;
+
+	uniform mat4 worldviewproj;
+	attribute vec4 vPosition;
+
+    void main()
+    {
+        gl_Position = worldviewproj * vPosition;
+    }`;
 	
-CL3D.Renderer.prototype.fs_shader_draw_depth_shadowmap_depth = "		\
-	precision highp float;										\n\
-																\n\
-    void main()													\
-    {															\
-		gl_FragColor = vec4(gl_FragCoord.z);					\n\
-    }															\
-	";	
+CL3D.Renderer.prototype.fs_shader_draw_depth_shadowmap_depth = GLSL`
+	#version 100
+	precision highp float;
+
+    void main()
+    {
+		gl_FragColor = vec4(gl_FragCoord.z);
+	}`;
 	
 // like vs_shader_normaltransform_for_shadowmap but for alpha ref materials
-CL3D.Renderer.prototype.vs_shader_normaltransform_alpharef_for_shadowmap = "		\
-	precision highp float;										\n\
-																\n\
-	uniform mat4 worldviewproj;									\
-	attribute vec4 vPosition;									\
-	attribute vec2 vTexCoord1;									\
-																\
-	varying vec2 v_texCoord1;									\
-																\
-    void main()													\
-    {															\
-		v_texCoord1 = vTexCoord1.st;							\
-        gl_Position = worldviewproj * vPosition;				\
-    }															\
-	";
+CL3D.Renderer.prototype.vs_shader_normaltransform_alpharef_for_shadowmap = GLSL`
+	#version 100
+	precision highp float;
+	
+	uniform mat4 worldviewproj;
+	attribute vec4 vPosition;
+	attribute vec2 vTexCoord1;
+
+	varying vec2 v_texCoord1;
+
+    void main()
+    {
+		v_texCoord1 = vTexCoord1.st;
+        gl_Position = worldviewproj * vPosition;
+    }`;
 	
 // like vs_shader_normaltransform_alpharef_for_shadowmap but with moving grass
-CL3D.Renderer.prototype.vs_shader_normaltransform_alpharef_moving_grass_for_shadowmap = "		\
-	precision highp float;										\n\
-																\n\
-	uniform mat4 worldviewproj;									\
-	attribute vec4 vPosition;									\
-	attribute vec2 vTexCoord1;									\
-	uniform float grassMovement;								\n\
-	uniform float windStrength;									\n\
-	uniform mat4 worldtransform;								\n\
-																\
-	varying vec2 v_texCoord1;									\
-																\
-    void main()													\
-    {															\
-		vec4 grasspos = vPosition;							\
-		grasspos.x += sin(grassMovement + ((worldtransform[3].x + vPosition.x) / 10.0)) * (1.0 - vTexCoord1.y) * windStrength;	\
-        gl_Position = worldviewproj * grasspos;					\
-		v_texCoord1 = vTexCoord1.st;							\
-    }															\
-	";	
+CL3D.Renderer.prototype.vs_shader_normaltransform_alpharef_moving_grass_for_shadowmap = GLSL`
+	#version 100
+	precision highp float;
+
+	uniform mat4 worldviewproj;
+	attribute vec4 vPosition;
+	attribute vec2 vTexCoord1;
+	uniform float grassMovement;
+	uniform float windStrength;
+	uniform mat4 worldtransform;
+
+	varying vec2 v_texCoord1;
+
+    void main()
+    {
+		vec4 grasspos = vPosition;
+		grasspos.x += sin(grassMovement + ((worldtransform[3].x + vPosition.x) / 10.0)) * (1.0 - vTexCoord1.y) * windStrength;
+        gl_Position = worldviewproj * grasspos;
+		v_texCoord1 = vTexCoord1.st;
+	}`;
 	
 // like fs_shader_draw_depth_shadowmap_depth but for alpha ref materials
-CL3D.Renderer.prototype.fs_shader_alpharef_draw_depth_shadowmap_depth = "		\
-	precision highp float;										\n\
-	varying vec2 v_texCoord1;									\
-	uniform sampler2D texture1;									\
-																\n\
-    void main()													\
-    {															\
-		vec2 texCoord = vec2(v_texCoord1.s, v_texCoord1.t);		\
-		vec4 diffuseColor = texture2D(texture1, texCoord);		\
-		if (diffuseColor.a < 0.5) discard;						\
-		gl_FragColor = vec4(gl_FragCoord.z);					\n\
-    }															\
-	";	
+CL3D.Renderer.prototype.fs_shader_alpharef_draw_depth_shadowmap_depth = GLSL`
+	#version 100
+	precision highp float;
+
+	varying vec2 v_texCoord1;
+	uniform sampler2D texture1;
+
+    void main()
+    {
+		vec2 texCoord = vec2(v_texCoord1.s, v_texCoord1.t);
+		vec4 diffuseColor = texture2D(texture1, texCoord);
+		if (diffuseColor.a < 0.5) discard;
+		gl_FragColor = vec4(gl_FragCoord.z);
+	}`;
 	
 // we only need to write gl_FragCoord.z for float rtt, but dont 
 // use those and pack this into rgba in case we have no floating point support: 
-CL3D.Renderer.prototype.fs_shader_draw_depth_shadowmap_rgbapack = "		\
-	precision highp float;										\n\
-																\n\
-    void main()													\
-    {															\
-		 const vec4 bitShift = vec4(1.0, 256.0, 256.0*256.0, 256.0*256.0*256.0); \n\
-		 const vec4 bitMask = vec4(1.0/256.0, 1.0/256.0, 1.0/256.0, 0.0); \n\
-		 vec4 rgbavalue = fract(gl_FragCoord.z * bitShift);	\n\
-		 rgbavalue -= rgbavalue.gbaa * bitMask;				\n\
-		 gl_FragColor = rgbavalue;	\n\
-    }															\
-	";
+CL3D.Renderer.prototype.fs_shader_draw_depth_shadowmap_rgbapack = GLSL`
+	#version 100
+	precision highp float;
+
+    void main()
+    {
+		 const vec4 bitShift = vec4(1.0, 256.0, 256.0*256.0, 256.0*256.0*256.0);
+		 const vec4 bitMask = vec4(1.0/256.0, 1.0/256.0, 1.0/256.0, 0.0);
+		 vec4 rgbavalue = fract(gl_FragCoord.z * bitShift);
+		 rgbavalue -= rgbavalue.gbaa * bitMask;
+		 gl_FragColor = rgbavalue;
+    }`;
 
 // normal transformation and lighting of an object (like vs_shader_normaltransform_with_light)
 // with additional computation of the lookup coordinate in the rendered shadow map.
-CL3D.Renderer.prototype.vs_shader_normaltransform_with_shadowmap_lookup = "		\
-	precision highp float;										\n\
-																\n\
-	uniform mat4 worldviewproj;									\n\
-	uniform mat4 worldviewprojLight; 							\n\
-	uniform mat4 worldviewprojLight2; 							\n\
-	uniform vec4 arrLightPositions[4];							\n\
-	uniform vec4 arrLightColors[5]; 							\n\
-	uniform vec3 vecDirLight; 									\n\
-	uniform vec4 colorDirLight; 								\n\
-																\
-	attribute vec4 vPosition;									\
-    attribute vec4 vNormal;										\
-	attribute vec4 vColor;										\
-    attribute vec2 vTexCoord1;									\
-	attribute vec2 vTexCoord2;									\
-																\
-	varying vec4 v_color;										\
-    varying vec2 v_texCoord1;									\
-	varying float v_backfaceValue;								\
-	varying vec4 v_posFromLight;	 // position on shadow map	\n\
-	varying vec4 v_posFromLight2;	 // position on 2nd shadow map	\n\
-																\
-    void main()													\
-    {															\
-        gl_Position = worldviewproj * vPosition;				\
-        v_texCoord1 = vTexCoord1.st;							\
-																\n\
-		// Calculate position on shadow map						\n\
-		v_posFromLight = worldviewprojLight * vPosition;		\
-		v_posFromLight2 = worldviewprojLight2 * vPosition;		"
-		+ CL3D.Renderer.prototype.vs_shader_light_part + 		
-	"	currentLight = currentLight * vec4(vColor.x, vColor.y, vColor.z, 1.0);	\
-		v_color = min(currentLight * 4.0, vec4(1.0,1.0,1.0,1.0));		\
-		v_color.a = vColor.a;	// preserve vertex alpha 		\n\
-    }															\
-	";
+CL3D.Renderer.prototype.vs_shader_normaltransform_with_shadowmap_lookup = GLSL`
+	#version 100
+	precision highp float;
+
+	uniform mat4 worldviewproj;
+	uniform mat4 worldviewprojLight;
+	uniform mat4 worldviewprojLight2;
+	uniform vec4 arrLightPositions[4];
+	uniform vec4 arrLightColors[5];
+	uniform vec3 vecDirLight;
+	uniform vec4 colorDirLight;
+
+	attribute vec4 vPosition;
+    attribute vec4 vNormal;
+	attribute vec4 vColor;
+    attribute vec2 vTexCoord1;
+	attribute vec2 vTexCoord2;
+	
+	varying vec4 v_color;
+    varying vec2 v_texCoord1;
+	varying float v_backfaceValue;
+	varying vec4 v_posFromLight;	 // position on shadow map
+	varying vec4 v_posFromLight2;	 // position on 2nd shadow map
+
+    void main()
+    {
+        gl_Position = worldviewproj * vPosition;
+        v_texCoord1 = vTexCoord1.st;
+
+		// Calculate position on shadow map
+		v_posFromLight = worldviewprojLight * vPosition;
+		v_posFromLight2 = worldviewprojLight2 * vPosition;
+
+		${CL3D.Renderer.prototype.vs_shader_light_part}
+
+		currentLight = currentLight * vec4(vColor.x, vColor.y, vColor.z, 1.0);
+		v_color = min(currentLight * 4.0, vec4(1.0,1.0,1.0,1.0));
+		v_color.a = vColor.a;	// preserve vertex alpha
+    }`;
 	
 // like fs_shader_onlyfirsttexture_gouraud_fog but also with shadow map
-CL3D.Renderer.prototype.fs_shader_onlyfirsttexture_gouraud_fog_shadow_map_rgbpack	 = "	\
-	uniform sampler2D texture1;									\
-	uniform sampler2D shadowmap;								\
-	uniform sampler2D shadowmap2;								\
-	uniform vec4 fogColor;										\
-	uniform float fogDensity;									\
-	uniform float shadowMapBias1;	 							\
-	uniform float shadowMapBias2;	 							\
-	uniform float shadowMapBackFaceBias;						\
-	uniform float shadowOpacity;	 							\
-																\
-	varying vec4 v_color;										\
-    varying vec2 v_texCoord1;									\
-	varying float v_backfaceValue;								\
-	varying vec4 v_posFromLight;								\
-																\
-	float unpackFromRGBA(const in vec4 valuein) {				\
-		const vec4 bitShift = vec4(1.0, 1.0/256.0, 1.0/(256.0*256.0), 1.0/(256.0*256.0*256.0)); \
-		return dot(valuein, bitShift);							\
-	}															\
-																\
-    void main()													\
-    {																			\
-		// diffuse texture														\n\
-		vec4 diffuseColor = texture2D(texture1, v_texCoord1) * v_color;			\n\
-																				\n\
-		// shadow map lookup													\n\
-		float perpDiv = v_posFromLight.w;										\n\
-		vec3 shadowCoord = (v_posFromLight.xyz / perpDiv) * 0.5 + 0.5;			\n\
-		shadowCoord = clamp(shadowCoord, vec3(0.0,0.0,0.0), vec3(1.0,1.0,1.0)); \n\
-		vec4 shadowMapColor = texture2D(shadowmap, shadowCoord.xy);				\n\
-		float shadowDepth = unpackFromRGBA(shadowMapColor);						\n\
-																				\n\
-		float distanceFromLight = shadowCoord.z; 					 			\n\
-		float visibility = 1.0 - (shadowOpacity * step(shadowMapBias1, shadowCoord.z - shadowDepth));	\n\
-																				\n\
-		gl_FragColor = diffuseColor * visibility;								\n\
-		gl_FragColor.a = diffuseColor.a;										\n\
-    }																			\
-	";
+CL3D.Renderer.prototype.fs_shader_onlyfirsttexture_gouraud_fog_shadow_map_rgbpack = GLSL`
+	#version 100
+	precision mediump float;
+
+	uniform sampler2D texture1;
+	uniform sampler2D shadowmap;
+	uniform sampler2D shadowmap2;
+	uniform vec4 fogColor;
+	uniform float fogDensity;
+	uniform float shadowMapBias1;
+	uniform float shadowMapBias2;
+	uniform float shadowMapBackFaceBias;
+	uniform float shadowOpacity;
+
+	varying vec4 v_color;
+    varying vec2 v_texCoord1;
+	varying float v_backfaceValue;
+	varying vec4 v_posFromLight;
+
+	float unpackFromRGBA(const in vec4 valuein) {
+		const vec4 bitShift = vec4(1.0, 1.0/256.0, 1.0/(256.0*256.0), 1.0/(256.0*256.0*256.0));
+		return dot(valuein, bitShift);
+	}
+
+    void main()
+    {
+		// diffuse texture
+		vec4 diffuseColor = texture2D(texture1, v_texCoord1) * v_color;
+
+		// shadow map lookup
+		float perpDiv = v_posFromLight.w;
+		vec3 shadowCoord = (v_posFromLight.xyz / perpDiv) * 0.5 + 0.5;
+		shadowCoord = clamp(shadowCoord, vec3(0.0,0.0,0.0), vec3(1.0,1.0,1.0));
+		vec4 shadowMapColor = texture2D(shadowmap, shadowCoord.xy);
+		float shadowDepth = unpackFromRGBA(shadowMapColor);
+
+		float distanceFromLight = shadowCoord.z;
+		float visibility = 1.0 - (shadowOpacity * step(shadowMapBias1, shadowCoord.z - shadowDepth));
+
+		gl_FragColor = diffuseColor * visibility;
+		gl_FragColor.a = diffuseColor.a;
+	}`;
 	
 // header part for shadow maps above main function. Can be used to add test functions for shadow mapping
-CL3D.Renderer.prototype.fs_shader_shadowmap_header_part = "				";
+CL3D.Renderer.prototype.fs_shader_shadowmap_header_part = GLSL`
+	`;
 
 // reusable part for calculating the shadow color
 // version for testing cascade shadow maps:
@@ -3615,215 +3675,225 @@ if (CL3D.UseShadowCascade)
 {
 	// version with cascade shadow maps
 	
-	CL3D.Renderer.prototype.fs_shader_shadowmap_part = "						\
-			// shadow map 1 lookup														\n\
-			vec3 shadowCoord = (v_posFromLight.xyz / v_posFromLight.w) * 0.5 + 0.5;		\n\
-			float brightnessFactor = 1.0; // when we have shadows, everthing is a bit darker, so compensate for this	\n\
-																						\n\
-			float visibility = 0.0;														\n\
-																						\n\
-			// now decide which map to use												\n\
-			if (v_backfaceValue < shadowMapBackFaceBias)								\n\
-			{																			\n\
-				// backface, no shadow needed there										\n\
-				visibility = 1.0;														\n\
-			}																			\n\
-			else																		\n\
-			// if (shadowCoord.x < 0.0 || shadowCoord.x > 1.0 || shadowCoord.y < 0.0 || shadowCoord.y > 1.0)	\n\
-			// same as:																	\n\
-			if ( ((1.0 - step(1.0, shadowCoord.x)) * (step(0.0, shadowCoord.x)) *		\n\
-				  (1.0 - step(1.0, shadowCoord.y)) * (step(0.0, shadowCoord.y))) < 0.5)	\n\
-			{																			\n\
-				// use shadowmap 2														\n\
-				vec3 shadowCoord2 = (v_posFromLight2.xyz / v_posFromLight2.w) * 0.5 + 0.5;\n\
-				vec4 shadowMapColor = texture2D(shadowmap2, shadowCoord2.xy);				\n\
-				float shadowDepth = shadowMapColor.r;									\n\
-																						\n\
-				visibility = 1.0 - (shadowOpacity * step(shadowMapBias2, shadowCoord2.z - shadowDepth));	\n\
-			}																			\n\
-			else																		\n\
-			{																			\n\
-				// use shadowmap 1														\n\
-				vec4 shadowMapColor = texture2D(shadowmap, shadowCoord.xy);				\n\
-				float shadowDepth = shadowMapColor.r;									\n\
-																						\n\
-				visibility = 1.0 - (shadowOpacity * step(shadowMapBias1, shadowCoord.z - shadowDepth));	\n\
-			}																			\n\
-																						\n\
-			vec4 colorWithShadow = diffuseColor * visibility * brightnessFactor;		\n\
-			";	
+	CL3D.Renderer.prototype.fs_shader_shadowmap_part = GLSL`
+		// shadow map 1 lookup
+		vec3 shadowCoord = (v_posFromLight.xyz / v_posFromLight.w) * 0.5 + 0.5;
+		float brightnessFactor = 1.0; // when we have shadows, everthing is a bit darker, so compensate for this
+
+		float visibility = 0.0;
+
+		// now decide which map to use
+		if (v_backfaceValue < shadowMapBackFaceBias)
+		{
+			// backface, no shadow needed there
+			visibility = 1.0;
+		}
+		else
+		// if (shadowCoord.x < 0.0 || shadowCoord.x > 1.0 || shadowCoord.y < 0.0 || shadowCoord.y > 1.0)
+		// same as:
+		if ( ((1.0 - step(1.0, shadowCoord.x)) * (step(0.0, shadowCoord.x)) *
+				(1.0 - step(1.0, shadowCoord.y)) * (step(0.0, shadowCoord.y))) < 0.5)
+		{
+			// use shadowmap 2
+			vec3 shadowCoord2 = (v_posFromLight2.xyz / v_posFromLight2.w) * 0.5 + 0.5;
+			vec4 shadowMapColor = texture2D(shadowmap2, shadowCoord2.xy);
+			float shadowDepth = shadowMapColor.r;
+
+			visibility = 1.0 - (shadowOpacity * step(shadowMapBias2, shadowCoord2.z - shadowDepth));
+		}
+		else
+		{
+			// use shadowmap 1
+			vec4 shadowMapColor = texture2D(shadowmap, shadowCoord.xy);
+			float shadowDepth = shadowMapColor.r;
+
+			visibility = 1.0 - (shadowOpacity * step(shadowMapBias1, shadowCoord.z - shadowDepth));
+		}
+
+		vec4 colorWithShadow = diffuseColor * visibility * brightnessFactor;
+		`;
 }
 else
 {
 	// version without cascade shadow maps 
 	
-	CL3D.Renderer.prototype.fs_shader_shadowmap_part = "						\
-			// shadow map lookup													\n\
-			vec3 shadowCoord = (v_posFromLight.xyz / v_posFromLight.w) * 0.5 + 0.5;			\n\
-			vec4 shadowMapColor = texture2D(shadowmap, shadowCoord.xy);				\n\
-			float shadowDepth = shadowMapColor.r;									\n\
-																					\n\
-			float distanceFromLight = shadowCoord.z; 								\n\
-			float visibility = 1.0 - (shadowOpacity * step(shadowMapBias1, shadowCoord.z - shadowDepth));	\n\
-																					\n\
-			// no shadows outside of shadowmap										\n\
-			// if (shadowCoord.x < 0.0 || shadowCoord.x > 1.0 || shadowCoord.y < 0.0 || shadowCoord.y > 1.0)	\n\
-			// same as:																\n\
-			if ( ((1.0 - step(1.0, shadowCoord.x)) * (step(0.0, shadowCoord.x)) *	\n\
-				  (1.0 - step(1.0, shadowCoord.y)) * (step(0.0, shadowCoord.y))) < 0.5)	\n\
-				visibility = 1.0;													\n\
-																					\n\
-			vec4 colorWithShadow = diffuseColor * visibility * 4.0;						\n\
-			";	
+	CL3D.Renderer.prototype.fs_shader_shadowmap_part = GLSL`
+		// shadow map lookup
+		vec3 shadowCoord = (v_posFromLight.xyz / v_posFromLight.w) * 0.5 + 0.5;
+		vec4 shadowMapColor = texture2D(shadowmap, shadowCoord.xy);
+		float shadowDepth = shadowMapColor.r;
+
+		float distanceFromLight = shadowCoord.z;
+		float visibility = 1.0 - (shadowOpacity * step(shadowMapBias1, shadowCoord.z - shadowDepth));
+
+		// no shadows outside of shadowmap
+		// if (shadowCoord.x < 0.0 || shadowCoord.x > 1.0 || shadowCoord.y < 0.0 || shadowCoord.y > 1.0)
+		// same as:
+		if ( ((1.0 - step(1.0, shadowCoord.x)) * (step(0.0, shadowCoord.x)) *
+				(1.0 - step(1.0, shadowCoord.y)) * (step(0.0, shadowCoord.y))) < 0.5)
+			visibility = 1.0;
+
+		vec4 colorWithShadow = diffuseColor * visibility * 4.0;
+		`;
 }		
 
 // reusable part for mixing fog and shadow
-CL3D.Renderer.prototype.fs_shader_mixdiffusefogandshadow_part = "				\
-		// fog																	\n\
-		float z = gl_FragCoord.z / gl_FragCoord.w; 								\n\
-		float fogFactor = clamp(exp2( -fogDensity * z * 1.442695), 0.0, 1.0); 	\n\
-		colorWithShadow = mix(fogColor, colorWithShadow, fogFactor);			\n\
-																				\n\
-		gl_FragColor = colorWithShadow * 4.0;											\n\
-		gl_FragColor.a = diffuseColor.a;										\n\
-		";	
+CL3D.Renderer.prototype.fs_shader_mixdiffusefogandshadow_part = GLSL`
+	// fog
+	float z = gl_FragCoord.z / gl_FragCoord.w;
+	float fogFactor = clamp(exp2( -fogDensity * z * 1.442695), 0.0, 1.0);
+	colorWithShadow = mix(fogColor, colorWithShadow, fogFactor);
+
+	gl_FragColor = colorWithShadow * 4.0;
+	gl_FragColor.a = diffuseColor.a;
+	`;
 		
 	
 // Like fs_shader_onlyfirsttexture_gouraud_fog_shadow_map_rgbpack but with floating point tests
-CL3D.Renderer.prototype.fs_shader_onlyfirsttexture_gouraud_fog_shadow_map	 = "	\
-	uniform sampler2D texture1;									\
-	uniform sampler2D shadowmap;								\
-	uniform sampler2D shadowmap2;								\
-	uniform vec4 fogColor;										\
-	uniform float fogDensity;									\
-	uniform float shadowMapBias1;								\
-	uniform float shadowMapBias2;								\
-	uniform float shadowMapBackFaceBias;						\
-	uniform float shadowOpacity;	 							\
-																\
-	varying vec4 v_color;										\
-    varying vec2 v_texCoord1;									\
-	varying float v_backfaceValue;								\
-	varying vec4 v_posFromLight;								\
-	varying vec4 v_posFromLight2;								"
+CL3D.Renderer.prototype.fs_shader_onlyfirsttexture_gouraud_fog_shadow_map = GLSL`
+	#version 100
+	precision mediump float;
+
+	uniform sampler2D texture1;
+	uniform sampler2D shadowmap;
+	uniform sampler2D shadowmap2;
+	uniform vec4 fogColor;
+	uniform float fogDensity;
+	uniform float shadowMapBias1;
+	uniform float shadowMapBias2;
+	uniform float shadowMapBackFaceBias;
+	uniform float shadowOpacity;
+
+	varying vec4 v_color;
+    varying vec2 v_texCoord1;
+	varying float v_backfaceValue;
+	varying vec4 v_posFromLight;
+	varying vec4 v_posFromLight2;
 	
-	+ CL3D.Renderer.prototype.fs_shader_shadowmap_header_part +
-	"															\
-    void main()													\
-    {															\
-		// diffuse texture										\n\
-		vec4 diffuseColor = texture2D(texture1, v_texCoord1) * v_color;		\n\
-																			\n"
-     + CL3D.Renderer.prototype.fs_shader_shadowmap_part 
-	 + CL3D.Renderer.prototype.fs_shader_mixdiffusefogandshadow_part 
-    + " } ";	
+	${CL3D.Renderer.prototype.fs_shader_shadowmap_header_part}
+	
+    void main()
+    {
+		// diffuse texture
+		vec4 diffuseColor = texture2D(texture1, v_texCoord1) * v_color;
+		
+    	${CL3D.Renderer.prototype.fs_shader_shadowmap_part}
+		${CL3D.Renderer.prototype.fs_shader_mixdiffusefogandshadow_part}
+	}`;	
 	
 // like fs_shader_vertex_alpha_two_textureblend_fog but with shadow map support
-CL3D.Renderer.prototype.fs_shader_vertex_alpha_two_textureblend_fog_shadow_map	 = "	\
-	uniform sampler2D texture1;									\
-	uniform sampler2D texture2;									\
-	uniform sampler2D shadowmap;								\
-	uniform sampler2D shadowmap2;								\
-	uniform vec4 fogColor;										\
-	uniform float fogDensity;									\
-	uniform float shadowMapBias1;	 							\
-	uniform float shadowMapBias2;	 							\
-	uniform float shadowMapBackFaceBias;						\
-	uniform float shadowOpacity;								\
-																\
-	varying vec4 v_color;										\
-    varying vec2 v_texCoord1;									\
-	varying vec2 v_texCoord2;									\
-	varying float v_backfaceValue;								\
-	varying vec4 v_posFromLight;								\
-	varying vec4 v_posFromLight2;								"
-	
-	+ CL3D.Renderer.prototype.fs_shader_shadowmap_header_part +
-	"															\
-																\
-    void main()													\
-    {															\
-        vec2 texCoord = vec2(v_texCoord1.s, v_texCoord1.t);		\
-		vec4 color1 = texture2D(texture1, texCoord);			\
-		vec4 color2 = texture2D(texture2, texCoord);			\
-		color1 = ((1.0 - v_color.w) * color1) + (v_color.w * color2);	// interpolate texture colors based on vertex alpha	 \n\
-		vec4 diffuseColor = color1 * v_color;							\
-		\n"
-     + CL3D.Renderer.prototype.fs_shader_shadowmap_part	
-	 + CL3D.Renderer.prototype.fs_shader_mixdiffusefogandshadow_part 
-    + " } ";	
+CL3D.Renderer.prototype.fs_shader_vertex_alpha_two_textureblend_fog_shadow_map = GLSL`
+	#version 100
+	precision mediump float;
+
+	uniform sampler2D texture1;
+	uniform sampler2D texture2;
+	uniform sampler2D shadowmap;
+	uniform sampler2D shadowmap2;
+	uniform vec4 fogColor;
+	uniform float fogDensity;
+	uniform float shadowMapBias1;
+	uniform float shadowMapBias2;
+	uniform float shadowMapBackFaceBias;
+	uniform float shadowOpacity;
+
+	varying vec4 v_color;
+    varying vec2 v_texCoord1;
+	varying vec2 v_texCoord2;
+	varying float v_backfaceValue;
+	varying vec4 v_posFromLight;
+	varying vec4 v_posFromLight2;
+
+	${CL3D.Renderer.prototype.fs_shader_shadowmap_header_part}
+
+    void main()
+    {
+        vec2 texCoord = vec2(v_texCoord1.s, v_texCoord1.t);
+		vec4 color1 = texture2D(texture1, texCoord);
+		vec4 color2 = texture2D(texture2, texCoord);
+		color1 = ((1.0 - v_color.w) * color1) + (v_color.w * color2);	// interpolate texture colors based on vertex alpha
+		vec4 diffuseColor = color1 * v_color;
+
+    ${CL3D.Renderer.prototype.fs_shader_shadowmap_part}
+	${CL3D.Renderer.prototype.fs_shader_mixdiffusefogandshadow_part}
+	}`;
 	
 // like fs_shader_onlyfirsttexture_gouraud_alpharef_fog but with shadow map support
-CL3D.Renderer.prototype.fs_shader_onlyfirsttexture_gouraud_alpharef_fog_shadow_map	= "		\
-	uniform sampler2D texture1;									\
-	uniform sampler2D shadowmap;								\
-	uniform sampler2D shadowmap2;								\
-	uniform vec4 fogColor;										\
-	uniform float fogDensity;									\
-	uniform float shadowMapBias1;	 							\
-	uniform float shadowMapBias2;	 							\
-	uniform float shadowMapBackFaceBias;						\
-	uniform float shadowOpacity;								\
-																\
-	varying vec4 v_color;										\
-    varying vec2 v_texCoord1;									\
-	varying float v_backfaceValue;								\
-	varying vec4 v_posFromLight;								\
-	varying vec4 v_posFromLight2;								"
-	
-	+ CL3D.Renderer.prototype.fs_shader_shadowmap_header_part +
-	"															\
-																\
-    void main()													\
-    {															\
-        vec2 texCoord = vec2(v_texCoord1.s, v_texCoord1.t);		\
-		vec4 diffuseColor = texture2D(texture1, texCoord) * vec4(v_color.r, v_color.g, v_color.b, 1.0);		\
-		if (diffuseColor.a < 0.5) discard;			"
-		
-	+ CL3D.Renderer.prototype.fs_shader_shadowmap_part
-	 + CL3D.Renderer.prototype.fs_shader_mixdiffusefogandshadow_part 
-    + " } ";	
+CL3D.Renderer.prototype.fs_shader_onlyfirsttexture_gouraud_alpharef_fog_shadow_map = GLSL`
+	#version 100
+	precision mediump float;
 
+	uniform sampler2D texture1;
+	uniform sampler2D shadowmap;
+	uniform sampler2D shadowmap2;
+	uniform vec4 fogColor;
+	uniform float fogDensity;
+	uniform float shadowMapBias1;
+	uniform float shadowMapBias2;
+	uniform float shadowMapBackFaceBias;
+	uniform float shadowOpacity;
+
+	varying vec4 v_color;
+    varying vec2 v_texCoord1;
+	varying float v_backfaceValue;
+	varying vec4 v_posFromLight;
+	varying vec4 v_posFromLight2;
+
+	${CL3D.Renderer.prototype.fs_shader_shadowmap_header_part}
+
+    void main()
+    {
+        vec2 texCoord = vec2(v_texCoord1.s, v_texCoord1.t);
+		vec4 diffuseColor = texture2D(texture1, texCoord) * vec4(v_color.r, v_color.g, v_color.b, 1.0);
+		if (diffuseColor.a < 0.5) discard;
+		
+	${CL3D.Renderer.prototype.fs_shader_shadowmap_part}
+	${CL3D.Renderer.prototype.fs_shader_mixdiffusefogandshadow_part}
+	}`;
 	
 // same as vs_shader_normaltransform_with_light_movegrass but with shadow map loopup
-CL3D.Renderer.prototype.vs_shader_normaltransform_with_light_movegrass_with_shadowmap_lookup = "				\
-	uniform mat4 worldviewproj;									\n\
-	uniform mat4 worldtransform;								\n\
-	uniform mat4 worldviewprojLight; 							\n\
-	uniform mat4 worldviewprojLight2; 							\n\
-	uniform vec4 arrLightPositions[4];							\n\
-	uniform vec4 arrLightColors[5]; 							\n\
-	uniform vec3 vecDirLight; 									\n\
-	uniform vec4 colorDirLight; 								\n\
-	uniform float grassMovement;								\n\
-	uniform float windStrength;									\n\
-																\
-	attribute vec4 vPosition;									\
-    attribute vec4 vNormal;										\
-	attribute vec4 vColor;										\
-    attribute vec2 vTexCoord1;									\
-	attribute vec2 vTexCoord2;									\
-																\
-	varying vec4 v_color;										\
-    varying vec2 v_texCoord1;									\
-	varying vec2 v_texCoord2;									\
-	varying float v_backfaceValue;								\
-	varying vec4 v_posFromLight;	 // position on shadow map	\n\
-	varying vec4 v_posFromLight2;	 // position on 2nd shadow map	\n\
-																\
-    void main()													\
-    {															\
-		vec4 grasspos = vPosition;							\
-		grasspos.x += sin(grassMovement + ((worldtransform[3].x + vPosition.x) / 10.0)) * (1.0 - vTexCoord1.y) * windStrength;	\
-        gl_Position = worldviewproj * grasspos;					\
-        v_texCoord1 = vTexCoord1.st;							\
-		v_texCoord2 = vTexCoord2.st;							\
-		// Calculate position on shadow map						\n\
-		v_posFromLight = worldviewprojLight * vPosition;		\
-		v_posFromLight2 = worldviewprojLight2 * vPosition;		"
-		+ CL3D.Renderer.prototype.vs_shader_light_part + 		
-	"	currentLight = currentLight * vec4(vColor.x, vColor.y, vColor.z, 1.0);	\
-		v_color = min(currentLight * 4.0, vec4(1.0,1.0,1.0,1.0));		\
-		v_color.a = vColor.a;	// preserve vertex alpha \n\
-    }															\
-	";
+CL3D.Renderer.prototype.vs_shader_normaltransform_with_light_movegrass_with_shadowmap_lookup = GLSL`
+	#version 100
+	precision mediump float;
+
+	uniform mat4 worldviewproj;
+	uniform mat4 worldtransform;
+	uniform mat4 worldviewprojLight;
+	uniform mat4 worldviewprojLight2;
+	uniform vec4 arrLightPositions[4];
+	uniform vec4 arrLightColors[5];
+	uniform vec3 vecDirLight;
+	uniform vec4 colorDirLight;
+	uniform float grassMovement;
+	uniform float windStrength;
+
+	attribute vec4 vPosition;
+    attribute vec4 vNormal;
+	attribute vec4 vColor;
+    attribute vec2 vTexCoord1;
+	attribute vec2 vTexCoord2;
+
+	varying vec4 v_color;
+    varying vec2 v_texCoord1;
+	varying vec2 v_texCoord2;
+	varying float v_backfaceValue;
+	varying vec4 v_posFromLight;	 // position on shadow map
+	varying vec4 v_posFromLight2;	 // position on 2nd shadow map
+
+    void main()
+    {
+		vec4 grasspos = vPosition;
+		grasspos.x += sin(grassMovement + ((worldtransform[3].x + vPosition.x) / 10.0)) * (1.0 - vTexCoord1.y) * windStrength;
+        gl_Position = worldviewproj * grasspos;
+        v_texCoord1 = vTexCoord1.st;
+		v_texCoord2 = vTexCoord2.st;
+		// Calculate position on shadow map
+		v_posFromLight = worldviewprojLight * vPosition;
+		v_posFromLight2 = worldviewprojLight2 * vPosition;
+
+		${CL3D.Renderer.prototype.vs_shader_light_part}
+
+		currentLight = currentLight * vec4(vColor.x, vColor.y, vColor.z, 1.0);
+		v_color = min(currentLight * 4.0, vec4(1.0,1.0,1.0,1.0));
+		v_color.a = vColor.a;	// preserve vertex alpha
+	}`;

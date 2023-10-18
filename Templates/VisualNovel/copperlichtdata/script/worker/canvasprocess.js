@@ -1,4 +1,4 @@
-importScripts("../module/library/comlink.js");
+importScripts("../module/dist/comlink.js");
 
 let ctx = self;
 const obj =
