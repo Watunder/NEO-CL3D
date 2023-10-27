@@ -6,7 +6,7 @@ Global.Emitter = mitt();
 Global.Comlink = Comlink;
 Global.Actor = Actor;
 Global.KeyframeProperty = KeyframeProperty;
-Global.Rekapi = Rekapi;
+Global.Rekapi = new Rekapi();;
 
 //
 
@@ -40,6 +40,15 @@ import { YukaManager } from './dist/yuka-cl3d.mjs'
 
 Global.YukaManager = new YukaManager();
 
-import './src/behavior3-cl3d/main.js';
+//
+
+import { factory, engine } from './dist/behavior3-cl3d.mjs';
+
+Global.LuaFactory = factory;
+Global.LuaEngine = engine;
 
 //
+
+import { factory as factory1, engine as engine1 } from './dist/ldtk-cl3d.mjs';
+
+Global.TEST = engine1;

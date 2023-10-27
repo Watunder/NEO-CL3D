@@ -368,14 +368,14 @@ CL3D.CopperLicht.prototype.makeWholePageSize = function()
 	this.MainElement.style.width = w + "px";
 	this.MainElement.style.height = h + "px";
 
-	this.MainElement.setAttribute("width", Math.floor(w * this.DPR));
-	this.MainElement.setAttribute("height", Math.floor(h * this.DPR));
+	this.MainElement.setAttribute("width", w * this.DPR);
+	this.MainElement.setAttribute("height", h * this.DPR);
 
 	this.VideoElement.style.width = w + "px";
 	this.VideoElement.style.height = h + "px";
 
-	this.VideoElement.setAttribute("width", Math.floor(w * this.DPR));
-	this.VideoElement.setAttribute("height", Math.floor(h * this.DPR));
+	this.VideoElement.setAttribute("width", w * this.DPR);
+	this.VideoElement.setAttribute("height", h * this.DPR);
 }
 
 

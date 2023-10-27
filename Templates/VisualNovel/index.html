@@ -67,6 +67,8 @@
 	<script type="text/javascript" src="copperlichtdata/script/jsinflate.js"></script>
 	<script type="text/javascript" src="copperlichtdata/script/publicsymbols.js"></script>
 	<!--Extern-->
+	<script type="text/javascript" src="copperlichtdata/script/externs/filesaver.js"></script>
+	<script type="text/javascript" src="copperlichtdata/script/externs/renderstate.js"></script>
 	<script type="text/javascript" src="copperlichtdata/script/externs/colormatrix.js"></script>
 	<script type="text/javascript" src="copperlichtdata/script/externs/simplemesh.js"></script>
 	<!--WASM-->
@@ -80,9 +82,7 @@
 </head>
 <body>
 	<div align="center">
-		<div id="top" style="position: fixed; left: 0; right: 0; top: 0; bottom: 0; opacity: 0; pointer-events: none;">
-			<canvas id="video"></canvas>
-		</div>
+		<canvas id="video" style="position: fixed; left: 0; right: 0; top: 0; bottom: 0; pointer-events: none; opacity: 0;"></canvas>
 		<canvas id="3darea"></canvas>
 	</div>
 	<script type="text/javascript">
@@ -103,15 +103,6 @@
 		Wasmoon.getFactory = function(env)
 		{
 			return new wasmoon.LuaFactory(undefined, env);
-		}
-
-		Wasmoon.getEngine = function(config = {})
-		{
-			return new wasmoon.LuaFactory().createEngine(
-			{
-				injectObjects: true,
-				...config,
-			});
 		}
 
 		// FMOD
@@ -206,7 +197,7 @@
 			(function fmodLoop()
 			{
 				requestAnimationFrame(fmodLoop);
-			})
+			})();
 
 			return FMOD.OK;
 		};
@@ -254,6 +245,8 @@
 
 		function effekseerMain()
 		{
+			// var canvas = document.getElementById("effect");
+			// var gl = canvas.getContext("webgl2");
 			var gl = CL3D.engine.getRenderer().getWebGL();
 
 			EFK.context = effekseer.createContext();
@@ -272,14 +265,10 @@
 
 			// fast rendering by skipping state fetching.
 			// If there is a problem with the drawing, please set this flag to false.
-			var fastRenderMode = false;
-			if (fastRenderMode)
-				EFK.context.setRestorationOfStatesFlag(false);
+			EFK.context.setRestorationOfStatesFlag(false);
 
-			(function effekseerLoop()
+			CL3D.engine.OnAfterDrawAll = function()
 			{
-    			requestAnimationFrame(effekseerLoop);
-
 				if(EFK.hasOwnProperty('ToonHit'))
 				{
 					if(EFK["ToonHit"].hasOwnProperty('handle'))
@@ -307,7 +296,16 @@
 
 				// Effekseer Rendering
 				EFK.context.draw();
-			})();
+
+				// Viewport Resize
+				// if (EFK.width != canvas.width || EFK.height != canvas.height)
+				// {
+				// 	EFK.width = canvas.width;
+				// 	EFK.height = canvas.height;
+					
+				// 	gl.viewport(0, 0, EFK.width, EFK.height);
+				// }
+			};
 		};
 	</script>
 	<br/>

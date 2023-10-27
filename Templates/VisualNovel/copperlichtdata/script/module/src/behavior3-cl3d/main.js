@@ -1,8 +1,10 @@
 const LUA = String.raw;
 const JSON = String.raw;
 
-const factory = Wasmoon.getFactory();
-const engine = await factory.createEngine();
+export const factory = Wasmoon.getFactory();
+export const engine = await factory.createEngine();
+
+engine.global.set('js_console', console);
 
 await factory.mountFile(`json.lua`,LUA`
 --
