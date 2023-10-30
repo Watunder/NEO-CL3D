@@ -199,7 +199,7 @@ CL3D.ScriptingInterface.prototype.executeCode = function(code)
 {
 	try
 	{
-		eval(code);
+		return eval(code);
 	}
 	catch(err)
 	{
