@@ -51,8 +51,17 @@ CL3D.SimpleMesh.prototype.OnRegisterSceneNode = function(scene)
 {
     if(this.Visible)
     {
-        scene.registerNodeForRendering(this, CL3D.Scene.RENDER_MODE_DEFALUT);
-        CL3D.SceneNode.prototype.OnRegisterSceneNode.call(this, scene);
+        if(this.Parent.Type == "fg")
+        {
+            scene.registerNodeForRendering(this, CL3D.Scene.TRANSPARENT_SOLID_AFTER_ZBUFFER_CLEAR);
+            CL3D.SceneNode.prototype.OnRegisterSceneNode.call(this, scene);
+        }
+        else
+        if(this.Parent.Type == "ui")
+        {
+            scene.registerNodeForRendering(this, CL3D.Scene.RENDER_MODE_2DOVERLAY);
+            CL3D.SceneNode.prototype.OnRegisterSceneNode.call(this, scene);
+        }
     }
 };
 

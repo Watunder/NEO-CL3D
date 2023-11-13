@@ -1,0 +1,214 @@
+[
+    {
+        "character": "NVL Girl",
+        "expression": "idle",
+        "dialogue": "Hello!",
+        "sound": "00001",
+        "event": [
+            {
+                "name": "MOVE",
+                "fg": "0",
+                "t": "300",
+                "x": "0",
+                "y": "5",
+                "z": "5"
+            }
+        ],
+        "branch": []
+    },
+    {
+        "character": "NVL Girl",
+        "expression": "idle",
+        "dialogue": "Why are you so happy?",
+        "sound": "00002",
+        "event": [
+            [
+                {
+                    "name": "MOVE",
+                    "fg": "0",
+                    "t": "150",
+                    "x": "0",
+                    "y": "0",
+                    "z": "0"
+                },
+                {
+                    "name": "MOVE",
+                    "fg": "0",
+                    "t": "150",
+                    "x": "1",
+                    "y": "0",
+                    "z": "0"
+                },
+                {
+                    "name": "MOVE",
+                    "fg": "0",
+                    "t": "150",
+                    "x": "-1",
+                    "y": "0",
+                    "z": "0"
+                },
+                {
+                    "name": "MOVE",
+                    "fg": "0",
+                    "t": "150",
+                    "x": "0",
+                    "y": "0",
+                    "z": "0"
+                }
+            ],
+            [
+                {
+                    "name": "MOVE",
+                    "fg": "1",
+                    "x": "0",
+                    "y": "-1",
+                    "z": "0",
+                    "t": "300"
+                },
+                {
+                    "name": "MOVE",
+                    "fg": "1",
+                    "x": "-25",
+                    "y": "-1",
+                    "z": "25",
+                    "t": "300"
+                }
+            ]
+        ],
+        "branch": []
+    },
+    {
+        "character": "NVL Girl",
+        "expression": "smile",
+        "dialogue": "Vins Chen,My RPG Dialogue system is going to be easy finally!",
+        "sound": "00003",
+        "event": [],
+        "branch": []
+    },
+    {
+        "character": "NVL Girl",
+        "expression": "idle",
+        "dialogue": "Wow man I can't believe it you created that game in coppercube!",
+        "sound": "00004",
+        "event": [
+            {
+                "name": "MOVE",
+                "fg": "1",
+                "x": "0",
+                "y": "-1",
+                "z": "0",
+                "t": "300"
+            },
+            {
+                "name": "MOVE",
+                "fg": "0",
+                "t": "150",
+                "x": "0",
+                "y": "0",
+                "z": "0"
+            },
+            {
+                "name": "MOVE",
+                "fg": "0",
+                "t": "150",
+                "x": "1",
+                "y": "0",
+                "z": "0"
+            },
+            {
+                "name": "MOVE",
+                "fg": "0",
+                "t": "150",
+                "x": "-1",
+                "y": "0",
+                "z": "0"
+            },
+            {
+                "name": "MOVE",
+                "fg": "0",
+                "t": "150",
+                "x": "0",
+                "y": "0",
+                "z": "0"
+            },
+            {
+                "name": "MOVE",
+                "fg": "1",
+                "x": "-25",
+                "y": "-1",
+                "z": "25",
+                "t": "300"
+            }
+        ],
+        "branch": []
+    },
+    {
+        "character": "NVL Girl",
+        "expression": "smile",
+        "dialogue": "Yeah, I am glad that I was able to do it",
+        "sound": "00005",
+        "event": [],
+        "branch": []
+    },
+    {
+        "character": "NVL Girl",
+        "expression": "idle",
+        "dialogue": "You have chosen option A",
+        "sound": "00005",
+        "event": [],
+        "branch": [
+            "积分>=1"
+        ]
+    },
+    {
+        "character": "NVL Girl",
+        "expression": "idle",
+        "dialogue": "You have chosen option B",
+        "sound": "00005",
+        "event": [
+            {
+                "name": "MOVE",
+                "fg": "0",
+                "t": "150",
+                "x": "0",
+                "y": "0",
+                "z": "0"
+            },
+            {
+                "name": "MOVE",
+                "fg": "0",
+                "t": "150",
+                "x": "1",
+                "y": "0",
+                "z": "0"
+            },
+            {
+                "name": "MOVE",
+                "fg": "0",
+                "t": "150",
+                "x": "-1",
+                "y": "0",
+                "z": "0"
+            },
+            {
+                "name": "MOVE",
+                "fg": "0",
+                "t": "150",
+                "x": "0",
+                "y": "0",
+                "z": "0"
+            }
+        ],
+        "branch": [
+            "积分<=1"
+        ]
+    },
+    {
+        "character": "NVL Girl",
+        "expression": "idle",
+        "dialogue": "This is the end",
+        "sound": "00005",
+        "event": [],
+        "branch": []
+    }
+]

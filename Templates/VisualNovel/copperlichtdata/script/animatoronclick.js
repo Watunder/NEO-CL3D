@@ -81,7 +81,7 @@ CL3D.AnimatorOnClick.prototype.animateNode = function(n, timeMs)
  * @private
  */
 CL3D.AnimatorOnClick.prototype.onMouseUp = function(event) 
-{			
+{
 	var n = this.TheObject;
 	if (!n)
 		return false;

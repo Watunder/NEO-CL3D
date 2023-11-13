@@ -6,7 +6,7 @@ Global.Emitter = mitt();
 Global.Comlink = Comlink;
 Global.Actor = Actor;
 Global.KeyframeProperty = KeyframeProperty;
-Global.Rekapi = new Rekapi();;
+Global.Rekapi = new Rekapi();
 
 //
 
@@ -34,21 +34,25 @@ import { CreaturePackage, CreaturePlayer } from './dist/creature-cl3d.mjs';
 Global.CreaturePackage = CreaturePackage;
 Global.CreaturePlayer = CreaturePlayer;
 
-//
+Global.StateIndex = 0;
+Global.StateList = [];
 
-import { YukaManager } from './dist/yuka-cl3d.mjs'
+Global.Emitter.on("set_behavior_state", (behavior) =>
+{
+	Global.StateList[behavior.StateIndex] = behavior.State;
+});
 
-Global.YukaManager = new YukaManager();
+// //not used
 
-//
+// import { YukaManager } from './dist/yuka-cl3d.mjs'
 
-import { factory, engine } from './dist/behavior3-cl3d.mjs';
+// Global.YukaManager = new YukaManager();
 
-Global.LuaFactory = factory;
-Global.LuaEngine = engine;
+// import { factory, engine } from './dist/behavior3-cl3d.mjs';
 
-//
+// Global.LuaFactory = factory;
+// Global.LuaEngine = engine;
 
-import { factory as factory1, engine as engine1 } from './dist/ldtk-cl3d.mjs';
+// import { factory as factory1, engine as engine1 } from './dist/ldtk-cl3d.mjs';
 
-Global.TEST = engine1;
+// Global.TEST = engine1;

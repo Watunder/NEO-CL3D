@@ -1675,11 +1675,11 @@ CL3D.ActionHandler = function(scene)
 /**
  * @private
  */
-CL3D.ActionHandler.prototype.execute = function(node, mgr)
+CL3D.ActionHandler.prototype.execute = function(node, mgr, isCache)
 {
 	for (var i=0; i<this.Actions.length; ++i)
 	{
-		 this.Actions[i].execute(node, this.SMGr);
+		 this.Actions[i].execute(node, this.SMGr, isCache);
 	}
 }
 
