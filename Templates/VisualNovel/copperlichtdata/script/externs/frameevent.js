@@ -32,13 +32,13 @@ CL3D.FrameEvent.prototype._init = function(type)
 	switch (type)
 	{
 		case "seque":
-			me.EVENT_HANDLER = function(){me._runSeque()};
-			break;
+		me.EVENT_HANDLER = function(){me._runSeque()};
+		break;
 
 		case "sync":
-			me.EVENT_HANDLER = function(){me._runSync()};
-			break;
-	};
+		me.EVENT_HANDLER = function(){me._runSync()};
+		break;
+	}
 };
 
 CL3D.FrameEvent.prototype._runSeque = function()
@@ -67,8 +67,8 @@ CL3D.FrameEvent.prototype._runSeque = function()
 				return;
 		}
 		
-		// ccbCallAction(me.context.StoryAction, me.EVENT_ARRAY[me.EVENT_INDEX++]);
-		me.action.Event = me.EVENT_ARRAY[me.EVENT_INDEX++];
+		// ccbCallAction(me.context.StoryAction, me.EVENT_ARRAY[++me.EVENT_INDEX]);
+		me.action.Event = me.EVENT_ARRAY[++me.EVENT_INDEX];
 		me.action.execute();
 	}
 
@@ -100,8 +100,8 @@ CL3D.FrameEvent.prototype._runSync = function()
 	else
 	if (me.behavior.State == "nothing")
 	{
-		// ccbCallAction(me.context.StoryAction, me.EVENT_ARRAY[me.EVENT_INDEX++]);
-		me.action.Event = me.EVENT_ARRAY[me.EVENT_INDEX++];
+		// ccbCallAction(me.context.StoryAction, me.EVENT_ARRAY[++me.EVENT_INDEX]);
+		me.action.Event = me.EVENT_ARRAY[++me.EVENT_INDEX];
 		me.action.execute();
 	}
 	
@@ -157,7 +157,6 @@ CL3D.FrameEvent.prototype.dispatch = function(macro, event)
 	if (event[0].toString() == "[object Object]")
 	{
 		me.EVENT_ARRAY = event;
-		console.log(me.EVENT_ARRAY);
 		ccbRegisterOnFrameEvent(me.EVENT_HANDLER);
 
 		return;

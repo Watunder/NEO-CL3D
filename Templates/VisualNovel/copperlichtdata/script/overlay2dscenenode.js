@@ -406,7 +406,7 @@ CL3D.Overlay2DSceneNode.prototype.createNewTextTexturesIfNecessary = function(re
 		ctx.fillRect(0, 0, canvas.width, canvas.height);
 		ctx.fillStyle = "rgba(255, 255, 255, 1)";
 		ctx.textBaseline = "top";
-		ctx.font = fontStr; 
+		ctx.font = fontStr;
 
 		for (var i=0; i<BrokenText.length; ++i)
 		{

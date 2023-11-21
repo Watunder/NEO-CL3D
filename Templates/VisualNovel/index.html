@@ -72,6 +72,7 @@
 	<!--Extern-->
 	<!-- <script type="text/javascript" src="copperlichtdata/script/externs/renderstate.js"></script> -->
 	<script type="text/javascript" src="copperlichtdata/script/externs/cycle.js"></script>
+	<script type="text/javascript" src="copperlichtdata/script/externs/html2canvas.js"></script>
 	<script type="text/javascript" src="copperlichtdata/script/externs/frameevent.js"></script>
 	<script type="text/javascript" src="copperlichtdata/script/externs/filesaver.js"></script>
 	<script type="text/javascript" src="copperlichtdata/script/externs/colormatrix.js"></script>
@@ -84,10 +85,13 @@
 	<!--Module-->
 	<script type="text/javascript" src="copperlichtdata/script/module/globalnamespace.js"></script>
 	<script type="module" src="copperlichtdata/script/module/global.mjs"></script>
+	<!--CSS-->
+	<link rel="stylesheet" href="copperlichtdata/style/text.css">
 </head>
 <body>
 	<div align="center">
 		<canvas id="video" style="position: fixed; left: 0; right: 0; top: 0; bottom: 0; pointer-events: none; opacity: 0;"></canvas>
+		<div id="text" class="text-box"></div>
 		<canvas id="3darea"></canvas>
 	</div>
 	<script type="text/javascript">
@@ -116,7 +120,7 @@
 
 		function handleFileComplete(event)
 		{
-			tex = new CL3D.Texture();
+			var tex = new CL3D.Texture();
 			tex.Image = event.result;
 			tex.Name = event.item.src;
 
@@ -333,12 +337,36 @@
 
 				// 	gl.viewport(0, 0, EFK.width, EFK.height);
 				// }
+
+				// ScreenShot
+				if (CL3D.Enable_ScreenShot)
+				{
+					html2canvas(document.body)
+					.then((canvas) =>
+					{
+						var base64 = canvas.toDataURL("image/png");
+						var tex = new CL3D.Texture();
+						tex.Name = "ScreenShot";
+						
+						tex.Image = new Image();
+						tex.Image.onload = function()
+						{
+							CL3D.ScriptingInterface.getScriptingInterface().Engine.getTextureManager().addTexture(tex);
+							CL3D.engine.getRenderer().finalizeLoadedImageTexture(tex);
+
+							tex.Loaded = true;
+						}
+						tex.Image.src = base64;
+					});
+
+					CL3D.Enable_ScreenShot = false;
+				}
 			};
 		};
 	</script>
-	<br/>
+	<!-- <br/>
 	<div align="center">
 		<small>Created using <a href="http://www.ambiera.com/coppercube/index.html">CopperCube</a></small>
-	</div>
+	</div> -->
 </body>
 </html>
