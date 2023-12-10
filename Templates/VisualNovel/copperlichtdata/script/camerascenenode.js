@@ -33,7 +33,6 @@ CL3D.CameraSceneNode = function()
 	
 	//this.recalculateProjectionMatrix();
 	//this.recalculateViewArea();
-	this.Projection.buildProjectionMatrixPerspectiveFovLH(this.Fovy, this.Aspect, this.ZNear, this.ZFar);
 }
 CL3D.CameraSceneNode.prototype = new CL3D.SceneNode();
 
@@ -43,6 +42,9 @@ CL3D.CameraSceneNode.prototype = new CL3D.SceneNode();
 CL3D.CameraSceneNode.prototype.recalculateProjectionMatrix = function()
 {
 	this.Projection.buildProjectionMatrixPerspectiveFovLH(this.Fovy, this.Aspect, this.ZNear, this.ZFar);
+	// TODO: 0.05?
+	// this.viewVolume = screen.width / window.innerWidth * 0.05;
+	// this.Projection.buildProjectionMatrixPerspectiveOrthoLH(window.innerWidth * this.viewVolume, window.innerHeight * this.viewVolume, this.ZNear, this.ZFar);
 }
 
 /** 

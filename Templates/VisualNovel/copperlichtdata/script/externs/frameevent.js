@@ -1,11 +1,3 @@
-function flatten(array)
-{
-	while (array.some(item => Array.isArray(item)))
-		array = [].concat(...array);
-
-	return array;
-}
-
 CL3D.FrameEvent = function(context, type = "seque")
 {
 	var me = this;
@@ -176,7 +168,7 @@ CL3D.FrameEvent.prototype.dispatch = function(macro, event)
 			continue;
 		};
 
-		var flat_macroObj = flatten(macro[name]);
+		var flat_macroObj = macro[name].flatAll();
 
 		for (var p = 0; p < flat_macroObj.length; ++p)
 		{
@@ -184,7 +176,7 @@ CL3D.FrameEvent.prototype.dispatch = function(macro, event)
 			
 			for (var c = 0; c < macro[name+"_Param"].length; ++c)
 			{
-				tmp_macroEvent = tmp_macroEvent.replaceAll(macro[name+"_Param"][c], event[i].split(/\s/)[c+1]);
+				tmp_macroEvent = tmp_macroEvent.replaceAll(macro[name+"_Param"][c], event[i].split(/\s/)[c+1].split("=")[1]);
 			}
 			
 			var obj = me.getVariable(tmp_macroEvent);

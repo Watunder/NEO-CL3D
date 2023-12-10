@@ -139,7 +139,7 @@ CL3D.DebugOutput.prototype.printInternal = function(str, force, ashtml)
 	if (this.TextRoot == null)
 	{
 		this.TextRoot = document.createElement("div");
-		this.TextRoot.className = 'cldebug';
+		// this.TextRoot.className = 'cldebug';
 		this.DebugRoot.appendChild(this.TextRoot);
 	}
 	if (ashtml)

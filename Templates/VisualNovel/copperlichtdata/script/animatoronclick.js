@@ -89,6 +89,11 @@ CL3D.AnimatorOnClick.prototype.onMouseUp = function(event)
 	if (!(n.scene === this.SMGr))
 		return false;
 		
+	if (event.button == 2)
+	{
+		return false;
+	}
+
 	var now = CL3D.CLTimer.getTime();
 	
 	if (now - this.engine.LastCameraDragTime < 250)

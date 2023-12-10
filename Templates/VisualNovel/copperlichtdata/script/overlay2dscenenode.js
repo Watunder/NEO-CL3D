@@ -213,6 +213,51 @@ CL3D.Overlay2DSceneNode.prototype.OnRegisterSceneNode = function(mgr)
  */
 CL3D.Overlay2DSceneNode.prototype.render = function(renderer)
 {
+	// ScreenShot
+	if (CL3D.Enable_ScreenShot)
+	{
+		const options =
+		{
+			width: window.innerWidth,
+			height : window.innerHeight,
+			ignoreElements:	(element) =>
+			{
+				if (element.id == "text")
+					return true;
+
+				if (element.id == "debug")
+					return true;
+
+				return false;
+			}
+		};
+
+		html2canvas(document.body, options)
+		.then((canvas) =>
+		{
+			var base64 = canvas.toDataURL("image/png");
+			var tex = new CL3D.Texture();
+			tex.Name = rename("ScreenShot");
+			
+			Global.SaveData.screenshot.name = tex.Name;
+			Global.SaveData.screenshot.base64 = base64;
+
+			tex.Image = new Image();
+			tex.Image.onload = function()
+			{
+				CL3D.ScriptingInterface.getScriptingInterface().Engine.getTextureManager().addTexture(tex);
+				CL3D.engine.getRenderer().finalizeLoadedImageTexture(tex);
+
+				tex.Loaded = true;
+
+				Global.Emitter.emit("pass_screenshot_name", Global.SaveData.screenshot.name);
+			}
+			tex.Image.src = base64;
+		});
+
+		CL3D.Enable_ScreenShot = false;
+	}
+
 	var rctTarget = this.getScreenCoordinatesRect(true, renderer);
 	var rctDrawText = rctTarget;
 	

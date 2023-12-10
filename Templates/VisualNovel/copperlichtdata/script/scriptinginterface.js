@@ -245,7 +245,7 @@ CL3D.ScriptingInterface.prototype.registerExtensionScriptActionHandler = functio
 /**
  * @private
  */
-CL3D.ScriptingInterface.prototype.runDrawCallbacks = function(theRenderer)
+CL3D.ScriptingInterface.prototype.runDrawCallbacks = function(theRenderer, timeMs)
 {
 	this.IsInDrawCallback = true;
 			
@@ -254,7 +254,7 @@ CL3D.ScriptingInterface.prototype.runDrawCallbacks = function(theRenderer)
 		this.TheRenderer = theRenderer;
 		
 		for (var i=0; i<this.ccbRegisteredFunctionArray.length; ++i)
-			this.ccbRegisteredFunctionArray[i](); 
+			this.ccbRegisteredFunctionArray[i](timeMs); 
 		
 		this.TheRenderer = null;
 	}
@@ -1815,6 +1815,23 @@ function ccbPlaySound(name)
 	var snd = sndmgr.getSoundFromSoundName(name, true);
 	if (snd != null)
 		sndmgr.play2D(snd, false, 1.0);
+}
+
+/**
+ * @ignore
+ */
+function ccbGetSoundDuration(name)
+{
+	if (name == "")
+		return 0;
+
+	var sndmgr = CL3D.gSoundManager;
+	var snd = sndmgr.getSoundFromSoundName(name, true);
+	
+	if (snd.audioElem.duration)
+		return snd.audioElem.duration * 1000;
+
+	return 1000;
 }
 
 /**

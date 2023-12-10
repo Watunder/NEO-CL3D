@@ -147,7 +147,28 @@
         "expression": "smile",
         "dialogue": "Yeah, I am glad that I was able to do it",
         "sound": "00005",
-        "event": [],
+        "event": [
+            {
+                "name": "BTN",
+                "index": "0",
+                "text": "A",
+                "x": "0.4",
+                "y": "0.4",
+                "w": "0.1",
+                "h": "0.1",
+                "js": "积分++"
+            },
+            {
+                "name": "BTN",
+                "index": "1",
+                "text": "B",
+                "x": "0.4",
+                "y": "0.6",
+                "w": "0.1",
+                "h": "0.1",
+                "js": "积分--"
+            }
+        ],
         "branch": []
     },
     {
@@ -155,7 +176,40 @@
         "expression": "idle",
         "dialogue": "You have chosen option A",
         "sound": "00005",
-        "event": [],
+        "event": [
+            {
+                "name": "MOVE",
+                "fg": "0",
+                "t": "150",
+                "x": "0",
+                "y": "0",
+                "z": "0"
+            },
+            {
+                "name": "MOVE",
+                "fg": "0",
+                "t": "150",
+                "x": "1",
+                "y": "0",
+                "z": "0"
+            },
+            {
+                "name": "MOVE",
+                "fg": "0",
+                "t": "150",
+                "x": "-1",
+                "y": "0",
+                "z": "0"
+            },
+            {
+                "name": "MOVE",
+                "fg": "0",
+                "t": "150",
+                "x": "0",
+                "y": "0",
+                "z": "0"
+            }
+        ],
         "branch": [
             "积分>=1"
         ]
@@ -200,7 +254,7 @@
             }
         ],
         "branch": [
-            "积分<=1"
+            "积分<1"
         ]
     },
     {

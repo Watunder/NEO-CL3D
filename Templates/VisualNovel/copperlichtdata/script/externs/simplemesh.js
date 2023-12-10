@@ -1,14 +1,3 @@
-function createVertex(x, y, z, s, t)
-{
-    var vtx = new CL3D.Vertex3D(true);
-    vtx.Pos.X = x;
-    vtx.Pos.Y = y;
-    vtx.Pos.Z = z;
-    vtx.TCoords.X = s;
-    vtx.TCoords.Y = t;
-    return vtx;
-}
-
 CL3D.SimpleMesh = function(texture, vertices, uvs, indices)
 {
     this.init();

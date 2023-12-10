@@ -331,7 +331,7 @@ CL3D.CopperLicht.prototype.createRenderer = function()
 
 				if (elapsed >= interval)
 				{
-					me.draw3DIntervalHandler();
+					me.draw3DIntervalHandler(now);
 
 					lastUpdate = now - (elapsed % interval);
 					// also adjusts for your interval not being
@@ -382,7 +382,7 @@ CL3D.CopperLicht.prototype.makeWholePageSize = function()
 /**
  * @private
  */
-CL3D.CopperLicht.prototype.draw3DIntervalHandler = function()
+CL3D.CopperLicht.prototype.draw3DIntervalHandler = function(timeMs)
 {
 	// resize
 
@@ -391,7 +391,7 @@ CL3D.CopperLicht.prototype.draw3DIntervalHandler = function()
 
 	// draw
 
-	this.draw3dScene();
+	this.draw3dScene(timeMs);
 
 	// update fps counter
 
@@ -543,7 +543,7 @@ CL3D.CopperLicht.prototype.startFirstSceneAfterEverythingLoaded = function()
  * has been drawn.
  * @public
  */
-CL3D.CopperLicht.prototype.draw3dScene = function()
+CL3D.CopperLicht.prototype.draw3dScene = function(timeMs)
 {
 	if (this.Document == null || this.TheRenderer == null)
 		return;
@@ -583,7 +583,7 @@ CL3D.CopperLicht.prototype.draw3dScene = function()
 			// scripting frame
 			var sc = CL3D.ScriptingInterface.getScriptingInterfaceReadOnly();
 			if (sc != null)
-				sc.runDrawCallbacks(this.TheRenderer);
+				sc.runDrawCallbacks(this.TheRenderer, timeMs);
 
 			// finished
 			this.TheRenderer.endScene();

@@ -749,7 +749,11 @@ CL3D.Scene.prototype.drawAll = function(renderer)
 		}
 	}
 	
-		
+	// draw effect
+	
+	if (CL3D.engine.OnEffekseerDraw)
+		CL3D.engine.OnEffekseerDraw();
+
 	// draw overlays
 	
 	this.CurrentRenderMode = CL3D.Scene.RENDER_MODE_2DOVERLAY;

@@ -42,6 +42,16 @@ Global.Emitter.on("set_behavior_state", (behavior) =>
 	Global.StateList[behavior.StateIndex] = behavior.State;
 });
 
+Global.SaveData =
+{
+	"line": 0,
+	"define": {"jscode": []},
+	"screenshot": {"name": "", "base64": ""}
+};
+
+Global.IsSave = false;
+Global.IsLoad = false;
+
 // //not used
 
 // import { YukaManager } from './dist/yuka-cl3d.mjs'
