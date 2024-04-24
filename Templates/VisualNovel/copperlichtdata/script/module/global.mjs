@@ -29,10 +29,10 @@ Global.SS6PlayerInstanceKeyParam = SS6PlayerInstanceKeyParam;
 Global.SS6Project = SS6Project;
 Global.SS6Player = SS6Player;
 
-import { CreaturePackage, CreaturePlayer } from './dist/creature-cl3d.mjs';
+// import { CreaturePackage, CreaturePlayer } from './dist/creature-cl3d.mjs';
 
-Global.CreaturePackage = CreaturePackage;
-Global.CreaturePlayer = CreaturePlayer;
+// Global.CreaturePackage = CreaturePackage;
+// Global.CreaturePlayer = CreaturePlayer;
 
 Global.StateIndex = 0;
 Global.StateList = [];

@@ -219,47 +219,50 @@
         "expression": "idle",
         "dialogue": "You have chosen option B",
         "sound": "00005",
-        "event": [],
+        "event": [
+            {
+                "name": "MOVE",
+                "fg": "0",
+                "t": "150",
+                "x": "0",
+                "y": "0",
+                "z": "0"
+            },
+            {
+                "name": "MOVE",
+                "fg": "0",
+                "t": "150",
+                "x": "1",
+                "y": "0",
+                "z": "0"
+            },
+            {
+                "name": "MOVE",
+                "fg": "0",
+                "t": "150",
+                "x": "-1",
+                "y": "0",
+                "z": "0"
+            },
+            {
+                "name": "MOVE",
+                "fg": "0",
+                "t": "150",
+                "x": "0",
+                "y": "0",
+                "z": "0"
+            }
+        ],
         "branch": [
             "积分<1"
         ]
     },
     {
-        "branch": [],
-        "event": [
-            [
-                {
-                    "name": "character",
-                    "default": "Test"
-                }
-            ],
-            [
-                {
-                    "name": "expression",
-                    "default": "test"
-                }
-            ],
-            [
-                {
-                    "name": "text",
-                    "default": "This",
-                    "size": "22pt",
-                    "color": "red"
-                },
-                {
-                    "name": "text",
-                    "default": "is"
-                },
-                {
-                    "name": "text",
-                    "default": "the"
-                },
-                {
-                    "name": "text",
-                    "default": "end"
-                }
-            ]
-        ],
-        "dialog2": true
+        "character": "NVL Girl",
+        "expression": "idle",
+        "dialogue": "This is the end",
+        "sound": "00005",
+        "event": [],
+        "branch": []
     }
 ]

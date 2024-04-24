@@ -30,6 +30,10 @@ CL3D.FrameEvent.prototype._init = function(type)
 		case "sync":
 		me.EVENT_HANDLER = function(){me._runSync()};
 		break;
+
+		case "dialog":
+		me.EVENT_HANDLER = function(){me._runDialog()};
+		break;
 	}
 };
 
@@ -104,6 +108,39 @@ CL3D.FrameEvent.prototype._runSync = function()
 	}
 };
 
+CL3D.FrameEvent.prototype._runDialog = function()
+{
+	var me = this;
+
+	if (me.firstTime == true)
+	{
+		Global.Emitter.on("pass_behavior", (behavior) =>
+		{
+			me.behavior = behavior;
+			Global.Emitter.off("pass_behavior");
+		});
+
+		// ccbCallAction(me.context.StoryAction, me.EVENT_ARRAY[0]);
+		me.action.Event = me.EVENT_ARRAY[0];
+		me.action.execute();
+		
+		me.firstTime = false;
+	}
+	else
+	if (me.behavior.State == "nothing")
+	{
+		// ccbCallAction(me.context.StoryAction, me.EVENT_ARRAY[++me.EVENT_INDEX]);
+		me.action.Event = me.EVENT_ARRAY[++me.EVENT_INDEX];
+		me.action.execute();
+	}
+
+	if (me.EVENT_INDEX == me.EVENT_ARRAY.length)
+	{
+		me.EVENT_INDEX = 0;
+		ccbUnregisterOnFrameEvent(me.EVENT_HANDLER);
+	}
+};
+
 CL3D.FrameEvent.prototype.getVariable = function(event)
 {
 	if (event.length == 0)
@@ -133,10 +170,10 @@ CL3D.FrameEvent.prototype.getVariable = function(event)
 			continue;
 		}
 
-		if (array3[1] == null)
-			return;
-
-		obj[array3[0]] = array3[1];
+        if (array3[1] == null)
+            obj["default"] = array3[0];
+        else
+            obj[array3[0]] = array3[1];
 	}
 
 	return obj;

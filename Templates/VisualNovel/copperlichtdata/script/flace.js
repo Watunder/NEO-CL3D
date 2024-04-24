@@ -51,6 +51,7 @@ CL3D.CopperLicht = function(elementIdOfCanvas, showInfoTexts, fps, showFPSCounte
 	this.DPR = window.devicePixelRatio || 1.0;
 	this.ElementIdOfCanvas = elementIdOfCanvas;
 	this.VideoElement = document.getElementById("video");
+	this.TextElement = document.getElementById("text");
 	this.MainElement = document.getElementById(this.ElementIdOfCanvas);
 	this.Document = new CL3D.CCDocument();
 	this.TheRenderer = null;
