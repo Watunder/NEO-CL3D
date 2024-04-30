@@ -46,7 +46,7 @@ CL3D.DebugOutput.prototype.enableFPSCounter = function()
 		return;
 		
 	this.FPSRoot = document.createElement("div");
-	var style = "color:#ffffff; padding: 5px; position: fixed; left: 20px; top: 20px;";
+	var style = "color:#ffffff; padding: 5px; position: fixed; left: 20px; top: 20px; pointer-events: none;";
 	this.FPSRoot.setAttribute('style', style);
 	this.DebugRoot.appendChild(this.FPSRoot);
 	var ln = document.createTextNode("FPS: 0");

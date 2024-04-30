@@ -1,0 +1,1810 @@
+{
+    "DPR": 1.25,
+    "ElementIdOfCanvas": "3darea",
+    "VideoElement": {},
+    "TextElement": {},
+    "MainElement": {},
+    "Document": {
+        "CurrentScene": -1,
+        "ApplicationTitle": "",
+        "Scenes": [],
+        "UpdateMode": 2,
+        "WaitUntilTexturesLoaded": false,
+        "CanvasWidth": 320,
+        "CanvasHeight": 200
+    },
+    "TheRenderer": {
+        "TheTextureManager": {
+            "Textures": [
+                {
+                    "Name": "copperlichtdata/face/NVL Girl/idle.png",
+                    "Loaded": true,
+                    "Image": {
+                        "onreadystatechange": null
+                    },
+                    "Texture": {},
+                    "RTTFrameBuffer": null,
+                    "CachedWidth": null,
+                    "CachedHeight": null,
+                    "OriginalWidth": null,
+                    "OriginalHeight": null
+                },
+                {
+                    "Name": "copperlichtdata/face/NVL Girl/smile.png",
+                    "Loaded": true,
+                    "Image": {
+                        "onreadystatechange": null
+                    },
+                    "Texture": {},
+                    "RTTFrameBuffer": null,
+                    "CachedWidth": null,
+                    "CachedHeight": null,
+                    "OriginalWidth": null,
+                    "OriginalHeight": null
+                },
+                {
+                    "Name": "copperlichtdata/sprite/MeshBone/Knight.png",
+                    "Loaded": true,
+                    "Image": {
+                        "onreadystatechange": null
+                    },
+                    "Texture": {},
+                    "RTTFrameBuffer": null,
+                    "CachedWidth": null,
+                    "CachedHeight": null,
+                    "OriginalWidth": null,
+                    "OriginalHeight": null
+                },
+                {
+                    "Name": "copperlichtdata/sprite/MeshBone/Effect.png",
+                    "Loaded": true,
+                    "Image": {
+                        "onreadystatechange": null
+                    },
+                    "Texture": {},
+                    "RTTFrameBuffer": null,
+                    "CachedWidth": null,
+                    "CachedHeight": null,
+                    "OriginalWidth": null,
+                    "OriginalHeight": null
+                },
+                {
+                    "Name": "copperlichtdata/sprite/raptor.png",
+                    "Loaded": true,
+                    "Image": {
+                        "onreadystatechange": null
+                    },
+                    "Texture": {},
+                    "RTTFrameBuffer": null,
+                    "CachedWidth": null,
+                    "CachedHeight": null,
+                    "OriginalWidth": null,
+                    "OriginalHeight": null
+                },
+                {
+                    "Name": "copperlichtdata/camp.jpg",
+                    "Loaded": false,
+                    "Image": {},
+                    "Texture": null,
+                    "RTTFrameBuffer": null,
+                    "CachedWidth": null,
+                    "CachedHeight": null,
+                    "OriginalWidth": null,
+                    "OriginalHeight": null
+                },
+                {
+                    "Name": "copperlichtdata/idle1.png",
+                    "Loaded": false,
+                    "Image": {},
+                    "Texture": null,
+                    "RTTFrameBuffer": null,
+                    "CachedWidth": null,
+                    "CachedHeight": null,
+                    "OriginalWidth": null,
+                    "OriginalHeight": null
+                },
+                {
+                    "Name": "copperlichtdata/metalpanel.jpg",
+                    "Loaded": false,
+                    "Image": {},
+                    "Texture": null,
+                    "RTTFrameBuffer": null,
+                    "CachedWidth": null,
+                    "CachedHeight": null,
+                    "OriginalWidth": null,
+                    "OriginalHeight": null
+                },
+                {
+                    "Name": "copperlichtdata/idle.png",
+                    "Loaded": false,
+                    "Image": {},
+                    "Texture": null,
+                    "RTTFrameBuffer": null,
+                    "CachedWidth": null,
+                    "CachedHeight": null,
+                    "OriginalWidth": null,
+                    "OriginalHeight": null
+                },
+                {
+                    "Name": "copperlichtdata/frame.png",
+                    "Loaded": false,
+                    "Image": {},
+                    "Texture": null,
+                    "RTTFrameBuffer": null,
+                    "CachedWidth": null,
+                    "CachedHeight": null,
+                    "OriginalWidth": null,
+                    "OriginalHeight": null
+                },
+                {
+                    "Name": "copperlichtdata/~default_billboard.png",
+                    "Loaded": false,
+                    "Image": {},
+                    "Texture": null,
+                    "RTTFrameBuffer": null,
+                    "CachedWidth": null,
+                    "CachedHeight": null,
+                    "OriginalWidth": null,
+                    "OriginalHeight": null
+                },
+                {
+                    "Name": "copperlichtdata/~default_particle.png",
+                    "Loaded": false,
+                    "Image": {},
+                    "Texture": null,
+                    "RTTFrameBuffer": null,
+                    "CachedWidth": null,
+                    "CachedHeight": null,
+                    "OriginalWidth": null,
+                    "OriginalHeight": null
+                },
+                {
+                    "Name": "copperlichtdata/animetest.fbx.png",
+                    "Loaded": false,
+                    "Image": {},
+                    "Texture": null,
+                    "RTTFrameBuffer": null,
+                    "CachedWidth": null,
+                    "CachedHeight": null,
+                    "OriginalWidth": null,
+                    "OriginalHeight": null
+                }
+            ],
+            "TheRenderer": {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"]"
+            },
+            "PathRoot": ""
+        },
+        "canvas": {
+            "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"MainElement\"]"
+        },
+        "gl": {},
+        "width": 1028,
+        "height": 550,
+        "textureWasLoadedFlag": true,
+        "Projection": {
+            "m00": 1,
+            "m01": 0,
+            "m02": 0,
+            "m03": 0,
+            "m04": 0,
+            "m05": 1,
+            "m06": 0,
+            "m07": 0,
+            "m08": 0,
+            "m09": 0,
+            "m10": 1,
+            "m11": 0,
+            "m12": 0,
+            "m13": 0,
+            "m14": 0,
+            "m15": 1,
+            "bIsIdentity": true
+        },
+        "View": {
+            "m00": 1,
+            "m01": 0,
+            "m02": 0,
+            "m03": 0,
+            "m04": 0,
+            "m05": 1,
+            "m06": 0,
+            "m07": 0,
+            "m08": 0,
+            "m09": 0,
+            "m10": 1,
+            "m11": 0,
+            "m12": 0,
+            "m13": 0,
+            "m14": 0,
+            "m15": 1,
+            "bIsIdentity": true
+        },
+        "World": {
+            "m00": 1,
+            "m01": 0,
+            "m02": 0,
+            "m03": 0,
+            "m04": 0,
+            "m05": 1,
+            "m06": 0,
+            "m07": 0,
+            "m08": 0,
+            "m09": 0,
+            "m10": 1,
+            "m11": 0,
+            "m12": 0,
+            "m13": 0,
+            "m14": 0,
+            "m15": 1,
+            "bIsIdentity": true
+        },
+        "AmbientLight": {
+            "A": 1,
+            "R": 0,
+            "G": 0,
+            "B": 0
+        },
+        "programStandardMaterial": null,
+        "programLightmapMaterial": null,
+        "MaterialPrograms": [
+            {
+                "blendenabled": false,
+                "locWorldViewProj": {},
+                "locNormalMatrix": null,
+                "locModelViewMatrix": null,
+                "locModelWorldMatrix": null,
+                "locLightPositions": null,
+                "locLightColors": null,
+                "locDirectionalLight": null,
+                "locDirectionalLightColor": null,
+                "locFogColor": null,
+                "locFogDensity": null,
+                "locGrassMovement": null,
+                "locWindStrength": null,
+                "locWorldviewprojLight": null,
+                "locWorldviewprojLight2": null,
+                "locShadowMapBias1": null,
+                "locShadowMapBias2": null,
+                "locShadowMapBackfaceBias": null,
+                "locShadowMapOpacity": null,
+                "shaderCallback": null
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            },
+            {
+                "blendenabled": false,
+                "locWorldViewProj": {},
+                "locNormalMatrix": null,
+                "locModelViewMatrix": null,
+                "locModelWorldMatrix": null,
+                "locLightPositions": null,
+                "locLightColors": null,
+                "locDirectionalLight": null,
+                "locDirectionalLightColor": null,
+                "locFogColor": null,
+                "locFogDensity": null,
+                "locGrassMovement": null,
+                "locWindStrength": null,
+                "locWorldviewprojLight": null,
+                "locWorldviewprojLight2": null,
+                "locShadowMapBias1": null,
+                "locShadowMapBias2": null,
+                "locShadowMapBackfaceBias": null,
+                "locShadowMapOpacity": null,
+                "shaderCallback": null
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][2]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][2]"
+            },
+            {
+                "blendenabled": false,
+                "locWorldViewProj": {},
+                "locNormalMatrix": null,
+                "locModelViewMatrix": null,
+                "locModelWorldMatrix": null,
+                "locLightPositions": null,
+                "locLightColors": null,
+                "locDirectionalLight": null,
+                "locDirectionalLightColor": null,
+                "locFogColor": null,
+                "locFogDensity": null,
+                "locGrassMovement": null,
+                "locWindStrength": null,
+                "locWorldviewprojLight": null,
+                "locWorldviewprojLight2": null,
+                "locShadowMapBias1": null,
+                "locShadowMapBias2": null,
+                "locShadowMapBackfaceBias": null,
+                "locShadowMapOpacity": null,
+                "shaderCallback": null
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            },
+            {
+                "blendenabled": false,
+                "locWorldViewProj": {},
+                "locNormalMatrix": {},
+                "locModelViewMatrix": {},
+                "locModelWorldMatrix": null,
+                "locLightPositions": null,
+                "locLightColors": null,
+                "locDirectionalLight": null,
+                "locDirectionalLightColor": null,
+                "locFogColor": null,
+                "locFogDensity": null,
+                "locGrassMovement": null,
+                "locWindStrength": null,
+                "locWorldviewprojLight": null,
+                "locWorldviewprojLight2": null,
+                "locShadowMapBias1": null,
+                "locShadowMapBias2": null,
+                "locShadowMapBackfaceBias": null,
+                "locShadowMapOpacity": null,
+                "shaderCallback": null
+            },
+            {
+                "blendenabled": true,
+                "blendsfactor": 1,
+                "blenddfactor": 769,
+                "locWorldViewProj": {},
+                "locNormalMatrix": null,
+                "locModelViewMatrix": null,
+                "locModelWorldMatrix": null,
+                "locLightPositions": null,
+                "locLightColors": null,
+                "locDirectionalLight": null,
+                "locDirectionalLightColor": null,
+                "locFogColor": null,
+                "locFogDensity": null,
+                "locGrassMovement": null,
+                "locWindStrength": null,
+                "locWorldviewprojLight": null,
+                "locWorldviewprojLight2": null,
+                "locShadowMapBias1": null,
+                "locShadowMapBias2": null,
+                "locShadowMapBackfaceBias": null,
+                "locShadowMapOpacity": null,
+                "shaderCallback": null
+            },
+            {
+                "blendenabled": true,
+                "blendsfactor": 770,
+                "blenddfactor": 771,
+                "locWorldViewProj": {},
+                "locNormalMatrix": null,
+                "locModelViewMatrix": null,
+                "locModelWorldMatrix": null,
+                "locLightPositions": null,
+                "locLightColors": null,
+                "locDirectionalLight": null,
+                "locDirectionalLightColor": null,
+                "locFogColor": null,
+                "locFogDensity": null,
+                "locGrassMovement": null,
+                "locWindStrength": null,
+                "locWorldviewprojLight": null,
+                "locWorldviewprojLight2": null,
+                "locShadowMapBias1": null,
+                "locShadowMapBias2": null,
+                "locShadowMapBackfaceBias": null,
+                "locShadowMapOpacity": null,
+                "shaderCallback": null
+            },
+            {
+                "blendenabled": true,
+                "blendsfactor": 770,
+                "blenddfactor": 771,
+                "locWorldViewProj": {},
+                "locNormalMatrix": null,
+                "locModelViewMatrix": null,
+                "locModelWorldMatrix": null,
+                "locLightPositions": null,
+                "locLightColors": null,
+                "locDirectionalLight": null,
+                "locDirectionalLightColor": null,
+                "locFogColor": null,
+                "locFogDensity": null,
+                "locGrassMovement": null,
+                "locWindStrength": null,
+                "locWorldviewprojLight": null,
+                "locWorldviewprojLight2": null,
+                "locShadowMapBias1": null,
+                "locShadowMapBias2": null,
+                "locShadowMapBackfaceBias": null,
+                "locShadowMapOpacity": null,
+                "shaderCallback": null
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            },
+            {
+                "blendenabled": true,
+                "blendsfactor": 770,
+                "blenddfactor": 771,
+                "locWorldViewProj": {},
+                "locNormalMatrix": {},
+                "locModelViewMatrix": {},
+                "locModelWorldMatrix": null,
+                "locLightPositions": null,
+                "locLightColors": null,
+                "locDirectionalLight": null,
+                "locDirectionalLightColor": null,
+                "locFogColor": null,
+                "locFogDensity": null,
+                "locGrassMovement": null,
+                "locWindStrength": null,
+                "locWorldviewprojLight": null,
+                "locWorldviewprojLight2": null,
+                "locShadowMapBias1": null,
+                "locShadowMapBias2": null,
+                "locShadowMapBackfaceBias": null,
+                "locShadowMapOpacity": null,
+                "shaderCallback": null
+            },
+            {
+                "blendenabled": false,
+                "locWorldViewProj": {},
+                "locNormalMatrix": null,
+                "locModelViewMatrix": null,
+                "locModelWorldMatrix": {},
+                "locLightPositions": {},
+                "locLightColors": {},
+                "locDirectionalLight": null,
+                "locDirectionalLightColor": null,
+                "locFogColor": null,
+                "locFogDensity": null,
+                "locGrassMovement": null,
+                "locWindStrength": null,
+                "locWorldviewprojLight": null,
+                "locWorldviewprojLight2": null,
+                "locShadowMapBias1": null,
+                "locShadowMapBias2": null,
+                "locShadowMapBackfaceBias": null,
+                "locShadowMapOpacity": null,
+                "shaderCallback": null
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            },
+            {
+                "blendenabled": false,
+                "locWorldViewProj": {},
+                "locNormalMatrix": null,
+                "locModelViewMatrix": null,
+                "locModelWorldMatrix": null,
+                "locLightPositions": null,
+                "locLightColors": null,
+                "locDirectionalLight": null,
+                "locDirectionalLightColor": null,
+                "locFogColor": null,
+                "locFogDensity": null,
+                "locGrassMovement": null,
+                "locWindStrength": null,
+                "locWorldviewprojLight": null,
+                "locWorldviewprojLight2": null,
+                "locShadowMapBias1": null,
+                "locShadowMapBias2": null,
+                "locShadowMapBackfaceBias": null,
+                "locShadowMapOpacity": null,
+                "shaderCallback": null
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            },
+            {
+                "blendenabled": false,
+                "locWorldViewProj": {},
+                "locNormalMatrix": null,
+                "locModelViewMatrix": null,
+                "locModelWorldMatrix": null,
+                "locLightPositions": null,
+                "locLightColors": null,
+                "locDirectionalLight": null,
+                "locDirectionalLightColor": null,
+                "locFogColor": null,
+                "locFogDensity": null,
+                "locGrassMovement": null,
+                "locWindStrength": null,
+                "locWorldviewprojLight": null,
+                "locWorldviewprojLight2": null,
+                "locShadowMapBias1": null,
+                "locShadowMapBias2": null,
+                "locShadowMapBackfaceBias": null,
+                "locShadowMapOpacity": null,
+                "shaderCallback": null
+            },
+            {
+                "blendenabled": true,
+                "blendsfactor": 770,
+                "blenddfactor": 771,
+                "locWorldViewProj": {},
+                "locNormalMatrix": null,
+                "locModelViewMatrix": null,
+                "locModelWorldMatrix": {},
+                "locLightPositions": null,
+                "locLightColors": null,
+                "locDirectionalLight": null,
+                "locDirectionalLightColor": null,
+                "locFogColor": null,
+                "locFogDensity": null,
+                "locGrassMovement": {},
+                "locWindStrength": {},
+                "locWorldviewprojLight": null,
+                "locWorldviewprojLight2": null,
+                "locShadowMapBias1": null,
+                "locShadowMapBias2": null,
+                "locShadowMapBackfaceBias": null,
+                "locShadowMapOpacity": null,
+                "shaderCallback": null
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            }
+        ],
+        "MaterialProgramsWithLight": [
+            {
+                "blendenabled": false,
+                "locWorldViewProj": {},
+                "locNormalMatrix": null,
+                "locModelViewMatrix": null,
+                "locModelWorldMatrix": null,
+                "locLightPositions": {},
+                "locLightColors": {},
+                "locDirectionalLight": {},
+                "locDirectionalLightColor": {},
+                "locFogColor": null,
+                "locFogDensity": null,
+                "locGrassMovement": null,
+                "locWindStrength": null,
+                "locWorldviewprojLight": null,
+                "locWorldviewprojLight2": null,
+                "locShadowMapBias1": null,
+                "locShadowMapBias2": null,
+                "locShadowMapBackfaceBias": null,
+                "locShadowMapOpacity": null,
+                "shaderCallback": null
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialProgramsWithLight\"][0]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][2]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][2]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][2]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][5]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            },
+            {
+                "blendenabled": false,
+                "locWorldViewProj": {},
+                "locNormalMatrix": {},
+                "locModelViewMatrix": {},
+                "locModelWorldMatrix": null,
+                "locLightPositions": {},
+                "locLightColors": {},
+                "locDirectionalLight": {},
+                "locDirectionalLightColor": {},
+                "locFogColor": null,
+                "locFogDensity": null,
+                "locGrassMovement": null,
+                "locWindStrength": null,
+                "locWorldviewprojLight": null,
+                "locWorldviewprojLight2": null,
+                "locShadowMapBias1": null,
+                "locShadowMapBias2": null,
+                "locShadowMapBackfaceBias": null,
+                "locShadowMapOpacity": null,
+                "shaderCallback": null
+            },
+            {
+                "blendenabled": true,
+                "blendsfactor": 1,
+                "blenddfactor": 769,
+                "locWorldViewProj": {},
+                "locNormalMatrix": null,
+                "locModelViewMatrix": null,
+                "locModelWorldMatrix": null,
+                "locLightPositions": {},
+                "locLightColors": {},
+                "locDirectionalLight": {},
+                "locDirectionalLightColor": {},
+                "locFogColor": null,
+                "locFogDensity": null,
+                "locGrassMovement": null,
+                "locWindStrength": null,
+                "locWorldviewprojLight": null,
+                "locWorldviewprojLight2": null,
+                "locShadowMapBias1": null,
+                "locShadowMapBias2": null,
+                "locShadowMapBackfaceBias": null,
+                "locShadowMapOpacity": null,
+                "shaderCallback": null
+            },
+            {
+                "blendenabled": true,
+                "blendsfactor": 770,
+                "blenddfactor": 771,
+                "locWorldViewProj": {},
+                "locNormalMatrix": null,
+                "locModelViewMatrix": null,
+                "locModelWorldMatrix": null,
+                "locLightPositions": {},
+                "locLightColors": {},
+                "locDirectionalLight": {},
+                "locDirectionalLightColor": {},
+                "locFogColor": null,
+                "locFogDensity": null,
+                "locGrassMovement": null,
+                "locWindStrength": null,
+                "locWorldviewprojLight": null,
+                "locWorldviewprojLight2": null,
+                "locShadowMapBias1": null,
+                "locShadowMapBias2": null,
+                "locShadowMapBackfaceBias": null,
+                "locShadowMapOpacity": null,
+                "shaderCallback": null
+            },
+            {
+                "blendenabled": true,
+                "blendsfactor": 770,
+                "blenddfactor": 771,
+                "locWorldViewProj": {},
+                "locNormalMatrix": null,
+                "locModelViewMatrix": null,
+                "locModelWorldMatrix": null,
+                "locLightPositions": {},
+                "locLightColors": {},
+                "locDirectionalLight": {},
+                "locDirectionalLightColor": {},
+                "locFogColor": null,
+                "locFogDensity": null,
+                "locGrassMovement": null,
+                "locWindStrength": null,
+                "locWorldviewprojLight": null,
+                "locWorldviewprojLight2": null,
+                "locShadowMapBias1": null,
+                "locShadowMapBias2": null,
+                "locShadowMapBackfaceBias": null,
+                "locShadowMapOpacity": null,
+                "shaderCallback": null
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            },
+            {
+                "blendenabled": true,
+                "blendsfactor": 770,
+                "blenddfactor": 771,
+                "locWorldViewProj": {},
+                "locNormalMatrix": {},
+                "locModelViewMatrix": {},
+                "locModelWorldMatrix": null,
+                "locLightPositions": {},
+                "locLightColors": {},
+                "locDirectionalLight": {},
+                "locDirectionalLightColor": {},
+                "locFogColor": null,
+                "locFogDensity": null,
+                "locGrassMovement": null,
+                "locWindStrength": null,
+                "locWorldviewprojLight": null,
+                "locWorldviewprojLight2": null,
+                "locShadowMapBias1": null,
+                "locShadowMapBias2": null,
+                "locShadowMapBackfaceBias": null,
+                "locShadowMapOpacity": null,
+                "shaderCallback": null
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][17]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            },
+            {
+                "blendenabled": false,
+                "locWorldViewProj": {},
+                "locNormalMatrix": null,
+                "locModelViewMatrix": null,
+                "locModelWorldMatrix": null,
+                "locLightPositions": {},
+                "locLightColors": {},
+                "locDirectionalLight": {},
+                "locDirectionalLightColor": {},
+                "locFogColor": null,
+                "locFogDensity": null,
+                "locGrassMovement": null,
+                "locWindStrength": null,
+                "locWorldviewprojLight": null,
+                "locWorldviewprojLight2": null,
+                "locShadowMapBias1": null,
+                "locShadowMapBias2": null,
+                "locShadowMapBackfaceBias": null,
+                "locShadowMapOpacity": null,
+                "shaderCallback": null
+            },
+            {
+                "blendenabled": true,
+                "blendsfactor": 770,
+                "blenddfactor": 771,
+                "locWorldViewProj": {},
+                "locNormalMatrix": null,
+                "locModelViewMatrix": null,
+                "locModelWorldMatrix": {},
+                "locLightPositions": {},
+                "locLightColors": {},
+                "locDirectionalLight": {},
+                "locDirectionalLightColor": {},
+                "locFogColor": null,
+                "locFogDensity": null,
+                "locGrassMovement": {},
+                "locWindStrength": {},
+                "locWorldviewprojLight": null,
+                "locWorldviewprojLight2": null,
+                "locShadowMapBias1": null,
+                "locShadowMapBias2": null,
+                "locShadowMapBackfaceBias": null,
+                "locShadowMapOpacity": null,
+                "shaderCallback": null
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            }
+        ],
+        "MaterialProgramsFog": [
+            {
+                "blendenabled": false,
+                "locWorldViewProj": {},
+                "locNormalMatrix": null,
+                "locModelViewMatrix": null,
+                "locModelWorldMatrix": null,
+                "locLightPositions": null,
+                "locLightColors": null,
+                "locDirectionalLight": null,
+                "locDirectionalLightColor": null,
+                "locFogColor": {},
+                "locFogDensity": {},
+                "locGrassMovement": null,
+                "locWindStrength": null,
+                "locWorldviewprojLight": null,
+                "locWorldviewprojLight2": null,
+                "locShadowMapBias1": null,
+                "locShadowMapBias2": null,
+                "locShadowMapBackfaceBias": null,
+                "locShadowMapOpacity": null,
+                "shaderCallback": null
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialProgramsFog\"][0]"
+            },
+            {
+                "blendenabled": false,
+                "locWorldViewProj": {},
+                "locNormalMatrix": null,
+                "locModelViewMatrix": null,
+                "locModelWorldMatrix": null,
+                "locLightPositions": null,
+                "locLightColors": null,
+                "locDirectionalLight": null,
+                "locDirectionalLightColor": null,
+                "locFogColor": {},
+                "locFogDensity": {},
+                "locGrassMovement": null,
+                "locWindStrength": null,
+                "locWorldviewprojLight": null,
+                "locWorldviewprojLight2": null,
+                "locShadowMapBias1": null,
+                "locShadowMapBias2": null,
+                "locShadowMapBackfaceBias": null,
+                "locShadowMapOpacity": null,
+                "shaderCallback": null
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialProgramsFog\"][2]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialProgramsFog\"][2]"
+            },
+            {
+                "blendenabled": false,
+                "locWorldViewProj": {},
+                "locNormalMatrix": null,
+                "locModelViewMatrix": null,
+                "locModelWorldMatrix": null,
+                "locLightPositions": null,
+                "locLightColors": null,
+                "locDirectionalLight": null,
+                "locDirectionalLightColor": null,
+                "locFogColor": {},
+                "locFogDensity": {},
+                "locGrassMovement": null,
+                "locWindStrength": null,
+                "locWorldviewprojLight": null,
+                "locWorldviewprojLight2": null,
+                "locShadowMapBias1": null,
+                "locShadowMapBias2": null,
+                "locShadowMapBackfaceBias": null,
+                "locShadowMapOpacity": null,
+                "shaderCallback": null
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            },
+            {
+                "blendenabled": false,
+                "locWorldViewProj": {},
+                "locNormalMatrix": {},
+                "locModelViewMatrix": {},
+                "locModelWorldMatrix": null,
+                "locLightPositions": null,
+                "locLightColors": null,
+                "locDirectionalLight": null,
+                "locDirectionalLightColor": null,
+                "locFogColor": {},
+                "locFogDensity": {},
+                "locGrassMovement": null,
+                "locWindStrength": null,
+                "locWorldviewprojLight": null,
+                "locWorldviewprojLight2": null,
+                "locShadowMapBias1": null,
+                "locShadowMapBias2": null,
+                "locShadowMapBackfaceBias": null,
+                "locShadowMapOpacity": null,
+                "shaderCallback": null
+            },
+            {
+                "blendenabled": true,
+                "blendsfactor": 1,
+                "blenddfactor": 769,
+                "locWorldViewProj": {},
+                "locNormalMatrix": null,
+                "locModelViewMatrix": null,
+                "locModelWorldMatrix": null,
+                "locLightPositions": null,
+                "locLightColors": null,
+                "locDirectionalLight": null,
+                "locDirectionalLightColor": null,
+                "locFogColor": {},
+                "locFogDensity": {},
+                "locGrassMovement": null,
+                "locWindStrength": null,
+                "locWorldviewprojLight": null,
+                "locWorldviewprojLight2": null,
+                "locShadowMapBias1": null,
+                "locShadowMapBias2": null,
+                "locShadowMapBackfaceBias": null,
+                "locShadowMapOpacity": null,
+                "shaderCallback": null
+            },
+            {
+                "blendenabled": true,
+                "blendsfactor": 770,
+                "blenddfactor": 771,
+                "locWorldViewProj": {},
+                "locNormalMatrix": null,
+                "locModelViewMatrix": null,
+                "locModelWorldMatrix": null,
+                "locLightPositions": null,
+                "locLightColors": null,
+                "locDirectionalLight": null,
+                "locDirectionalLightColor": null,
+                "locFogColor": {},
+                "locFogDensity": {},
+                "locGrassMovement": null,
+                "locWindStrength": null,
+                "locWorldviewprojLight": null,
+                "locWorldviewprojLight2": null,
+                "locShadowMapBias1": null,
+                "locShadowMapBias2": null,
+                "locShadowMapBackfaceBias": null,
+                "locShadowMapOpacity": null,
+                "shaderCallback": null
+            },
+            {
+                "blendenabled": true,
+                "blendsfactor": 770,
+                "blenddfactor": 771,
+                "locWorldViewProj": {},
+                "locNormalMatrix": null,
+                "locModelViewMatrix": null,
+                "locModelWorldMatrix": null,
+                "locLightPositions": null,
+                "locLightColors": null,
+                "locDirectionalLight": null,
+                "locDirectionalLightColor": null,
+                "locFogColor": {},
+                "locFogDensity": {},
+                "locGrassMovement": null,
+                "locWindStrength": null,
+                "locWorldviewprojLight": null,
+                "locWorldviewprojLight2": null,
+                "locShadowMapBias1": null,
+                "locShadowMapBias2": null,
+                "locShadowMapBackfaceBias": null,
+                "locShadowMapOpacity": null,
+                "shaderCallback": null
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            },
+            {
+                "blendenabled": true,
+                "blendsfactor": 770,
+                "blenddfactor": 771,
+                "locWorldViewProj": {},
+                "locNormalMatrix": {},
+                "locModelViewMatrix": {},
+                "locModelWorldMatrix": null,
+                "locLightPositions": null,
+                "locLightColors": null,
+                "locDirectionalLight": null,
+                "locDirectionalLightColor": null,
+                "locFogColor": {},
+                "locFogDensity": {},
+                "locGrassMovement": null,
+                "locWindStrength": null,
+                "locWorldviewprojLight": null,
+                "locWorldviewprojLight2": null,
+                "locShadowMapBias1": null,
+                "locShadowMapBias2": null,
+                "locShadowMapBackfaceBias": null,
+                "locShadowMapOpacity": null,
+                "shaderCallback": null
+            },
+            {
+                "blendenabled": false,
+                "locWorldViewProj": {},
+                "locNormalMatrix": null,
+                "locModelViewMatrix": null,
+                "locModelWorldMatrix": {},
+                "locLightPositions": {},
+                "locLightColors": {},
+                "locDirectionalLight": null,
+                "locDirectionalLightColor": null,
+                "locFogColor": null,
+                "locFogDensity": null,
+                "locGrassMovement": null,
+                "locWindStrength": null,
+                "locWorldviewprojLight": null,
+                "locWorldviewprojLight2": null,
+                "locShadowMapBias1": null,
+                "locShadowMapBias2": null,
+                "locShadowMapBackfaceBias": null,
+                "locShadowMapOpacity": null,
+                "shaderCallback": null
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            },
+            {
+                "blendenabled": false,
+                "locWorldViewProj": {},
+                "locNormalMatrix": null,
+                "locModelViewMatrix": null,
+                "locModelWorldMatrix": null,
+                "locLightPositions": null,
+                "locLightColors": null,
+                "locDirectionalLight": null,
+                "locDirectionalLightColor": null,
+                "locFogColor": {},
+                "locFogDensity": {},
+                "locGrassMovement": null,
+                "locWindStrength": null,
+                "locWorldviewprojLight": null,
+                "locWorldviewprojLight2": null,
+                "locShadowMapBias1": null,
+                "locShadowMapBias2": null,
+                "locShadowMapBackfaceBias": null,
+                "locShadowMapOpacity": null,
+                "shaderCallback": null
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            },
+            {
+                "blendenabled": false,
+                "locWorldViewProj": {},
+                "locNormalMatrix": null,
+                "locModelViewMatrix": null,
+                "locModelWorldMatrix": null,
+                "locLightPositions": null,
+                "locLightColors": null,
+                "locDirectionalLight": null,
+                "locDirectionalLightColor": null,
+                "locFogColor": {},
+                "locFogDensity": {},
+                "locGrassMovement": null,
+                "locWindStrength": null,
+                "locWorldviewprojLight": null,
+                "locWorldviewprojLight2": null,
+                "locShadowMapBias1": null,
+                "locShadowMapBias2": null,
+                "locShadowMapBackfaceBias": null,
+                "locShadowMapOpacity": null,
+                "shaderCallback": null
+            },
+            {
+                "blendenabled": true,
+                "blendsfactor": 770,
+                "blenddfactor": 771,
+                "locWorldViewProj": {},
+                "locNormalMatrix": null,
+                "locModelViewMatrix": null,
+                "locModelWorldMatrix": {},
+                "locLightPositions": null,
+                "locLightColors": null,
+                "locDirectionalLight": null,
+                "locDirectionalLightColor": null,
+                "locFogColor": {},
+                "locFogDensity": {},
+                "locGrassMovement": {},
+                "locWindStrength": {},
+                "locWorldviewprojLight": null,
+                "locWorldviewprojLight2": null,
+                "locShadowMapBias1": null,
+                "locShadowMapBias2": null,
+                "locShadowMapBackfaceBias": null,
+                "locShadowMapOpacity": null,
+                "shaderCallback": null
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            }
+        ],
+        "MaterialProgramsWithLightFog": [
+            {
+                "blendenabled": false,
+                "locWorldViewProj": {},
+                "locNormalMatrix": null,
+                "locModelViewMatrix": null,
+                "locModelWorldMatrix": null,
+                "locLightPositions": {},
+                "locLightColors": {},
+                "locDirectionalLight": {},
+                "locDirectionalLightColor": {},
+                "locFogColor": {},
+                "locFogDensity": {},
+                "locGrassMovement": null,
+                "locWindStrength": null,
+                "locWorldviewprojLight": null,
+                "locWorldviewprojLight2": null,
+                "locShadowMapBias1": null,
+                "locShadowMapBias2": null,
+                "locShadowMapBackfaceBias": null,
+                "locShadowMapOpacity": null,
+                "shaderCallback": null
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialProgramsWithLightFog\"][0]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialProgramsFog\"][2]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialProgramsFog\"][2]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialProgramsFog\"][2]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialProgramsFog\"][5]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            },
+            {
+                "blendenabled": false,
+                "locWorldViewProj": {},
+                "locNormalMatrix": {},
+                "locModelViewMatrix": {},
+                "locModelWorldMatrix": null,
+                "locLightPositions": {},
+                "locLightColors": {},
+                "locDirectionalLight": {},
+                "locDirectionalLightColor": {},
+                "locFogColor": {},
+                "locFogDensity": {},
+                "locGrassMovement": null,
+                "locWindStrength": null,
+                "locWorldviewprojLight": null,
+                "locWorldviewprojLight2": null,
+                "locShadowMapBias1": null,
+                "locShadowMapBias2": null,
+                "locShadowMapBackfaceBias": null,
+                "locShadowMapOpacity": null,
+                "shaderCallback": null
+            },
+            {
+                "blendenabled": true,
+                "blendsfactor": 1,
+                "blenddfactor": 769,
+                "locWorldViewProj": {},
+                "locNormalMatrix": null,
+                "locModelViewMatrix": null,
+                "locModelWorldMatrix": null,
+                "locLightPositions": {},
+                "locLightColors": {},
+                "locDirectionalLight": {},
+                "locDirectionalLightColor": {},
+                "locFogColor": {},
+                "locFogDensity": {},
+                "locGrassMovement": null,
+                "locWindStrength": null,
+                "locWorldviewprojLight": null,
+                "locWorldviewprojLight2": null,
+                "locShadowMapBias1": null,
+                "locShadowMapBias2": null,
+                "locShadowMapBackfaceBias": null,
+                "locShadowMapOpacity": null,
+                "shaderCallback": null
+            },
+            {
+                "blendenabled": true,
+                "blendsfactor": 770,
+                "blenddfactor": 771,
+                "locWorldViewProj": {},
+                "locNormalMatrix": null,
+                "locModelViewMatrix": null,
+                "locModelWorldMatrix": null,
+                "locLightPositions": {},
+                "locLightColors": {},
+                "locDirectionalLight": {},
+                "locDirectionalLightColor": {},
+                "locFogColor": {},
+                "locFogDensity": {},
+                "locGrassMovement": null,
+                "locWindStrength": null,
+                "locWorldviewprojLight": null,
+                "locWorldviewprojLight2": null,
+                "locShadowMapBias1": null,
+                "locShadowMapBias2": null,
+                "locShadowMapBackfaceBias": null,
+                "locShadowMapOpacity": null,
+                "shaderCallback": null
+            },
+            {
+                "blendenabled": true,
+                "blendsfactor": 770,
+                "blenddfactor": 771,
+                "locWorldViewProj": {},
+                "locNormalMatrix": null,
+                "locModelViewMatrix": null,
+                "locModelWorldMatrix": null,
+                "locLightPositions": {},
+                "locLightColors": {},
+                "locDirectionalLight": {},
+                "locDirectionalLightColor": {},
+                "locFogColor": {},
+                "locFogDensity": {},
+                "locGrassMovement": null,
+                "locWindStrength": null,
+                "locWorldviewprojLight": null,
+                "locWorldviewprojLight2": null,
+                "locShadowMapBias1": null,
+                "locShadowMapBias2": null,
+                "locShadowMapBackfaceBias": null,
+                "locShadowMapOpacity": null,
+                "shaderCallback": null
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            },
+            {
+                "blendenabled": true,
+                "blendsfactor": 770,
+                "blenddfactor": 771,
+                "locWorldViewProj": {},
+                "locNormalMatrix": {},
+                "locModelViewMatrix": {},
+                "locModelWorldMatrix": null,
+                "locLightPositions": {},
+                "locLightColors": {},
+                "locDirectionalLight": {},
+                "locDirectionalLightColor": {},
+                "locFogColor": {},
+                "locFogDensity": {},
+                "locGrassMovement": null,
+                "locWindStrength": null,
+                "locWorldviewprojLight": null,
+                "locWorldviewprojLight2": null,
+                "locShadowMapBias1": null,
+                "locShadowMapBias2": null,
+                "locShadowMapBackfaceBias": null,
+                "locShadowMapOpacity": null,
+                "shaderCallback": null
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialProgramsFog\"][17]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            },
+            {
+                "blendenabled": false,
+                "locWorldViewProj": {},
+                "locNormalMatrix": null,
+                "locModelViewMatrix": null,
+                "locModelWorldMatrix": null,
+                "locLightPositions": {},
+                "locLightColors": {},
+                "locDirectionalLight": {},
+                "locDirectionalLightColor": {},
+                "locFogColor": {},
+                "locFogDensity": {},
+                "locGrassMovement": null,
+                "locWindStrength": null,
+                "locWorldviewprojLight": null,
+                "locWorldviewprojLight2": null,
+                "locShadowMapBias1": null,
+                "locShadowMapBias2": null,
+                "locShadowMapBackfaceBias": null,
+                "locShadowMapOpacity": null,
+                "shaderCallback": null
+            },
+            {
+                "blendenabled": true,
+                "blendsfactor": 770,
+                "blenddfactor": 771,
+                "locWorldViewProj": {},
+                "locNormalMatrix": null,
+                "locModelViewMatrix": null,
+                "locModelWorldMatrix": {},
+                "locLightPositions": {},
+                "locLightColors": {},
+                "locDirectionalLight": {},
+                "locDirectionalLightColor": {},
+                "locFogColor": {},
+                "locFogDensity": {},
+                "locGrassMovement": {},
+                "locWindStrength": {},
+                "locWorldviewprojLight": null,
+                "locWorldviewprojLight2": null,
+                "locShadowMapBias1": null,
+                "locShadowMapBias2": null,
+                "locShadowMapBackfaceBias": null,
+                "locShadowMapOpacity": null,
+                "shaderCallback": null
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            }
+        ],
+        "MaterialProgramsWithShadowMap": [
+            {
+                "blendenabled": false,
+                "locWorldViewProj": {},
+                "locNormalMatrix": null,
+                "locModelViewMatrix": null,
+                "locModelWorldMatrix": null,
+                "locLightPositions": {},
+                "locLightColors": {},
+                "locDirectionalLight": {},
+                "locDirectionalLightColor": {},
+                "locFogColor": {},
+                "locFogDensity": {},
+                "locGrassMovement": null,
+                "locWindStrength": null,
+                "locWorldviewprojLight": {},
+                "locWorldviewprojLight2": {},
+                "locShadowMapBias1": {},
+                "locShadowMapBias2": {},
+                "locShadowMapBackfaceBias": {},
+                "locShadowMapOpacity": {},
+                "shaderCallback": null
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialProgramsWithShadowMap\"][0]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialProgramsFog\"][2]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialProgramsFog\"][2]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialProgramsFog\"][2]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialProgramsFog\"][5]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            },
+            {
+                "blendenabled": false,
+                "locWorldViewProj": {},
+                "locNormalMatrix": {},
+                "locModelViewMatrix": {},
+                "locModelWorldMatrix": null,
+                "locLightPositions": {},
+                "locLightColors": {},
+                "locDirectionalLight": {},
+                "locDirectionalLightColor": {},
+                "locFogColor": {},
+                "locFogDensity": {},
+                "locGrassMovement": null,
+                "locWindStrength": null,
+                "locWorldviewprojLight": null,
+                "locWorldviewprojLight2": null,
+                "locShadowMapBias1": null,
+                "locShadowMapBias2": null,
+                "locShadowMapBackfaceBias": null,
+                "locShadowMapOpacity": null,
+                "shaderCallback": null
+            },
+            {
+                "blendenabled": true,
+                "blendsfactor": 1,
+                "blenddfactor": 769,
+                "locWorldViewProj": {},
+                "locNormalMatrix": null,
+                "locModelViewMatrix": null,
+                "locModelWorldMatrix": null,
+                "locLightPositions": {},
+                "locLightColors": {},
+                "locDirectionalLight": {},
+                "locDirectionalLightColor": {},
+                "locFogColor": {},
+                "locFogDensity": {},
+                "locGrassMovement": null,
+                "locWindStrength": null,
+                "locWorldviewprojLight": {},
+                "locWorldviewprojLight2": {},
+                "locShadowMapBias1": {},
+                "locShadowMapBias2": {},
+                "locShadowMapBackfaceBias": {},
+                "locShadowMapOpacity": {},
+                "shaderCallback": null
+            },
+            {
+                "blendenabled": true,
+                "blendsfactor": 770,
+                "blenddfactor": 771,
+                "locWorldViewProj": {},
+                "locNormalMatrix": null,
+                "locModelViewMatrix": null,
+                "locModelWorldMatrix": null,
+                "locLightPositions": {},
+                "locLightColors": {},
+                "locDirectionalLight": {},
+                "locDirectionalLightColor": {},
+                "locFogColor": {},
+                "locFogDensity": {},
+                "locGrassMovement": null,
+                "locWindStrength": null,
+                "locWorldviewprojLight": {},
+                "locWorldviewprojLight2": {},
+                "locShadowMapBias1": {},
+                "locShadowMapBias2": {},
+                "locShadowMapBackfaceBias": {},
+                "locShadowMapOpacity": {},
+                "shaderCallback": null
+            },
+            {
+                "blendenabled": true,
+                "blendsfactor": 770,
+                "blenddfactor": 771,
+                "locWorldViewProj": {},
+                "locNormalMatrix": null,
+                "locModelViewMatrix": null,
+                "locModelWorldMatrix": null,
+                "locLightPositions": {},
+                "locLightColors": {},
+                "locDirectionalLight": {},
+                "locDirectionalLightColor": {},
+                "locFogColor": {},
+                "locFogDensity": {},
+                "locGrassMovement": null,
+                "locWindStrength": null,
+                "locWorldviewprojLight": {},
+                "locWorldviewprojLight2": {},
+                "locShadowMapBias1": {},
+                "locShadowMapBias2": {},
+                "locShadowMapBackfaceBias": {},
+                "locShadowMapOpacity": {},
+                "shaderCallback": null
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            },
+            {
+                "blendenabled": true,
+                "blendsfactor": 770,
+                "blenddfactor": 771,
+                "locWorldViewProj": {},
+                "locNormalMatrix": {},
+                "locModelViewMatrix": {},
+                "locModelWorldMatrix": null,
+                "locLightPositions": {},
+                "locLightColors": {},
+                "locDirectionalLight": {},
+                "locDirectionalLightColor": {},
+                "locFogColor": {},
+                "locFogDensity": {},
+                "locGrassMovement": null,
+                "locWindStrength": null,
+                "locWorldviewprojLight": null,
+                "locWorldviewprojLight2": null,
+                "locShadowMapBias1": null,
+                "locShadowMapBias2": null,
+                "locShadowMapBackfaceBias": null,
+                "locShadowMapOpacity": null,
+                "shaderCallback": null
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialProgramsFog\"][17]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            },
+            {
+                "blendenabled": false,
+                "locWorldViewProj": {},
+                "locNormalMatrix": null,
+                "locModelViewMatrix": null,
+                "locModelWorldMatrix": null,
+                "locLightPositions": {},
+                "locLightColors": {},
+                "locDirectionalLight": {},
+                "locDirectionalLightColor": {},
+                "locFogColor": {},
+                "locFogDensity": {},
+                "locGrassMovement": null,
+                "locWindStrength": null,
+                "locWorldviewprojLight": {},
+                "locWorldviewprojLight2": {},
+                "locShadowMapBias1": {},
+                "locShadowMapBias2": {},
+                "locShadowMapBackfaceBias": {},
+                "locShadowMapOpacity": {},
+                "shaderCallback": null
+            },
+            {
+                "blendenabled": true,
+                "blendsfactor": 770,
+                "blenddfactor": 771,
+                "locWorldViewProj": {},
+                "locNormalMatrix": null,
+                "locModelViewMatrix": null,
+                "locModelWorldMatrix": {},
+                "locLightPositions": {},
+                "locLightColors": {},
+                "locDirectionalLight": {},
+                "locDirectionalLightColor": {},
+                "locFogColor": {},
+                "locFogDensity": {},
+                "locGrassMovement": {},
+                "locWindStrength": {},
+                "locWorldviewprojLight": {},
+                "locWorldviewprojLight2": {},
+                "locShadowMapBias1": {},
+                "locShadowMapBias2": {},
+                "locShadowMapBackfaceBias": {},
+                "locShadowMapOpacity": {},
+                "shaderCallback": null
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            },
+            {
+                "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialPrograms\"][0]"
+            }
+        ],
+        "MinExternalMaterialTypeId": 30,
+        "Program2DDrawingColorOnly": {
+            "blendenabled": false,
+            "locWorldViewProj": null,
+            "locNormalMatrix": null,
+            "locModelViewMatrix": null,
+            "locModelWorldMatrix": null,
+            "locLightPositions": null,
+            "locLightColors": null,
+            "locDirectionalLight": null,
+            "locDirectionalLightColor": null,
+            "locFogColor": null,
+            "locFogDensity": null,
+            "locGrassMovement": null,
+            "locWindStrength": null,
+            "locWorldviewprojLight": null,
+            "locWorldviewprojLight2": null,
+            "locShadowMapBias1": null,
+            "locShadowMapBias2": null,
+            "locShadowMapBackfaceBias": null,
+            "locShadowMapOpacity": null,
+            "shaderCallback": null
+        },
+        "Program2DDrawingTextureOnly": {
+            "blendenabled": false,
+            "locWorldViewProj": null,
+            "locNormalMatrix": null,
+            "locModelViewMatrix": null,
+            "locModelWorldMatrix": null,
+            "locLightPositions": null,
+            "locLightColors": null,
+            "locDirectionalLight": null,
+            "locDirectionalLightColor": null,
+            "locFogColor": null,
+            "locFogDensity": null,
+            "locGrassMovement": null,
+            "locWindStrength": null,
+            "locWorldviewprojLight": null,
+            "locWorldviewprojLight2": null,
+            "locShadowMapBias1": null,
+            "locShadowMapBias2": null,
+            "locShadowMapBackfaceBias": null,
+            "locShadowMapOpacity": null,
+            "shaderCallback": null
+        },
+        "Program2DDrawingCanvasFontColor": {
+            "blendenabled": false,
+            "locWorldViewProj": null,
+            "locNormalMatrix": null,
+            "locModelViewMatrix": null,
+            "locModelWorldMatrix": null,
+            "locLightPositions": null,
+            "locLightColors": null,
+            "locDirectionalLight": null,
+            "locDirectionalLightColor": null,
+            "locFogColor": null,
+            "locFogDensity": null,
+            "locGrassMovement": null,
+            "locWindStrength": null,
+            "locWorldviewprojLight": null,
+            "locWorldviewprojLight2": null,
+            "locShadowMapBias1": null,
+            "locShadowMapBias2": null,
+            "locShadowMapBackfaceBias": null,
+            "locShadowMapOpacity": null,
+            "shaderCallback": null
+        },
+        "OnChangeMaterial": null,
+        "StaticBillboardMeshBuffer": null,
+        "Lights": [],
+        "DirectionalLight": null,
+        "currentGLProgram": {
+            "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"MaterialProgramsWithLight\"][0]"
+        },
+        "domainTextureLoadErrorPrinted": false,
+        "printShaderErrors": true,
+        "CurrentRenderTarget": null,
+        "InvertedDepthTest": false,
+        "FogEnabled": false,
+        "FogColor": {
+            "A": 1,
+            "R": 1,
+            "G": 1,
+            "B": 1
+        },
+        "FogDensity": 0.01,
+        "WindSpeed": 1,
+        "WindStrength": 4,
+        "ShadowMapEnabled": false,
+        "ShadowMapTexture": null,
+        "ShadowMapTexture2": null,
+        "ShadowMapLightMatrix": null,
+        "ShadowMapLightMatrix2": null,
+        "ShadowMapUsesRGBPacking": false,
+        "ShadowMapBias1": 0.000003,
+        "ShadowMapBias2": 0.000003,
+        "ShadowMapBackFaceBias": 0.5,
+        "ShadowMapOpacity": 0.5,
+        "UsesWebGL2": true
+    },
+    "IsPaused": false,
+    "NextCameraToSetActive": null,
+    "TheTextureManager": {
+        "$ref": "$[\"Scenes\"][0][\"RootNode\"][\"Children\"][0][\"engine\"][\"TheRenderer\"][\"TheTextureManager\"]"
+    },
+    "TheMeshCache": {
+        "Meshes": []
+    },
+    "LoadingAFile": false,
+    "WaitingForTexturesToBeLoaded": false,
+    "LoadingAnimationCounter": 0,
+    "FPS": 60,
+    "OnAnimate": null,
+    "OnBeforeDrawAll": null,
+    "OnLoadingComplete": null,
+    "requestPointerLockAfterFullscreen": false,
+    "pointerIsCurrentlyLocked": false,
+    "playingVideoStreams": [],
+    "pointerLockForFPSCameras": true,
+    "fullpage": true,
+    "NoWebGLText": "\t\tError: This browser does not support WebGL (or it is disabled).<br/>\t\tSee <a href=\"http://www.ambiera.com/copperlicht/browsersupport.html\">here</a> for details.",
+    "RegisteredAnimatorsForKeyUp": [],
+    "RegisteredAnimatorsForKeyDown": [],
+    "MouseIsDown": false,
+    "MouseX": 0,
+    "MouseY": 0,
+    "MouseMoveX": 0,
+    "MouseMoveY": 0,
+    "MouseDownX": 0,
+    "MouseDownY": 0,
+    "MouseIsInside": true,
+    "IsTouchPinching": false,
+    "StartTouchPinchDistance": 0,
+    "LastCameraDragTime": 0,
+    "LoadingDialog": {},
+    "CanvasTopLeftX": 0,
+    "CanvasTopLeftY": 0,
+    "LoadingImage": {}
+}

@@ -18,60 +18,60 @@ if(!this.GLSL)
 CL3D.Renderer = function(textureManager)
 {
 	this.TheTextureManager = textureManager;
-	
+
 	this.canvas = null;
 	this.gl = null;
 	this.width = 0;
 	this.height = 0;
 	this.textureWasLoadedFlag = false;
-	
+
 	this.Projection = new CL3D.Matrix4();
 	this.View = new CL3D.Matrix4();
 	this.World = new CL3D.Matrix4();
-	
+
 	this.AmbientLight = new CL3D.ColorF();
 	this.AmbientLight.R = 0.0;
 	this.AmbientLight.G = 0.0;
 	this.AmbientLight.B = 0.0;
-	
+
 	this.programStandardMaterial = null;
 	this.programLightmapMaterial = null;
-	
+
 	this.MaterialPrograms = new Array();
 	this.MaterialProgramsWithLight = new Array();
 	this.MaterialProgramsFog = new Array();
 	this.MaterialProgramsWithLightFog = new Array();
 	this.MaterialProgramsWithShadowMap = new Array();
 	this.MinExternalMaterialTypeId = 30;
-	
+
 	this.Program2DDrawingColorOnly = null;
 	this.Program2DDrawingTextureOnly = null;
 	this.Program2DDrawingCanvasFontColor = null;
-	
+
 	this.OnChangeMaterial = null;
-	
+
 	this.StaticBillboardMeshBuffer = null;
-	
+
 	this.Lights = new Array();
 	this.DirectionalLight = null;
-	
+
 	// webgl specific
 	this.currentGLProgram = null;
-	
+
 	this.domainTextureLoadErrorPrinted = false;
-	
+
 	this.printShaderErrors = true;
-	
+
 	this.CurrentRenderTarget = null;
 	this.InvertedDepthTest = false;
-	
+
 	this.FogEnabled = false;
 	this.FogColor = new CL3D.ColorF();
 	this.FogDensity = 0.01;
-	
+
 	this.WindSpeed = 1.0;
 	this.WindStrength = 4.0;
-	
+
 	this.ShadowMapEnabled = false;
 	this.ShadowMapTexture = null;
 	this.ShadowMapTexture2 = null; // for second shadow buffer in case CL3D.UseShadowCascade is true
@@ -80,14 +80,14 @@ CL3D.Renderer = function(textureManager)
 	this.ShadowMapUsesRGBPacking = false;
 	this.ShadowMapBias1 = 0.000003;
 	this.ShadowMapBias2 = 0.000003;
-	this.ShadowMapBackFaceBias = 0.5;		
+	this.ShadowMapBackFaceBias = 0.5;
 	this.ShadowMapOpacity = 0.5;
-	
+
 	this.UsesWebGL2 = false;
 };
 
 /**
- * Event handler called after the renderer switches to a specific material, useful for shader programming. 
+ * Event handler called after the renderer switches to a specific material, useful for shader programming.
  * You can use this to set the variables and uniforms in a custom shader by using this callback.
  * The first parameter of the function is the material type id, which gets returned for example by createMaterialType().
  * @example
@@ -96,11 +96,11 @@ CL3D.Renderer = function(textureManager)
  * // [...] create a shader and material here using for example
  * // var newMaterialType = engine.getRenderer().
  * //    createMaterialType(vertex_shader_source, fragment_shader_source);
- *	
+ *
  * // register callback function to set a variable in the new shader:
  * // note that createMaterialType() also accepts a shadercallback function as parameters
  * // which you could use instead of this approach.
- * engine.getRenderer().OnChangeMaterial = function(mattype) 
+ * engine.getRenderer().OnChangeMaterial = function(mattype)
  * {
  *   var renderer = engine.getRenderer();
  *   if (renderer && mattype == newMaterialType)
@@ -119,7 +119,7 @@ CL3D.Renderer = function(textureManager)
  */
 CL3D.Renderer.prototype.OnChangeMaterial = null;
 
-/** 
+/**
  * Returns the current width of the rendering surface in pixels.
  * @public
  **/
@@ -149,7 +149,7 @@ CL3D.Renderer.prototype.getWebGL = function()
 }
 
 
-/** 
+/**
  * Returns the current height of the rendering surface in pixels.
  * @public
  **/
@@ -177,11 +177,11 @@ CL3D.Renderer.prototype.drawMesh = function(mesh, forceNoShadowMap)
 {
 	if (mesh == null)
 		return;
-		
+
 	for (var i=0; i<mesh.MeshBuffers.length; ++i)
 	{
-		var buf = mesh.MeshBuffers[i];	
-		this.setMaterial(buf.Mat, forceNoShadowMap);		
+		var buf = mesh.MeshBuffers[i];
+		this.setMaterial(buf.Mat, forceNoShadowMap);
 		this.drawMeshBuffer(buf);
 	}
 }
@@ -198,11 +198,11 @@ CL3D.Renderer.prototype.setMaterial = function(mat, forceNoShadowMap)
 	{
 		return;
 	}
-	
+
 	var gl = this.gl;
 	if (gl == null)
 		return;
-	
+
 	// --------------------------------------------
 	// set material
 
@@ -228,31 +228,31 @@ CL3D.Renderer.prototype.setMaterial = function(mat, forceNoShadowMap)
 				program = this.MaterialPrograms[mat.Type];
 		}
 	}
-	catch(e) 
+	catch(e)
 	{
 	}
-	
+
 	if (program == null)
 		return;
 
 	this.currentGLProgram = program;
 	gl.useProgram(program);
-	
+
 	// call callback function
 	if (this.OnChangeMaterial != null)
 	{
 		try
-		{			
+		{
 			this.OnChangeMaterial(mat.Type);
 		}
 		catch(e) {}
 	}
-	
+
 	if (program.shaderCallback != null)
 		program.shaderCallback();
-	
+
 	// set program blend mode
-	
+
 	if (program.blendenabled)
 	{
 		gl.enable(gl.BLEND);
@@ -260,59 +260,59 @@ CL3D.Renderer.prototype.setMaterial = function(mat, forceNoShadowMap)
 	}
 	else
 		gl.disable(gl.BLEND);
-	
+
 	// zwrite mode
-		
+
 	if (!mat.ZWriteEnabled || mat.doesNotUseDepthMap())
 		gl.depthMask(false);
 	else
 		gl.depthMask(true);
-		
+
 	// zread mode
-	
+
 	if (mat.ZReadEnabled)
 		gl.enable(gl.DEPTH_TEST);
 	else
 		gl.disable(gl.DEPTH_TEST);
-		
+
 	// depth function
-	
+
 	gl.depthFunc( this.InvertedDepthTest ? gl.GREATER : gl.LEQUAL );
-		
+
 	// backface culling
-	
+
 	if (mat.BackfaceCulling)
 		gl.enable(gl.CULL_FACE);
 	else
 		gl.disable(gl.CULL_FACE);
-	
+
 	// -------------------------------------------
 	// set textures
-	
+
 	// texture 1
-	
+
 	if (mat.Tex1 && mat.Tex1.Loaded)
 	{
 		gl.activeTexture(gl.TEXTURE0);
 		gl.bindTexture(gl.TEXTURE_2D, mat.Tex1.Texture);
-		
+
 		// texture clamping
-		
+
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, mat.ClampTexture1 ? gl.CLAMP_TO_EDGE : gl.REPEAT);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, mat.ClampTexture1 ? gl.CLAMP_TO_EDGE : gl.REPEAT);
 	}
 	else
 	{
 		// not yet loaded or inactive
-	
+
 		gl.activeTexture(gl.TEXTURE0);
 		gl.bindTexture(gl.TEXTURE_2D, null);
 	}
-	
+
 	gl.uniform1i(gl.getUniformLocation(program, "texture1"), 0);
-	
+
 	// texture 2
-	
+
 	if (mat.Tex2 && mat.Tex2.Loaded)
 	{
 		gl.activeTexture(gl.TEXTURE1);
@@ -321,11 +321,11 @@ CL3D.Renderer.prototype.setMaterial = function(mat, forceNoShadowMap)
 	else
 	{
 		// not yet loaded or inactive
-	
+
 		gl.activeTexture(gl.TEXTURE1);
 		gl.bindTexture(gl.TEXTURE_2D, null);
 	}
-	
+
 	gl.uniform1i(gl.getUniformLocation(program, "texture2"), 1);
 }
 
@@ -338,7 +338,7 @@ CL3D.Renderer.prototype.setCullMode = function(mode)
 {
 	var gl = this.gl;
 	var m = 0;
-	
+
 	if (mode == 1)
 		m = gl.FRONT;
 	else
@@ -347,14 +347,14 @@ CL3D.Renderer.prototype.setCullMode = function(mode)
 	else
 	if (mode == 3)
 		m = gl.FRONT_AND_BACK;
-		
+
 	gl.cullFace(m);
 }
 
 
 /**
  * Draws a mesh buffer.
- * Note, you might want to set the material of the mesh buffer before drawing it, use {@link setMaterial}() 
+ * Note, you might want to set the material of the mesh buffer before drawing it, use {@link setMaterial}()
  * to do this before calling this function.
  * @param {CL3D.MeshBuffer} buf the mesh buffer to draw.
  * @public
@@ -363,10 +363,10 @@ CL3D.Renderer.prototype.drawMeshBuffer = function(buf, indexCountToUse)
 {
 	if (buf == null)
 		return;
-		
+
 	if (this.gl == null)
 		return;
-		
+
 	if (buf.RendererNativeArray == null)
 		this.createRendererNativeArray(buf)
 	else
@@ -375,10 +375,10 @@ CL3D.Renderer.prototype.drawMeshBuffer = function(buf, indexCountToUse)
 	else
 	if (buf.OnlyPositionsChanged)
 		this.updatePositionsInRendererNativeArray(buf);
-		
+
 	buf.OnlyPositionsChanged = false;
 	buf.OnlyUpdateBufferIfPossible = false;
-		
+
 	this.drawWebGlStaticGeometry(buf.RendererNativeArray, indexCountToUse);
 }
 
@@ -390,7 +390,7 @@ CL3D.Renderer.prototype.updateRendererNativeArray = function(buf)
 {
 	if (buf.Vertices.length == 0 ||  buf.Indices.length == 0)
 		return;
-		
+
 	if (buf.RendererNativeArray.vertexCount < buf.Vertices.length ||
 	    buf.RendererNativeArray.indexCount < buf.Indices.length)
 	{
@@ -398,55 +398,55 @@ CL3D.Renderer.prototype.updateRendererNativeArray = function(buf)
 		this.createRendererNativeArray(buf)
 		return;
 	}
-	
+
 	if (buf.RendererNativeArray != null)
 	{
 		var  gl = this.gl;
 		var len = buf.Vertices.length;
-		
+
 		var positionsArray = buf.RendererNativeArray.positionsArray;
 		var colorArray = buf.RendererNativeArray.colorArray;
-		
+
 		for (var i=0; i<len; ++i)
 		{
 			var v = buf.Vertices[i];
-			
+
 			positionsArray[i*3+0] = v.Pos.X;
 			positionsArray[i*3+1] = v.Pos.Y;
 			positionsArray[i*3+2] = v.Pos.Z;
-			
+
 			colorArray[i*4+0] = CL3D.getRed(v.Color)/255.0;
 			colorArray[i*4+1] = CL3D.getGreen(v.Color)/255.0;
-			colorArray[i*4+2] = CL3D.getBlue(v.Color)/255.0;			
+			colorArray[i*4+2] = CL3D.getBlue(v.Color)/255.0;
 			colorArray[i*4+3] = CL3D.getAlpha(v.Color)/255.0;
 		}
-		
+
 		gl.bindBuffer(gl.ARRAY_BUFFER, buf.RendererNativeArray.positionBuffer);
 		gl.bufferSubData(gl.ARRAY_BUFFER, 0, positionsArray);
-		
+
 		gl.bindBuffer(gl.ARRAY_BUFFER, buf.RendererNativeArray.colorBuffer);
 		gl.bufferSubData(gl.ARRAY_BUFFER, 0, colorArray);
-		
+
 		// this is used for particle systems. The indices only update when size of the array changes
 		if (buf.RendererNativeArray.indexCount < buf.Indices.length)
 		{
 			var indexCount = buf.Indices.length;
-			var indexArray = new WebGLUnsignedShortArray(indexCount);		
-			
+			var indexArray = new WebGLUnsignedShortArray(indexCount);
+
 			for (var j=0; j<indexCount; j+=3)
 			{
 				indexArray[j+0] = buf.Indices[j+0];
 				indexArray[j+1] = buf.Indices[j+2];
 				indexArray[j+2] = buf.Indices[j+1];
-			}	
+			}
 
 			buf.RendererNativeArray.indexBuffer = gl.createBuffer();
 			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buf.RendererNativeArray.indexBuffer);
 			gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indexArray, gl.STATIC_DRAW);
-			
+
 			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
 		}
-		
+
 		buf.RendererNativeArray.indexCount = buf.Indices.length;
 		buf.RendererNativeArray.vertexCount = buf.Vertices.length;
 	}
@@ -462,18 +462,18 @@ CL3D.Renderer.prototype.updatePositionsInRendererNativeArray = function(buf)
 	{
 		var  gl = this.gl;
 		var len = buf.Vertices.length;
-		
+
 		var positionsArray = buf.RendererNativeArray.positionsArray;
-		
+
 		for (var i=0; i<len; ++i)
 		{
 			var v = buf.Vertices[i];
-			
+
 			positionsArray[i*3+0] = v.Pos.X;
 			positionsArray[i*3+1] = v.Pos.Y;
 			positionsArray[i*3+2] = v.Pos.Z;
 		}
-		
+
 		gl.bindBuffer(gl.ARRAY_BUFFER, buf.RendererNativeArray.positionBuffer);
 		gl.bufferSubData(gl.ARRAY_BUFFER, 0, positionsArray);
 	}
@@ -491,56 +491,56 @@ CL3D.Renderer.prototype.createRendererNativeArray = function(buf)
 		var  gl = this.gl;
 		var obj = new Object();
 		var len = buf.Vertices.length;
-		
-		var positionsArray = new WebGLFloatArray(len*3);		
+
+		var positionsArray = new WebGLFloatArray(len*3);
 		var normalsArray = new WebGLFloatArray(len*3);
 		var tcoordsArray = new WebGLFloatArray(len*2);
 		var tcoordsArray2 = new WebGLFloatArray(len*2);
 		var colorArray = new WebGLFloatArray(len*4);
-		
+
 		var tangentsArray = null;
 		var binormalsArray = null;
 		if (buf.Tangents)
 			tangentsArray = new WebGLFloatArray(len*3);
 		if (buf.Binormals)
 			binormalsArray = new WebGLFloatArray(len*3);
-	
+
 		for (var i=0; i<len; ++i)
 		{
 			var v = buf.Vertices[i];
-			
+
 			positionsArray[i*3+0] = v.Pos.X;
 			positionsArray[i*3+1] = v.Pos.Y;
 			positionsArray[i*3+2] = v.Pos.Z;
-			
+
 			normalsArray[i*3+0] = v.Normal.X;
 			normalsArray[i*3+1] = v.Normal.Y;
 			normalsArray[i*3+2] = v.Normal.Z;
-			
+
 			tcoordsArray[i*2+0] = v.TCoords.X;
 			tcoordsArray[i*2+1] = v.TCoords.Y;
-			
+
 			tcoordsArray2[i*2+0] = v.TCoords2.X;
 			tcoordsArray2[i*2+1] = v.TCoords2.Y;
-			
+
 			colorArray[i*4+0] = CL3D.getRed(v.Color)/255.0;
 			colorArray[i*4+1] = CL3D.getGreen(v.Color)/255.0;
-			colorArray[i*4+2] = CL3D.getBlue(v.Color)/255.0;			
+			colorArray[i*4+2] = CL3D.getBlue(v.Color)/255.0;
 			colorArray[i*4+3] = CL3D.getAlpha(v.Color)/255.0;
-		}	
-		
+		}
+
 		if (tangentsArray && binormalsArray)
 		{
 			for (var i=0; i<len; ++i)
 			{
 				var t = buf.Tangents[i];
-				
+
 				tangentsArray[i*3+0] = t.X;
 				tangentsArray[i*3+1] = t.Y;
 				tangentsArray[i*3+2] = t.Z;
-				
+
 				var b = buf.Binormals[i];
-				
+
 				binormalsArray[i*3+0] = b.X;
 				binormalsArray[i*3+1] = b.Y;
 				binormalsArray[i*3+2] = b.Z;
@@ -548,67 +548,67 @@ CL3D.Renderer.prototype.createRendererNativeArray = function(buf)
 		}
 
 		var indexCount = buf.Indices.length;
-		var indexArray = new WebGLUnsignedShortArray(indexCount);		
-		
+		var indexArray = new WebGLUnsignedShortArray(indexCount);
+
 		for (var j=0; j<indexCount; j+=3)
 		{
 			indexArray[j+0] = buf.Indices[j+0];
 			indexArray[j+1] = buf.Indices[j+2];
 			indexArray[j+2] = buf.Indices[j+1];
-		}		
-		
+		}
+
 		// create render arrays
-				
+
 		obj.positionBuffer = gl.createBuffer();
 		gl.bindBuffer(gl.ARRAY_BUFFER, obj.positionBuffer);
 		gl.bufferData(gl.ARRAY_BUFFER, positionsArray, gl.DYNAMIC_DRAW); //gl.STATIC_DRAW); // set to dynamic draw to make it possible to update it later
 		obj.positionsArray = positionsArray; // storing it for making it possible to update this later
-		
+
 		obj.texcoordsBuffer = gl.createBuffer();
 		gl.bindBuffer(gl.ARRAY_BUFFER, obj.texcoordsBuffer);
 		gl.bufferData(gl.ARRAY_BUFFER, tcoordsArray, gl.STATIC_DRAW);
-		
+
 		obj.texcoordsBuffer2 = gl.createBuffer();
 		gl.bindBuffer(gl.ARRAY_BUFFER, obj.texcoordsBuffer2);
 		gl.bufferData(gl.ARRAY_BUFFER, tcoordsArray2, gl.STATIC_DRAW);
-		
+
 		obj.normalBuffer = gl.createBuffer();
 		gl.bindBuffer(gl.ARRAY_BUFFER, obj.normalBuffer);
 		gl.bufferData(gl.ARRAY_BUFFER, normalsArray, gl.STATIC_DRAW);
-		
+
 		if (tangentsArray && binormalsArray)
 		{
 			obj.tangentBuffer = gl.createBuffer();
 			gl.bindBuffer(gl.ARRAY_BUFFER, obj.tangentBuffer);
 			gl.bufferData(gl.ARRAY_BUFFER, tangentsArray, gl.STATIC_DRAW);
-			
+
 			obj.binormalBuffer = gl.createBuffer();
 			gl.bindBuffer(gl.ARRAY_BUFFER, obj.binormalBuffer);
 			gl.bufferData(gl.ARRAY_BUFFER, binormalsArray, gl.STATIC_DRAW);
 		}
-		
+
 		gl.bindBuffer(gl.ARRAY_BUFFER, null);
-		
+
 		obj.colorBuffer = gl.createBuffer();
 		gl.bindBuffer(gl.ARRAY_BUFFER, obj.colorBuffer);
 		gl.bufferData(gl.ARRAY_BUFFER, colorArray, gl.STATIC_DRAW);
 		obj.colorArray = colorArray; // storing it for making it possible to update this later
-				
+
 		gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
 		obj.indexBuffer = gl.createBuffer();
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, obj.indexBuffer);
 		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indexArray, gl.STATIC_DRAW);
-		
+
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
-	
+
 		// finalize
-		
+
 		obj.gl = gl;
 		obj.indexCount = indexCount;
 		obj.vertexCount = len;
-		
-		buf.RendererNativeArray = obj;    
+
+		buf.RendererNativeArray = obj;
 		buf.OnlyPositionsChanged = false;
 		buf.OnlyUpdateBufferIfPossible = false;
 	}
@@ -620,13 +620,13 @@ CL3D.Renderer.prototype.createRendererNativeArray = function(buf)
 CL3D.Renderer.prototype.drawWebGlStaticGeometry = function(b, indexCountToUse)
 {
 	//CL3D.gCCDebugOutput.print("drawElementsBegin with " + b.indexCount + " indices " + b.positionBuffer + " " + b.texcoordsBuffer + " " + b.normalBuffer);
-	
+
 	var  gl = this.gl;
-	
+
 	var withTangentsAndBinormals = b.tangentBuffer && b.binormalBuffer;
-	
+
 	// enable all of the vertex attribute arrays.
-	
+
 	gl.enableVertexAttribArray(0);
 	gl.enableVertexAttribArray(1);
 	gl.enableVertexAttribArray(2);
@@ -640,56 +640,56 @@ CL3D.Renderer.prototype.drawWebGlStaticGeometry = function(b, indexCountToUse)
 
 	gl.bindBuffer(gl.ARRAY_BUFFER, b.texcoordsBuffer);
 	gl.vertexAttribPointer(1, 2, gl.FLOAT, false, 0, 0);
-	
+
 	gl.bindBuffer(gl.ARRAY_BUFFER, b.texcoordsBuffer2);
 	gl.vertexAttribPointer(2, 2, gl.FLOAT, false, 0, 0);
 
 	gl.bindBuffer(gl.ARRAY_BUFFER, b.normalBuffer);
 	gl.vertexAttribPointer(3, 3, gl.FLOAT, false, 0, 0);
-	
+
 	gl.bindBuffer(gl.ARRAY_BUFFER, b.colorBuffer);
 	gl.vertexAttribPointer(4, 4, gl.FLOAT, false, 0, 0);
-	
+
 	if (withTangentsAndBinormals)
 	{
 		gl.enableVertexAttribArray(5);
 		gl.enableVertexAttribArray(6);
-	
+
 		gl.bindBuffer(gl.ARRAY_BUFFER, b.tangentBuffer);
 		gl.vertexAttribPointer(5, 3, gl.FLOAT, false, 0, 0);
-	
+
 		gl.bindBuffer(gl.ARRAY_BUFFER, b.binormalBuffer);
 		gl.vertexAttribPointer(6, 3, gl.FLOAT, false, 0, 0);
 	}
 
 	// bind the index array
-	
+
 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, b.indexBuffer);
-	
+
 	// matrices
-	
+
 	var mat = new CL3D.Matrix4(false);
 	this.Projection.copyTo(mat);
 	mat = mat.multiply(this.View);
 	mat = mat.multiply(this.World);
-	
+
 	// set world view projection matrix
 	var program = this.currentGLProgram;
 	if (program.locWorldViewProj != null)
 		gl.uniformMatrix4fv(program.locWorldViewProj, false, this.getMatrixAsWebGLFloatArray(mat));
-	
+
 	// set normal matrix
 	if (program.locNormalMatrix != null)
 	{
 		// set the normal matrix
-		
+
 		var matnormal = new CL3D.Matrix4(true);
 		this.Projection.copyTo(matnormal);
 		matnormal = matnormal.multiply(this.View);
 		matnormal = matnormal.multiply(this.World);
 		matnormal.makeInverse();
 		matnormal = matnormal.getTransposed(); // the second argument below, 'false', cannot be set to true because it doesn't work, so we have to transpose it ourselves
-		
+
 		gl.uniformMatrix4fv(program.locNormalMatrix, false, this.getMatrixAsWebGLFloatArray(matnormal));
 	}
 
@@ -697,35 +697,35 @@ CL3D.Renderer.prototype.drawWebGlStaticGeometry = function(b, indexCountToUse)
 	if (program.locModelViewMatrix != null)
 	{
 		// set the model view matrix
-		
+
 		var matmodelview = new CL3D.Matrix4(true);
 		matmodelview = matmodelview.multiply(this.View);
 		matmodelview = matmodelview.multiply(this.World);
-		
+
 		gl.uniformMatrix4fv(program.locModelViewMatrix, false, this.getMatrixAsWebGLFloatArray(matmodelview));
 	}
-	
+
 	// set model view
 	if (program.locModelWorldMatrix != null)
 	{
-		// set the model world matrix		
+		// set the model world matrix
 		gl.uniformMatrix4fv(program.locModelWorldMatrix, false, this.getMatrixAsWebGLFloatArray(this.World.getTransposed()));
 	}
-	
+
 	// set light values
 	if (program.locLightPositions != null)
 		this.setDynamicLightsIntoConstants(program, withTangentsAndBinormals, withTangentsAndBinormals); // when using normal maps, we need word space coordinates of the light positions
-		
+
 	// set fog values
 	if (program.locFogColor != null)
 		this.gl.uniform4f(program.locFogColor, this.FogColor.R, this.FogColor.G, this.FogColor.B, 1.0);
 	if (program.locFogDensity != null)
 		this.gl.uniform1f(program.locFogDensity, this.FogDensity);
-		
+
 	// set shadow map values
 	if (this.ShadowMapEnabled)
 		this.setShadowMapDataIntoConstants(program);
-		
+
 	// set grass movement values
 	if (program.locGrassMovement != null)
 	{
@@ -733,26 +733,26 @@ CL3D.Renderer.prototype.drawWebGlStaticGeometry = function(b, indexCountToUse)
 		this.gl.uniform1f(program.locGrassMovement, grassMovement);
 		this.gl.uniform1f(program.locWindStrength, this.WindStrength);
 	}
-	
+
 	// draw
-	
+
 	if (indexCountToUse == null)
 		indexCountToUse = b.indexCount;
-		
+
     gl.drawElements(gl.TRIANGLES, indexCountToUse, gl.UNSIGNED_SHORT, 0);
-	
+
 	//CL3D.gCCDebugOutput.print("drawElementsEnd");
-	
+
 	// unbind optional buffers
-	
+
 	if (withTangentsAndBinormals)
 	{
 		gl.disableVertexAttribArray(5);
 		gl.disableVertexAttribArray(6);
-		
+
 		/*gl.bindBuffer(gl.ARRAY_BUFFER, null);
 		gl.vertexAttribPointer(5, 3, gl.FLOAT, false, 0, 0);
-	
+
 		gl.bindBuffer(gl.ARRAY_BUFFER, null);
 		gl.vertexAttribPointer(6, 3, gl.FLOAT, false, 0, 0);*/
 	}
@@ -768,35 +768,35 @@ CL3D.Renderer.prototype.setShadowMapDataIntoConstants = function(program)
 	if (this.ShadowMapLightMatrix && program.locWorldviewprojLight)
 	{
 		var m = new CL3D.Matrix4(true);
-		m = m.multiply(this.ShadowMapLightMatrix);	
-		m = m.multiply(this.World);			
-		
-		gl.uniformMatrix4fv(program.locWorldviewprojLight, false, this.getMatrixAsWebGLFloatArray(m));		
+		m = m.multiply(this.ShadowMapLightMatrix);
+		m = m.multiply(this.World);
+
+		gl.uniformMatrix4fv(program.locWorldviewprojLight, false, this.getMatrixAsWebGLFloatArray(m));
 	}
-	
+
 	if (this.ShadowMapLightMatrix2 && program.locWorldviewprojLight2)
 	{
 		var m = new CL3D.Matrix4(true);
-		m = m.multiply(this.ShadowMapLightMatrix2);	
-		m = m.multiply(this.World);			
-		
-		gl.uniformMatrix4fv(program.locWorldviewprojLight2, false, this.getMatrixAsWebGLFloatArray(m));		
+		m = m.multiply(this.ShadowMapLightMatrix2);
+		m = m.multiply(this.World);
+
+		gl.uniformMatrix4fv(program.locWorldviewprojLight2, false, this.getMatrixAsWebGLFloatArray(m));
 	}
-	
+
 	if (program.locShadowMapBias1)
-		gl.uniform1f(program.locShadowMapBias1, this.ShadowMapBias1);	
-	
+		gl.uniform1f(program.locShadowMapBias1, this.ShadowMapBias1);
+
 	if (program.locShadowMapBias2)
-		gl.uniform1f(program.locShadowMapBias2, this.ShadowMapBias2);	
-	
+		gl.uniform1f(program.locShadowMapBias2, this.ShadowMapBias2);
+
 	if (program.locShadowMapBackfaceBias)
-		gl.uniform1f(program.locShadowMapBackfaceBias, this.ShadowMapBackfaceBias);	
-			
+		gl.uniform1f(program.locShadowMapBackfaceBias, this.ShadowMapBackfaceBias);
+
 	if (program.locShadowMapOpacity)
-		gl.uniform1f(program.locShadowMapOpacity, this.ShadowMapOpacity);	
-		
+		gl.uniform1f(program.locShadowMapOpacity, this.ShadowMapOpacity);
+
 	// shadow map texture
-	
+
 	if (this.ShadowMapTexture)
 	{
 		gl.activeTexture(gl.TEXTURE2);
@@ -805,14 +805,14 @@ CL3D.Renderer.prototype.setShadowMapDataIntoConstants = function(program)
 	else
 	{
 		// not yet loaded or inactive
-	
+
 		gl.activeTexture(gl.TEXTURE2);
 		gl.bindTexture(gl.TEXTURE_2D, null);
 	}
-	
+
 	gl.uniform1i(gl.getUniformLocation(program, "shadowmap"), 2);
-	
-	
+
+
 	if (CL3D.UseShadowCascade)
 	{
 		if (this.ShadowMapTexture2)
@@ -823,11 +823,11 @@ CL3D.Renderer.prototype.setShadowMapDataIntoConstants = function(program)
 		else
 		{
 			// not yet loaded or inactive
-		
+
 			gl.activeTexture(gl.TEXTURE3);
 			gl.bindTexture(gl.TEXTURE_2D, null);
 		}
-		
+
 		gl.uniform1i(gl.getUniformLocation(program, "shadowmap2"), 3);
 	}
 }
@@ -839,98 +839,98 @@ CL3D.Renderer.prototype.setDynamicLightsIntoConstants = function(program, useWor
 {
 	// we use two contants per light, where we pack Position, Color and Attenuation into, like this:
 	// (px, py, pz, att) and (cr, cg, cb, 1)
-	
+
 	var buf1 = new ArrayBuffer(4 * 4 * Float32Array.BYTES_PER_ELEMENT);
 	var positionArray = new WebGLFloatArray(buf1);
-	
+
 	var buf2 = new ArrayBuffer(5 * 4 * Float32Array.BYTES_PER_ELEMENT);
 	var colorArray = new WebGLFloatArray(buf2);
 
 	// calculate matrix to transform light position into object space (unless useWorldSpacePositionsForLights is true)
-	
+
 	var mat = new CL3D.Matrix4(true);
-	
+
 	if (!useWorldSpacePositionsForLights && ((this.Lights != null && this.Lights.length > 0) || this.DirectionalLight != null))
 		this.World.getInverse(mat);
-	
+
 	// add all lights
-	
+
 	for (var i=0; i<4; ++i)
 	{
 		var idx = i*4;
-		
+
 		if (this.Lights != null && i < this.Lights.length)
 		{
 			var l = this.Lights[i];
-			
+
 			var vt = mat.getTransformedVect(l.Position); // we need to set the position of the light in the current object's space
-			
-			positionArray[idx]   = vt.X; 
-			positionArray[idx+1] = vt.Y; 
+
+			positionArray[idx]   = vt.X;
+			positionArray[idx+1] = vt.Y;
 			positionArray[idx+2] = vt.Z;
-			
+
 			var attenuation = 1.0;
 
-			if (useOldNormalMappingAttenuationCalculation)			
-				attenuation = 1.0 / (l.Radius * l.Radius); 
+			if (useOldNormalMappingAttenuationCalculation)
+				attenuation = 1.0 / (l.Radius * l.Radius);
 			else
-				attenuation = l.Attenuation;			
-				
+				attenuation = l.Attenuation;
+
 			positionArray[idx+3] = attenuation;
-			
-			colorArray[idx]   = l.Color.R; 
-			colorArray[idx+1] = l.Color.G; 
-			colorArray[idx+2] = l.Color.B; 
-			colorArray[idx+3] = 1; 
+
+			colorArray[idx]   = l.Color.R;
+			colorArray[idx+1] = l.Color.G;
+			colorArray[idx+2] = l.Color.B;
+			colorArray[idx+3] = 1;
 		}
 		else
 		{
 			// add a dark light, since the shader expects 4 lights
-			
-			positionArray[idx]   = 1; 
-			positionArray[idx+1] = 0; 
-			positionArray[idx+2] = 0; 
-			positionArray[idx+3] = 1.0; 
-			
-			colorArray[idx]   = 0; 
-			colorArray[idx+1] = 0; 
-			colorArray[idx+2] = 0; 
+
+			positionArray[idx]   = 1;
+			positionArray[idx+1] = 0;
+			positionArray[idx+2] = 0;
+			positionArray[idx+3] = 1.0;
+
+			colorArray[idx]   = 0;
+			colorArray[idx+1] = 0;
+			colorArray[idx+2] = 0;
 			colorArray[idx+3] = 1;
 		}
 	}
-	
+
 	// add ambient light
-	
-	colorArray[16] = this.AmbientLight.R; 
-	colorArray[17] = this.AmbientLight.G; 
-	colorArray[18] = this.AmbientLight.B; 
-	colorArray[19] = 1.0; 
-		
+
+	colorArray[16] = this.AmbientLight.R;
+	colorArray[17] = this.AmbientLight.G;
+	colorArray[18] = this.AmbientLight.B;
+	colorArray[19] = 1.0;
+
 	// send point lights and ambient light to 3d card
-	
+
 	this.gl.uniform4fv(program.locLightPositions, positionArray);
 	this.gl.uniform4fv(program.locLightColors, colorArray);
-		
+
 	// add directional light
-	
+
 	if (program.locDirectionalLight != null)
 	{
 		var dirlight = this.DirectionalLight;
-		
+
 		var dir = null;
-		
+
 		if (dirlight && dirlight.Direction)
 			dir = dirlight.Direction.clone();
 		else
 			dir = new CL3D.Vect3d(1,0,0);
-			
+
 		dir.multiplyThisWithScal(-1.0);
-		
+
 		mat.rotateVect(dir);
 		dir.normalize();
-			
+
 		this.gl.uniform3f(program.locDirectionalLight, dir.X, dir.Y, dir.Z, 1.0);
-		
+
 		if (dirlight)
 			this.gl.uniform4f(program.locDirectionalLightColor, dirlight.Color.R, dirlight.Color.G, dirlight.Color.B, 1.0);
 		else
@@ -952,10 +952,10 @@ CL3D.Renderer.prototype.draw3DLine = function(vect3dFrom, vect3dTo)
 /**
  * Draws a 2d rectangle
  * @public
- * @param x {Number} x coordinate in pixels 
- * @param y {Number} y coordinate in pixels 
- * @param width {Number} width of the rectangle in pixels 
- * @param height {Number} height of the rectangle in pixels 
+ * @param x {Number} x coordinate in pixels
+ * @param y {Number} y coordinate in pixels
+ * @param width {Number} width of the rectangle in pixels
+ * @param height {Number} height of the rectangle in pixels
  * @param color {Number} color of the rectangle. See CL3D.createColor()
  * @param blend {Boolean} (optional) set to true to enable alpha blending (using the alpha component of the color) and false not to blend
  */
@@ -963,91 +963,91 @@ CL3D.Renderer.prototype.draw2DRectangle = function(x, y, width, height, color, b
 {
 	if (width <= 0 || height <= 0 || this.width == 0 || this.height == 0)
 		return;
-		
+
 	var doblend = true;
 	if (blend == null || blend == false)
-		doblend = false;	
-		
+		doblend = false;
+
 	var  gl = this.gl;
-	
+
 	gl.enableVertexAttribArray(0);
 	gl.disableVertexAttribArray(1);
 	gl.disableVertexAttribArray(2);
 	gl.disableVertexAttribArray(3);
 	gl.disableVertexAttribArray(4);
-	
+
 	// transform to view
-	
+
 	y = this.height - y; // upside down
 	var xFact = 2.0 / this.width;
 	var yFact = 2.0 / this.height;
-	
+
 	x = (x * xFact) - 1;
 	y = (y * yFact) - 1;
 	width *= xFact;
 	height *= yFact;
-		
-	// positions 
-	
-	var positionsArray = new WebGLFloatArray(4*3);	
-	
+
+	// positions
+
+	var positionsArray = new WebGLFloatArray(4*3);
+
 	positionsArray[0] = x;
 	positionsArray[1] = y;
 	positionsArray[2] = 0;
-	
+
 	positionsArray[3] = x + width;
 	positionsArray[4] = y;
 	positionsArray[5] = 0;
-	
+
 	positionsArray[6] = x + width;
 	positionsArray[7] = y - height;
 	positionsArray[8] = 0;
-	
+
 	positionsArray[9] = x;
 	positionsArray[10] = y - height;
 	positionsArray[11] = 0;
-	
+
 	// indices
-	
+
 	var indexCount = 6;
-	var indexArray = new WebGLUnsignedShortArray(indexCount);		
+	var indexArray = new WebGLUnsignedShortArray(indexCount);
 	indexArray[0] = 0;
 	indexArray[1] = 2;
 	indexArray[2] = 1;
 	indexArray[3] = 0;
 	indexArray[4] = 3;
 	indexArray[5] = 2;
-	
+
 	// create render arrays
-				
+
 	var positionBuffer = gl.createBuffer();
 	gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
 	gl.bufferData(gl.ARRAY_BUFFER, positionsArray, gl.STATIC_DRAW);
 	gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 0, 0);
-	
+
 	var indexBuffer = gl.createBuffer();
 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
 	gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indexArray, gl.STATIC_DRAW);
 
 	// set shader
-	
+
 	this.currentGLProgram = this.Program2DDrawingColorOnly;
 	gl.useProgram(this.currentGLProgram);
-	
+
 	// set color
-	
-	gl.uniform4f(gl.getUniformLocation(this.currentGLProgram, "vColor"), 
+
+	gl.uniform4f(gl.getUniformLocation(this.currentGLProgram, "vColor"),
 		CL3D.getRed(color)   / 255,
 		CL3D.getGreen(color) / 255,
 		CL3D.getBlue(color)  / 255,
 		doblend ? (CL3D.getAlpha(color) / 255) : 1.0);
-		
-		
+
+
 	// set blend mode and other tests
-	
+
 	gl.depthMask(false);
 	gl.disable(gl.DEPTH_TEST);
-	
+
 	if (!doblend)
 	{
 		gl.disable(gl.BLEND);
@@ -1057,11 +1057,11 @@ CL3D.Renderer.prototype.draw2DRectangle = function(x, y, width, height, color, b
 		gl.enable(gl.BLEND);
 		gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 	}
-		
+
 	// draw
-			
+
 	gl.drawElements(gl.TRIANGLES, indexCount, gl.UNSIGNED_SHORT, 0);
-	
+
 	// clean up again
 	gl.deleteBuffer(positionBuffer);
 	gl.deleteBuffer(indexBuffer);
@@ -1070,124 +1070,124 @@ CL3D.Renderer.prototype.draw2DRectangle = function(x, y, width, height, color, b
 /**
  * Draws a 2d image
  * @public
- * @param {Number} x x coordinate in pixels 
- * @param {Number} y y coordinate in pixels 
- * @param {Number} width width of the rectangle in pixels 
- * @param {Number} height height of the rectangle in pixels 
+ * @param {Number} x x coordinate in pixels
+ * @param {Number} y y coordinate in pixels
+ * @param {Number} width width of the rectangle in pixels
+ * @param {Number} height height of the rectangle in pixels
  * @param {CL3D.Texture} tex texture to draw
  * @param {Boolean} blend (optional) set to true to enable alpha blending (using the alpha component of the color) and false not to blend
  * @param shaderToUse (optional) shader to be used or null if the default shader should be used. Set this to something returned by getGLProgramFromMaterialType() for example.
  */
 CL3D.Renderer.prototype.draw2DImage = function(x, y, width, height, tex, blend, shaderToUse, srcRightX, srcBottomY, sharp)
-{		
+{
 	if (tex == null || tex.isLoaded() == false || width <= 0 || height <= 0 || this.width == 0 || this.height == 0)
 		return;
-		
+
 	if (srcRightX == null)
 		srcRightX = 1.0;
 	if (srcBottomY == null)
 		srcBottomY = 1.0;
-				
+
 	var doblend = true;
 	if (blend == null || blend == false)
-		doblend = false;	
-		
+		doblend = false;
+
 	var  gl = this.gl;
-	
+
 	gl.enableVertexAttribArray(0);
 	gl.enableVertexAttribArray(1);
 	gl.disableVertexAttribArray(2);
 	gl.disableVertexAttribArray(3);
 	gl.disableVertexAttribArray(4);
-	
+
 	// transform to view
-	
+
 	y = this.height - y; // upside down
 	var xFact = 2.0 / this.width;
 	var yFact = 2.0 / this.height;
-	
+
 	x = (x * xFact) - 1;
 	y = (y * yFact) - 1;
 	width *= xFact;
 	height *= yFact;
-		
-	// positions 
-	
-	var positionsArray = new WebGLFloatArray(4*3);	
-	
+
+	// positions
+
+	var positionsArray = new WebGLFloatArray(4*3);
+
 	positionsArray[0] = x;
 	positionsArray[1] = y;
 	positionsArray[2] = 0;
-	
+
 	positionsArray[3] = x + width;
 	positionsArray[4] = y;
 	positionsArray[5] = 0;
-	
+
 	positionsArray[6] = x + width;
 	positionsArray[7] = y - height;
 	positionsArray[8] = 0;
-	
+
 	positionsArray[9] = x;
 	positionsArray[10] = y - height;
 	positionsArray[11] = 0;
-	
+
 	// texture coordinates
-	
-	var tcoordsArray = new WebGLFloatArray(4*2);	
-	
+
+	var tcoordsArray = new WebGLFloatArray(4*2);
+
 	tcoordsArray[0] = 0;
 	tcoordsArray[1] = 0;
-	
+
 	tcoordsArray[2] = srcRightX;
 	tcoordsArray[3] = 0;
-	
+
 	tcoordsArray[4] = srcRightX;
 	tcoordsArray[5] = srcBottomY;
-	
+
 	tcoordsArray[6] = 0;
 	tcoordsArray[7] = srcBottomY;
-	
+
 	// indices
-	
+
 	var indexCount = 6;
-	var indexArray = new WebGLUnsignedShortArray(indexCount);		
+	var indexArray = new WebGLUnsignedShortArray(indexCount);
 	indexArray[0] = 0;
 	indexArray[1] = 2;
 	indexArray[2] = 1;
 	indexArray[3] = 0;
 	indexArray[4] = 3;
 	indexArray[5] = 2;
-	
+
 	// create render arrays
-				
+
 	var positionBuffer = gl.createBuffer();
 	gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
 	gl.bufferData(gl.ARRAY_BUFFER, positionsArray, gl.STATIC_DRAW);
 	gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 0, 0);
-	
+
 	var tcoordsBuffer = gl.createBuffer();
 	gl.bindBuffer(gl.ARRAY_BUFFER, tcoordsBuffer);
 	gl.bufferData(gl.ARRAY_BUFFER, tcoordsArray, gl.STATIC_DRAW);
 	gl.vertexAttribPointer(1, 2, gl.FLOAT, false, 0, 0);
-	
+
 	var indexBuffer = gl.createBuffer();
 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
 	gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indexArray, gl.STATIC_DRAW);
-		
+
 	// set shader
-	
+
 	if (shaderToUse == null)
 		this.currentGLProgram = this.Program2DDrawingTextureOnly;
 	else
-		this.currentGLProgram = shaderToUse;	
-	
+		this.currentGLProgram = shaderToUse;
+
 	gl.useProgram(this.currentGLProgram);
 
 	// set blend mode and other tests
-	
+
 	gl.depthMask(false);
 	gl.disable(gl.DEPTH_TEST);
-	
+
 	if (!doblend)
 	{
 		gl.disable(gl.BLEND);
@@ -1197,16 +1197,16 @@ CL3D.Renderer.prototype.draw2DImage = function(x, y, width, height, tex, blend, 
 		gl.enable(gl.BLEND);
 		gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 	}
-	
+
 	// set texture
-	
+
 	gl.activeTexture(gl.TEXTURE0);
 	gl.bindTexture(gl.TEXTURE_2D, tex.getWebGLTexture());
-	
-	// disable blur 
+
+	// disable blur
 
 	if (sharp)
-	{		
+	{
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
 	}
@@ -1215,27 +1215,27 @@ CL3D.Renderer.prototype.draw2DImage = function(x, y, width, height, tex, blend, 
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
 	}
-		
+
 	// texture clamping
-		
+
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-			
-	// disable texture 2 
-	
+
+	// disable texture 2
+
 	gl.activeTexture(gl.TEXTURE1);
 	gl.bindTexture(gl.TEXTURE_2D, null);
-		
+
 	// draw
-			
+
 	gl.drawElements(gl.TRIANGLES, indexCount, gl.UNSIGNED_SHORT, 0);
-	
+
 	// clean up again
-	
+
 	gl.deleteBuffer(tcoordsBuffer);
 	gl.deleteBuffer(positionBuffer);
 	gl.deleteBuffer(indexBuffer);
-	
+
 	//if (disableBlur)
 	{
 		// reset to default again
@@ -1254,29 +1254,29 @@ CL3D.Renderer.prototype.draw2DFontImage = function(x, y, width, height, tex, col
 {
 	if (tex == null || tex.isLoaded() == false || width <= 0 || height <= 0 || this.width == 0 || this.height == 0)
 		return;
-		
+
 	var doblend = true;
 	var gl = this.gl;
-		
+
 	this.currentGLProgram = this.Program2DDrawingCanvasFontColor;
 	gl.useProgram(this.currentGLProgram);
-	
+
 	// TODO: in the latest release, non-power-of-two textures do not work anymore, so ALL
 	// out font textures are scaled up. we need to fix this later by drawing them with the actual size and not scaling them up
-	
+
 	// set color
-	
-	gl.uniform4f(gl.getUniformLocation(this.currentGLProgram, "vColor"), 
+
+	gl.uniform4f(gl.getUniformLocation(this.currentGLProgram, "vColor"),
 		CL3D.getRed(color)   / 255,
 		CL3D.getGreen(color) / 255,
 		CL3D.getBlue(color)  / 255,
 		doblend ? (CL3D.getAlpha(color) / 255) : 1.0);
-		
+
 	//this.draw2DImage(x, y, width, height, tex, doblend, this.Program2DDrawingCanvasFontColor, );
-	
+
 	//gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
     //gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-	
+
 	this.draw2DImage(x, y, width, height, tex, doblend, this.Program2DDrawingCanvasFontColor, tex.OriginalWidth / tex.CachedWidth, tex.OriginalHeight / tex.CachedHeight, true);
 }
 
@@ -1291,23 +1291,23 @@ CL3D.Renderer.prototype.beginScene = function(clearColor)
 {
 	if (this.gl == null)
 		return;
-		
+
 	//CL3D.gCCDebugOutput.print("drawBegin");
-		
-	// adjust size 
+
+	// adjust size
 	this.ensuresizeok();
-	
+
 	// clear graphics here
 
 	var gl = this.gl;
-	
+
 	gl.clearDepth(this.InvertedDepthTest ? 0.0 : 1.0);
 	gl.depthMask(true);
-	gl.clearColor(	CL3D.getRed(clearColor) / 255.0, 
-					CL3D.getGreen(clearColor) / 255.0, 
-					CL3D.getBlue(clearColor) / 255.0, 
+	gl.clearColor(	CL3D.getRed(clearColor) / 255.0,
+					CL3D.getGreen(clearColor) / 255.0,
+					CL3D.getBlue(clearColor) / 255.0,
 					1); //CL3D.getAlpha(clearColor) / 255.0);
-						
+
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 }
 
@@ -1333,11 +1333,11 @@ CL3D.Renderer.prototype.endScene = function()
 {
 	if (this.gl == null)
 		return;
-		
+
 	var gl = this.gl;
-	
+
 	gl.flush();
-	
+
 	//CL3D.gCCDebugOutput.print("drawEnd");
 }
 
@@ -1353,7 +1353,7 @@ CL3D.Renderer.prototype.clearDynamicLights = function()
 }
 
 /**
- * Adds a new dynamic light to the rendering pipeline. 
+ * Adds a new dynamic light to the rendering pipeline.
  * @public
   * @param {CL3D.Light} l light data of the light to add
  */
@@ -1364,7 +1364,7 @@ CL3D.Renderer.prototype.addDynamicLight = function(l)
 
 
 /**
- * Sets the current dynamic directional light to the rendering pipeline. 
+ * Sets the current dynamic directional light to the rendering pipeline.
  * The renderer supports an unlimited amount of point lights and one directional light.
  * @public
   * @param {CL3D.Light} l light data of the light to add
@@ -1382,16 +1382,16 @@ CL3D.Renderer.prototype.ensuresizeok = function()
 {
 	if (this.canvas == null  || this.gl == null)
 		return;
-	
+
 	if (this.width == this.canvas.width &&
 	    this.height == this.canvas.height)
 		return;
-	
+
 	this.width = this.canvas.width;
 	this.height = this.canvas.height;
 
 	var gl = this.gl;
-	
+
 	// Set the viewport and projection matrix for the scene
 	if (gl.viewport)
 		gl.viewport(0, 0, this.width, this.height);
@@ -1403,13 +1403,13 @@ CL3D.Renderer.prototype.ensuresizeok = function()
  * @private
  */
 CL3D.Renderer.prototype.init = function(canvaselement)
-{	
+{
 	this.canvas = canvaselement;
 	this.gl = null;
 	try
 	{
 		//this.gl = canvaselement.getContext("2d");
-		
+
 		var names = [];
 		names.push("webgl2");
 		names.push("webgl");
@@ -1418,28 +1418,28 @@ CL3D.Renderer.prototype.init = function(canvaselement)
 		names.push("webkit-3d");
 		names.push("3d");
 
-		for (var i=0; i<names.length; i++) 
+		for (var i=0; i<names.length; i++)
 		{
-			try 
-			{ 
+			try
+			{
 				this.gl = this.canvas.getContext(names[i], {alpha: false }); // { antialias: true }
-				if (this.gl != null) 
+				if (this.gl != null)
 				{
 					if (names[i] == "webgl2")
 						this.UsesWebGL2 = true;
-					
+
 					break;
 				}
-			} 
+			}
 			catch (e)
-			{ 
+			{
 			}
 		}
-	} 
-	catch (e) 
+	}
+	catch (e)
 	{
 	}
-	
+
 	if (this.gl == null)
 	{
 		return false;
@@ -1450,7 +1450,7 @@ CL3D.Renderer.prototype.init = function(canvaselement)
 		this.initWebGL();
 		this.ensuresizeok();
 	}
-	
+
 	return true;
 }
 
@@ -1459,10 +1459,10 @@ CL3D.Renderer.prototype.init = function(canvaselement)
  */
 CL3D.Renderer.prototype.removeCompatibilityProblems = function()
 {
-	// WebKit and Chrome: 
-	// 20. Aug 2010: WebGLFloatArray has been renamed to Float32Array and 
+	// WebKit and Chrome:
+	// 20. Aug 2010: WebGLFloatArray has been renamed to Float32Array and
 	// WebGLUnsignedShortArray to Uint16Array
-	
+
 	if ( typeof WebGLFloatArray == 'undefined' &&
 	     typeof Float32Array != 'undefined' )
 	{
@@ -1471,12 +1471,12 @@ CL3D.Renderer.prototype.removeCompatibilityProblems = function()
 			WebGLFloatArray = Float32Array;
 			WebGLUnsignedShortArray = Uint16Array;
 		}
-		catch (e) 
+		catch (e)
 		{
 			CL3D.gCCDebugOutput.printError("Error: Float32 array types for webgl not found.");
 		}
 	}
-	
+
 	/*
 	if ( typeof WebGLIntArray == 'undefined' &&
 	     typeof Int32Array != 'undefined' )
@@ -1485,17 +1485,17 @@ CL3D.Renderer.prototype.removeCompatibilityProblems = function()
 		{
 			WebGLIntArray = Int32Array;
 		}
-		catch (e) 
+		catch (e)
 		{
 			CL3D.gCCDebugOutput.printError("Error: Int32 array types for webgl not found.");
 		}
 	}
-	*/	
+	*/
 
 	// Firefox:
 	// The WebGL*Array where named Canvas*Array in the past.
 	// However, this will only affect old nightly builds. The current nightly does already
-	// support the new names. (13 Dec 2009).	
+	// support the new names. (13 Dec 2009).
 	if ( typeof WebGLFloatArray == 'undefined' &&
 	     typeof CanvasFloatArray != 'undefined' )
 	{
@@ -1503,26 +1503,26 @@ CL3D.Renderer.prototype.removeCompatibilityProblems = function()
 		{
 			WebGLFloatArray = CanvasFloatArray;
 			WebGLUnsignedShortArray = CanvasUnsignedShortArray;
-			
+
 			// others, not used by copperlicht
 			//WebGLArrayBuffer = CanvasArrayBuffer;
 			//WebGLByteArray = CanvasByteArray;
 			//WebGLUnsignedByteArray = CanvasUnsignedByteArray;
-			//WebGLShortArray = CanvasShortArray;			
+			//WebGLShortArray = CanvasShortArray;
 			//WebGLIntArray = CanvasIntArray;
 			//WebGLUnsignedIntArray = CanvasUnsignedIntArray;
-			
+
 		}
-		catch (e) 
+		catch (e)
 		{
 			CL3D.gCCDebugOutput.printError("Error: canvas array types for webgl not found.");
 		}
 	}
 
 	var gl = this.gl;
-	
+
 	// Google Chrome compatibility code
-	// Since a JavaScript function may have multiple return types, functions 
+	// Since a JavaScript function may have multiple return types, functions
 	// 'getProgrami' and 'getShaderi' where renamed. However, Chrome does still
 	// use the old names.  (30 Nov 2009)
 	if (!gl['getProgramParameter'])
@@ -1534,17 +1534,17 @@ CL3D.Renderer.prototype.removeCompatibilityProblems = function()
 /**
  * @private
  */
-CL3D.Renderer.prototype.loadShader = function(shaderType, shaderSource) 
+CL3D.Renderer.prototype.loadShader = function(shaderType, shaderSource)
 {
 	var gl = this.gl;
     var shader = gl.createShader(shaderType);
-    if (shader == null) 
-		return null;	
-		
+    if (shader == null)
+		return null;
+
     gl.shaderSource(shader, shaderSource);
     gl.compileShader(shader);
- 
-    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) 
+
+    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS))
 	{
 		if (this.printShaderErrors)
 		{
@@ -1554,8 +1554,8 @@ CL3D.Renderer.prototype.loadShader = function(shaderType, shaderSource)
 				CL3D.gCCDebugOutput.printError(msg);
 		}
         return null;
-    }    
- 
+    }
+
     return shader;
 }
 
@@ -1566,60 +1566,60 @@ CL3D.Renderer.prototype.loadShader = function(shaderType, shaderSource)
 CL3D.Renderer.prototype.createShaderProgram = function(vertexShaderSource, fragmentShaderSource, useBinormalsAndTangents)
 {
 	// create shader
-	
+
 	var gl = this.gl;
-	
+
 	var finalVertexShader = vertexShaderSource;
 	var finalFramentShader = fragmentShaderSource;
-	
+
 	var head_append = GLSL`
 		#version 100
 		precision mediump float;
 	`;
-	
+
 	if ( finalVertexShader.indexOf('#version 100') == -1 )
 		finalVertexShader = head_append + vertexShaderSource;
-		
+
 	if ( finalFramentShader.indexOf('#version 100') == -1 )
 		finalFramentShader = head_append + fragmentShaderSource;
-		
+
 	var vertexShader = this.loadShader(gl.VERTEX_SHADER, finalVertexShader);
 	var fragmentShader = this.loadShader(gl.FRAGMENT_SHADER, finalFramentShader);
-	
+
 	if (!vertexShader || !fragmentShader)
 	{
 		if (this.printShaderErrors)
 			CL3D.gCCDebugOutput.print("Could not create shader program");
 		return null;
 	}
-		 
+
 	// create program
-	
+
 	// create program object
 	var program = gl.createProgram();
-	 
+
 	// attach our two shaders to the program
 	gl.attachShader(program, vertexShader);
 	gl.attachShader(program, fragmentShader);
-	 
+
 	// setup attributes (optional)
 	gl.bindAttribLocation(program, 0, "vPosition");
 	gl.bindAttribLocation(program, 1, "vTexCoord1");
 	gl.bindAttribLocation(program, 2, "vTexCoord2");
-	gl.bindAttribLocation(program, 3, "vNormal");	
-	gl.bindAttribLocation(program, 4, "vColor");	
-	
+	gl.bindAttribLocation(program, 3, "vNormal");
+	gl.bindAttribLocation(program, 4, "vColor");
+
 	if (useBinormalsAndTangents)
 	{
-		gl.bindAttribLocation(program, 5, "vBinormal");	
-		gl.bindAttribLocation(program, 6, "vTangent");	
+		gl.bindAttribLocation(program, 5, "vBinormal");
+		gl.bindAttribLocation(program, 6, "vTangent");
 	}
-	
+
 	//gl.bindTexture(gl.TEXTURE_2D, mat.Tex1.Texture);
-	 
+
 	// linking
 	gl.linkProgram(program);
-	if (!gl.getProgramParameter(program, gl.LINK_STATUS)) 
+	if (!gl.getProgramParameter(program, gl.LINK_STATUS))
 	{
 		if (this.printShaderErrors)
 			CL3D.gCCDebugOutput.print("Could not link program:" + gl.getProgramInfoLog(program));
@@ -1630,11 +1630,11 @@ CL3D.Renderer.prototype.createShaderProgram = function(vertexShaderSource, fragm
 		gl.uniform1i(gl.getUniformLocation(program, "texture1"), 0);
 		gl.uniform1i(gl.getUniformLocation(program, "texture2"), 1);
 	}
-	 
+
 	// setup uniforms (optional)
 	//this.gl.useProgram(program);
 	//this.gl.uniform1i(gl.getUniformLocation(program, "uTexture"), 0);
-	
+
 	return program;
 }
 
@@ -1643,16 +1643,16 @@ CL3D.Renderer.prototype.createShaderProgram = function(vertexShaderSource, fragm
  * There is a tutorial showing how to create a new CL3D.Material in the documentation, but also this short
  * example may give an overview:
  * @public
- * @example 
+ * @example
  * // add a cube to test out
  * var cubenode = new CubeSceneNode();
  * scene.getRootSceneNode().addChild(cubenode);
- * cubenode.getMaterial(0).Tex1 = 
+ * cubenode.getMaterial(0).Tex1 =
  *   engine.getTextureManager().getTexture("crate_wood.jpg", true);
  *
  * // now, we want to use a custom material for our cube, lets write
  * // a vertex and a fragment shader:
- * // (note: there must be no character, even no space behind 
+ * // (note: there must be no character, even no space behind
  * // the '\' characters).
  * var vertex_shader = "           \
  *   uniform mat4 worldviewproj;   \
@@ -1668,7 +1668,7 @@ CL3D.Renderer.prototype.createShaderProgram = function(vertexShaderSource, fragm
  *     v_texCoord1 = vTexCoord1.st; \
  *     v_texCoord2 = vTexCoord2.st; \
  *   }";
- *   
+ *
  *  var fragment_shader = "        \
  *   uniform sampler2D texture1;   \
  *   uniform sampler2D texture2;   \
@@ -1681,18 +1681,18 @@ CL3D.Renderer.prototype.createShaderProgram = function(vertexShaderSource, fragm
  *     vec2 texCoord = vec2(v_texCoord1.s, v_texCoord1.t); \
  *     gl_FragColor = texture2D(texture1, texCoord) * 2; \
  *   }";
- *  
- *  // create a solid material using the shaders. For transparent materials, 
- *  // take a look at the other parameters of createMaterialType  
+ *
+ *  // create a solid material using the shaders. For transparent materials,
+ *  // take a look at the other parameters of createMaterialType
  *  var newMaterialType = engine.getRenderer().createMaterialType(vertex_shader, fragment_shader);
  *  if (newMaterialType != -1)
  *    cubenode.getMaterial(0).Type = newMaterialType;
  *  else
  *    alert('could not create shader');
  * @param vertexShaderSource {String} Source for the vertex shader of the new CL3D.Material. CopperLicht will set the current
- *  World-View-Projection matrix in an attribute named 'worldviewproj' (if existing), the world transformation matrix into 'worldtransform', the normal transformation matrix in an attribute named 
+ *  World-View-Projection matrix in an attribute named 'worldviewproj' (if existing), the world transformation matrix into 'worldtransform', the normal transformation matrix in an attribute named
  *  'normaltransform' if available, and the concatenated view model transformation into an attribute named 'modelviewtransform', if available.
- * Positions will be stored in vPosition, 
+ * Positions will be stored in vPosition,
  * normals in vNormal, the first texture coordinate in vTexCoord1 and the second in vTexCoord2.
  * All other variables will need to be set manually by you. Use {@link getGLProgramFromMaterialType} to do this.
  * @param fragmentShaderSource {String} Source for the fragment shader of the new CL3D.Material. If the fragment shader uses a variable 'texture1' and 'texture2' as in the example above, CopperLicht will set this to the textures of the current material.
@@ -1703,22 +1703,22 @@ CL3D.Renderer.prototype.createShaderProgram = function(vertexShaderSource, fragm
  * @param blenddfactor this is optional. Blend destination factor, when blending is enabled. Set to a webGL blend factor like gl.ONE_MINUS_SRC_ALPHA or gl.ONE_MINUS_SRC_COLOR. You can get the gl object by using {@link getWebGL()}.
  * @param functionShaderCallback {function} an optional function which should be called when the material is being used. Can be used to set shader variables.
  */
-CL3D.Renderer.prototype.createMaterialType = function(vertexShaderSource, fragmentShaderSource, blendenabled, 
+CL3D.Renderer.prototype.createMaterialType = function(vertexShaderSource, fragmentShaderSource, blendenabled,
 													  blendsfactor, blenddfactor, functionShaderCallback)
 {
 	var program = this.createMaterialTypeInternal(vertexShaderSource, fragmentShaderSource, blendenabled, blendsfactor, blenddfactor);
 	if (!program)
 		return -1;
-		
+
 	program.shaderCallback = functionShaderCallback;
-		
-	this.MinExternalMaterialTypeId += 1;		
+
+	this.MinExternalMaterialTypeId += 1;
 	this.MaterialPrograms[this.MinExternalMaterialTypeId] = program;
 	this.MaterialProgramsWithLight[this.MinExternalMaterialTypeId] = program;
 	this.MaterialProgramsFog[this.MinExternalMaterialTypeId] = program;
 	this.MaterialProgramsWithLightFog[this.MinExternalMaterialTypeId] = program;
 	this.MaterialProgramsWithShadowMap[this.MinExternalMaterialTypeId] = program;
-	
+
 	return this.MinExternalMaterialTypeId;
 }
 
@@ -1738,7 +1738,7 @@ CL3D.Renderer.prototype.getGLProgramFromMaterialType = function(mattype)
 		program = this.MaterialPrograms[mattype];
 	}
 	catch(e) {}
-	
+
 	return program;
 }
 
@@ -1750,7 +1750,7 @@ CL3D.Renderer.prototype.createMaterialTypeInternal = function(vsshader, fsshader
 {
 	if (useBinormalsAndTangents == null)
 		useBinormalsAndTangents = false;
-		
+
 	var program = this.createShaderProgram(vsshader, fsshader, useBinormalsAndTangents);
 	if (program)
 	{
@@ -1758,9 +1758,9 @@ CL3D.Renderer.prototype.createMaterialTypeInternal = function(vsshader, fsshader
 		program.blendenabled = blendenabled ? blendenabled : false;
 		program.blendsfactor = blendsfactor;
 		program.blenddfactor = blenddfactor;
-		
+
 		var gl = this.gl;
-		
+
 		// store preset shader attribute locations
 		program.locWorldViewProj = gl.getUniformLocation(program, "worldviewproj");
 		program.locNormalMatrix = gl.getUniformLocation(program, "normaltransform");
@@ -1773,21 +1773,21 @@ CL3D.Renderer.prototype.createMaterialTypeInternal = function(vsshader, fsshader
 		program.locFogColor = gl.getUniformLocation(program, "fogColor");
 		program.locFogDensity = gl.getUniformLocation(program, "fogDensity");
 		program.locGrassMovement = gl.getUniformLocation(program, "grassMovement");
-		program.locWindStrength = gl.getUniformLocation(program, "windStrength");		
-		
+		program.locWindStrength = gl.getUniformLocation(program, "windStrength");
+
 		// locations for shadow maps related attributes
-		program.locWorldviewprojLight = gl.getUniformLocation(program, "worldviewprojLight"); 
-		program.locWorldviewprojLight2 = gl.getUniformLocation(program, "worldviewprojLight2"); 
-		program.locShadowMapBias1 = gl.getUniformLocation(program, "shadowMapBias1"); 
-		program.locShadowMapBias2 = gl.getUniformLocation(program, "shadowMapBias2"); 
-		program.locShadowMapBackfaceBias = gl.getUniformLocation(program, "shadowMapBackFaceBias"); 
-		program.locShadowMapOpacity = gl.getUniformLocation(program, "shadowOpacity"); 
-		
-		
+		program.locWorldviewprojLight = gl.getUniformLocation(program, "worldviewprojLight");
+		program.locWorldviewprojLight2 = gl.getUniformLocation(program, "worldviewprojLight2");
+		program.locShadowMapBias1 = gl.getUniformLocation(program, "shadowMapBias1");
+		program.locShadowMapBias2 = gl.getUniformLocation(program, "shadowMapBias2");
+		program.locShadowMapBackfaceBias = gl.getUniformLocation(program, "shadowMapBackFaceBias");
+		program.locShadowMapOpacity = gl.getUniformLocation(program, "shadowOpacity");
+
+
 		// shader callback function default to null
 		program.shaderCallback = null;
-	}		
-		
+	}
+
 	return program;
 }
 
@@ -1797,15 +1797,15 @@ CL3D.Renderer.prototype.createMaterialTypeInternal = function(vsshader, fsshader
 CL3D.Renderer.prototype.initWebGL = function()
 {
 	var gl = this.gl;
-	
+
 	// don't print shader errors
 	this.printShaderErrors = true;
-	
+
 	// -------------------------------------------------------------
 	// create shaders without lighting
-	
+
 	var fallbackShader = this.createMaterialTypeInternal(this.vs_shader_normaltransform, this.fs_shader_onlyfirsttexture_gouraud);
-	
+
 	var programStandardMaterial = fallbackShader;
 	var programLightmapMaterial = this.createMaterialTypeInternal(this.vs_shader_normaltransform, this.fs_shader_lightmapcombine);
 	var programLightmapMaterial_m4 = this.createMaterialTypeInternal(this.vs_shader_normaltransform, this.fs_shader_lightmapcombine_m4);
@@ -1818,11 +1818,11 @@ CL3D.Renderer.prototype.initWebGL = function()
 	var programGouraudShaded = this.createMaterialTypeInternal(this.vs_shader_normaltransform_gouraud, this.fs_shader_onlyfirsttexture_gouraud);
 	var programNormalmappedMaterial = this.createMaterialTypeInternal(this.vs_shader_normalmappedtransform, this.fs_shader_normalmapped);
 	var programSolidVertexAlphaTwoTextureBlendMaterial = this.createMaterialTypeInternal(this.vs_shader_normaltransform, this.fs_shader_vertex_alpha_two_textureblend);
-	
+
 	this.Program2DDrawingColorOnly = this.createMaterialTypeInternal(this.vs_shader_2ddrawing_coloronly, this.fs_shader_simplecolor);
 	this.Program2DDrawingTextureOnly = this.createMaterialTypeInternal(this.vs_shader_2ddrawing_texture, this.fs_shader_onlyfirsttexture);
 	this.Program2DDrawingCanvasFontColor = this.createMaterialTypeInternal(this.vs_shader_2ddrawing_texture, this.fs_shader_2ddrawing_canvasfont);
-	
+
 	this.MaterialPrograms[CL3D.Material.EMT_SOLID] = programStandardMaterial;
 	this.MaterialPrograms[CL3D.Material.EMT_SOLID+1] = programStandardMaterial;
 	this.MaterialPrograms[CL3D.Material.EMT_LIGHTMAP] = programLightmapMaterial;
@@ -1837,23 +1837,23 @@ CL3D.Renderer.prototype.initWebGL = function()
 	this.MaterialPrograms[CL3D.Material.EMT_NORMAL_MAP_SOLID] = programNormalmappedMaterial;
 	this.MaterialPrograms[CL3D.Material.EMT_SOLID_VERTEX_ALPHA_TWO_TEXTURE_BLEND] = programSolidVertexAlphaTwoTextureBlendMaterial;
 	this.MaterialPrograms[CL3D.Material.EMT_TRANSPARENT_ALPHA_CHANNEL_REF_MOVING_GRASS] = programTransparentAlphaChannelRefMoveGrass;
-	
+
 	// EMT_ONETEXTURE_BLEND
 	this.MaterialPrograms[23] = programGouraudShaded;
-	
+
 	// -------------------------------------------------------------
 	// now do the same with materials with lighting
-	
+
 	programStandardMaterial = this.createMaterialTypeInternal(this.vs_shader_normaltransform_with_light, this.fs_shader_onlyfirsttexture_gouraud);
 	programTransparentAlphaChannel = this.createMaterialTypeInternal(this.vs_shader_normaltransform_with_light, this.fs_shader_onlyfirsttexture_gouraud, true, gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 	programTransparentAlphaChannelRef = this.createMaterialTypeInternal(this.vs_shader_normaltransform_with_light, this.fs_shader_onlyfirsttexture_gouraud_alpharef, true, gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-	programTransparentAlphaChannelRefMoveGrass = this.createMaterialTypeInternal(this.vs_shader_normaltransform_with_light_movegrass, this.fs_shader_onlyfirsttexture_gouraud_alpharef, true, gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);	
+	programTransparentAlphaChannelRefMoveGrass = this.createMaterialTypeInternal(this.vs_shader_normaltransform_with_light_movegrass, this.fs_shader_onlyfirsttexture_gouraud_alpharef, true, gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 	programTransparentAdd = this.createMaterialTypeInternal(this.vs_shader_normaltransform_with_light, this.fs_shader_onlyfirsttexture_gouraud, true, gl.ONE, gl.ONE_MINUS_SRC_COLOR);
-	
+
 	programReflectionMaterial = this.createMaterialTypeInternal(this.vs_shader_reflectiontransform_with_light, this.fs_shader_lightmapcombine_gouraud);
 	programTranspReflectionMaterial = this.createMaterialTypeInternal(this.vs_shader_reflectiontransform_with_light, this.fs_shader_lightmapcombine_gouraud, true, gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 	programSolidVertexAlphaTwoTextureBlendMaterial = this.createMaterialTypeInternal(this.vs_shader_normaltransform_with_light, this.fs_shader_vertex_alpha_two_textureblend);
-	
+
 	this.MaterialProgramsWithLight[CL3D.Material.EMT_SOLID] = programStandardMaterial;
 	this.MaterialProgramsWithLight[CL3D.Material.EMT_SOLID+1] = programStandardMaterial;
 	this.MaterialProgramsWithLight[CL3D.Material.EMT_LIGHTMAP] = programLightmapMaterial;
@@ -1868,11 +1868,11 @@ CL3D.Renderer.prototype.initWebGL = function()
 	this.MaterialProgramsWithLight[CL3D.Material.EMT_NORMAL_MAP_SOLID] = programNormalmappedMaterial;
 	this.MaterialProgramsWithLight[CL3D.Material.EMT_SOLID_VERTEX_ALPHA_TWO_TEXTURE_BLEND] = programSolidVertexAlphaTwoTextureBlendMaterial;
 	this.MaterialProgramsWithLight[CL3D.Material.EMT_TRANSPARENT_ALPHA_CHANNEL_REF_MOVING_GRASS] = programTransparentAlphaChannelRefMoveGrass;
-	
-	
+
+
 	// -------------------------------------------------------------
 	// now create both material types also with fog support
-	
+
 	var programStandardMaterialFog = this.createMaterialTypeInternal(this.vs_shader_normaltransform, this.fs_shader_onlyfirsttexture_gouraud_fog);
 	var programLightmapMaterialFog = this.createMaterialTypeInternal(this.vs_shader_normaltransform, this.fs_shader_lightmapcombine_fog);
 	var programLightmapMaterial_m4Fog = this.createMaterialTypeInternal(this.vs_shader_normaltransform, this.fs_shader_lightmapcombine_m4_fog);
@@ -1900,23 +1900,23 @@ CL3D.Renderer.prototype.initWebGL = function()
 	this.MaterialProgramsFog[CL3D.Material.EMT_NORMAL_MAP_SOLID] = programNormalmappedMaterialFog;
 	this.MaterialProgramsFog[CL3D.Material.EMT_SOLID_VERTEX_ALPHA_TWO_TEXTURE_BLEND] = programSolidVertexAlphaTwoTextureBlendMaterialFog;
 	this.MaterialProgramsFog[CL3D.Material.EMT_TRANSPARENT_ALPHA_CHANNEL_REF_MOVING_GRASS] = programTransparentAlphaChannelRefFogMoveGrass;
-	
+
 	// EMT_ONETEXTURE_BLEND
 	this.MaterialProgramsFog[23] = programGouraudShadedFog;
-	
+
 	// -------------------------------------------------------------
 	// dynamic light shaders with fog support
-	
+
 	programStandardMaterialFog = this.createMaterialTypeInternal(this.vs_shader_normaltransform_with_light, this.fs_shader_onlyfirsttexture_gouraud_fog);
 	programTransparentAlphaChannelFog = this.createMaterialTypeInternal(this.vs_shader_normaltransform_with_light, this.fs_shader_onlyfirsttexture_gouraud_fog, true, gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 	programTransparentAlphaChannelRefFog = this.createMaterialTypeInternal(this.vs_shader_normaltransform_with_light, this.fs_shader_onlyfirsttexture_gouraud_alpharef_fog, true, gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 	programTransparentAlphaChannelRefFogMoveGrass = this.createMaterialTypeInternal(this.vs_shader_normaltransform_with_light_movegrass, this.fs_shader_onlyfirsttexture_gouraud_alpharef_fog, true, gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 	programTransparentAddFog = this.createMaterialTypeInternal(this.vs_shader_normaltransform_with_light, this.fs_shader_onlyfirsttexture_gouraud_fog, true, gl.ONE, gl.ONE_MINUS_SRC_COLOR);
-	
+
 	programReflectionMaterialFog = this.createMaterialTypeInternal(this.vs_shader_reflectiontransform_with_light, this.fs_shader_lightmapcombine_gouraud_fog);
 	programTranspReflectionMaterialFog = this.createMaterialTypeInternal(this.vs_shader_reflectiontransform_with_light, this.fs_shader_lightmapcombine_gouraud_fog, true, gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 	programSolidVertexAlphaTwoTextureBlendMaterialFog = this.createMaterialTypeInternal(this.vs_shader_normaltransform_with_light, this.fs_shader_vertex_alpha_two_textureblend_fog);
-	
+
 	this.MaterialProgramsWithLightFog[CL3D.Material.EMT_SOLID] = programStandardMaterialFog;
 	this.MaterialProgramsWithLightFog[CL3D.Material.EMT_SOLID+1] = programStandardMaterialFog;
 	this.MaterialProgramsWithLightFog[CL3D.Material.EMT_LIGHTMAP] = programLightmapMaterialFog;
@@ -1931,25 +1931,25 @@ CL3D.Renderer.prototype.initWebGL = function()
 	this.MaterialProgramsWithLightFog[CL3D.Material.EMT_NORMAL_MAP_SOLID] = programNormalmappedMaterialFog;
 	this.MaterialProgramsWithLightFog[CL3D.Material.EMT_SOLID_VERTEX_ALPHA_TWO_TEXTURE_BLEND] = programSolidVertexAlphaTwoTextureBlendMaterialFog;
 	this.MaterialProgramsWithLightFog[CL3D.Material.EMT_TRANSPARENT_ALPHA_CHANNEL_REF_MOVING_GRASS] = programTransparentAlphaChannelRefFogMoveGrass;
-	
+
 	// -------------------------------------------------------------
 	// dynamic light + fog + shadow map shaders
-	
-	var vsshaderShadowMap = this.ShadowMapUsesRGBPacking ? 
+
+	var vsshaderShadowMap = this.ShadowMapUsesRGBPacking ?
 							this.fs_shader_onlyfirsttexture_gouraud_fog_shadow_map_rgbpack :
 							this.fs_shader_onlyfirsttexture_gouraud_fog_shadow_map;
-	
+
 	programStandardMaterialFog = this.createMaterialTypeInternal(this.vs_shader_normaltransform_with_shadowmap_lookup, vsshaderShadowMap);
 	programTransparentAlphaChannelFog = this.createMaterialTypeInternal(this.vs_shader_normaltransform_with_shadowmap_lookup, vsshaderShadowMap, true, gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 	programTransparentAlphaChannelRefFog = this.createMaterialTypeInternal(this.vs_shader_normaltransform_with_shadowmap_lookup, this.fs_shader_onlyfirsttexture_gouraud_alpharef_fog_shadow_map, true, gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 	programTransparentAlphaChannelRefFogMoveGrass = this.createMaterialTypeInternal(this.vs_shader_normaltransform_with_light_movegrass_with_shadowmap_lookup, this.fs_shader_onlyfirsttexture_gouraud_alpharef_fog_shadow_map, true, gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 	programTransparentAddFog = this.createMaterialTypeInternal(this.vs_shader_normaltransform_with_shadowmap_lookup, vsshaderShadowMap, true, gl.ONE, gl.ONE_MINUS_SRC_COLOR);
-	
+
 	// TODO: this material needs  shadow map support
 	programReflectionMaterialFog = this.createMaterialTypeInternal(this.vs_shader_reflectiontransform_with_light, this.fs_shader_lightmapcombine_gouraud_fog);
 	programTranspReflectionMaterialFog = this.createMaterialTypeInternal(this.vs_shader_reflectiontransform_with_light, this.fs_shader_lightmapcombine_gouraud_fog, true, gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 	programSolidVertexAlphaTwoTextureBlendMaterialFog = this.createMaterialTypeInternal(this.vs_shader_normaltransform_with_shadowmap_lookup, this.fs_shader_vertex_alpha_two_textureblend_fog_shadow_map);
-	
+
 	this.MaterialProgramsWithShadowMap[CL3D.Material.EMT_SOLID] = programStandardMaterialFog;
 	this.MaterialProgramsWithShadowMap[CL3D.Material.EMT_SOLID+1] = programStandardMaterialFog;
 	this.MaterialProgramsWithShadowMap[CL3D.Material.EMT_LIGHTMAP] = programLightmapMaterialFog;
@@ -1965,36 +1965,36 @@ CL3D.Renderer.prototype.initWebGL = function()
 	this.MaterialProgramsWithShadowMap[CL3D.Material.EMT_SOLID_VERTEX_ALPHA_TWO_TEXTURE_BLEND] = programSolidVertexAlphaTwoTextureBlendMaterialFog;
 	this.MaterialProgramsWithShadowMap[CL3D.Material.EMT_TRANSPARENT_ALPHA_CHANNEL_REF_MOVING_GRASS] = programTransparentAlphaChannelRefFogMoveGrass;
 
-	
+
 	// -------------------------------------------------------------
-	
+
 	// reset shader error output
 	this.printShaderErrors = true;
-	
+
 	// set fallback materials
 	for (var f=0; f<this.MinExternalMaterialTypeId; ++f)
 	{
 		if (this.MaterialPrograms[f] == null)
 			this.MaterialPrograms[f] = fallbackShader;
-			
+
 		if (this.MaterialProgramsWithLight[f] == null)
 			this.MaterialProgramsWithLight[f] = fallbackShader;
-			
+
 		if (this.MaterialProgramsFog[f] == null)
 			this.MaterialProgramsFog[f] = fallbackShader;
-			
+
 		if (this.MaterialProgramsWithLightFog[f] == null)
 			this.MaterialProgramsWithLightFog[f] = fallbackShader;
-		
+
 		if (this.MaterialProgramsWithShadowMap[f] == null)
-			this.MaterialProgramsWithShadowMap[f] = fallbackShader;		
+			this.MaterialProgramsWithShadowMap[f] = fallbackShader;
 	}
-	
+
 	// set WebGL default values
-	
+
 	gl.useProgram(programStandardMaterial);
 	this.currentGLProgram = programStandardMaterial;
-		
+
 	gl.clearColor(0, 0, 1, 1);
     gl.clearDepth(1.0);
 
@@ -2065,7 +2065,7 @@ CL3D.Renderer.prototype.getWorld = function()
 CL3D.Renderer.prototype.setWorld = function(m)
 {
 	if (m)
-		m.copyTo(this.World);	
+		m.copyTo(this.World);
 }
 
 
@@ -2094,19 +2094,19 @@ CL3D.Renderer.prototype.deleteTexture = function(tex)
 {
 	if (tex == null)
 		return;
-		
+
 	var gl = this.gl;
 	gl.deleteTexture(tex.getWebGLTexture());
-	
+
 	tex.Texture = null;
 	tex.Loaded = false;
-	
+
 	if (tex.RTTFrameBuffer)
 		gl.deleteFramebuffer(tex.RTTFrameBuffer);
-	
+
 	this.TheTextureManager.removeTexture(tex);
-	
-	tex.RTTFrameBuffer = null;	
+
+	tex.RTTFrameBuffer = null;
 }
 
 
@@ -2119,29 +2119,29 @@ CL3D.Renderer.prototype.deleteTexture = function(tex)
 CL3D.Renderer.prototype.addRenderTargetTexture = function(sx, sy, createFloatingPointTexture, createDepthTexture, registerInTextureManagerWithThisName)
 {
 	var gl = this.gl;
-	
+
 	// check for floating point extension
-	
-	if (createFloatingPointTexture)  
-	{	
+
+	if (createFloatingPointTexture)
+	{
 		// In WebGL1 to check for support for rendering to a floating point texture:
 		// - first check for and enable the OES_texture_float extension
 		// - then create a floating point texture
 		// - attach it to a framebuffer
 		// - call gl.checkFramebufferStatus to see if it returned gl.FRAMEBUFFER_COMPLETE
-		
-		// In WebGL2 you need to check for and enable EXT_color_buffer_float 
+
+		// In WebGL2 you need to check for and enable EXT_color_buffer_float
 		// or else gl.checkFramebufferStatus will never return gl.FRAMEBUFFER_COMPLETE for a floating point texture
-	
+
 		if (!this.UsesWebGL2)
 		{
 			// webgl 1
-			
+
 			var ext = gl.getExtension('OES_texture_float');
 			if (!ext)
 				return null;
 			this.ExtFloat = ext;
-			
+
 			var ext2 = gl.getExtension('OES_texture_float_linear'); // for linear filtering
 			if (!ext2)
 				return null;
@@ -2150,19 +2150,19 @@ CL3D.Renderer.prototype.addRenderTargetTexture = function(sx, sy, createFloating
 		else
 		{
 			// webgl 2
-			
+
 			ext = gl.getExtension('EXT_color_buffer_float');
 			if (!ext)
 				return null;
 			this.ExtFloat2 = ext;
-						
+
 			ext = gl.getExtension('OES_texture_float_linear'); // for linear filtering
 			if (!ext)
 				return null;
 			this.ExtFloatLinear = ext;
 		}
 	}
-	
+
 	if (createDepthTexture && !this.UsesWebGL2) // in webgl 2, this is built-in
 	{
 		var ext = gl.getExtension('WEBGL_depth_texture');
@@ -2170,13 +2170,13 @@ CL3D.Renderer.prototype.addRenderTargetTexture = function(sx, sy, createFloating
 			return null;
 		this.ExtDepth = ext;
 	}
-		
+
 	// texture
-	
+
 	var texture = gl.createTexture();
-	
+
 	gl.bindTexture(gl.TEXTURE_2D, texture);
-	
+
 	var withMipMap = false;
 	if (withMipMap)
 	{
@@ -2185,13 +2185,13 @@ CL3D.Renderer.prototype.addRenderTargetTexture = function(sx, sy, createFloating
 		gl.generateMipmap(gl.TEXTURE_2D);
 	}
 	else
-	{	
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR); 
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); 
+	{
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
 		//gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-		//gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE); 
+		//gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 	}
-	
+
 	if (createDepthTexture)
 		gl.texImage2D(gl.TEXTURE_2D, 0, gl.DEPTH_COMPONENT, sx, sy, 0, gl.DEPTH_COMPONENT, gl.UNSIGNED_SHORT, null);
 	else
@@ -2200,18 +2200,18 @@ CL3D.Renderer.prototype.addRenderTargetTexture = function(sx, sy, createFloating
 		if (this.UsesWebGL2)
 			gl.texStorage2D(gl.TEXTURE_2D, 1, gl.RGBA32F, sx, sy);
 		else
-			gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, sx, sy, 0, gl.RGBA, gl.FLOAT, null);		
+			gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, sx, sy, 0, gl.RGBA, gl.FLOAT, null);
 	}
 	else
 		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, sx, sy, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
-		
+
 	// frame buffer
-	
+
 	var rttFramebuffer = gl.createFramebuffer();
     gl.bindFramebuffer(gl.FRAMEBUFFER, rttFramebuffer);
 	rttFramebuffer.width = sx;
-    rttFramebuffer.height = sy;    
-		
+    rttFramebuffer.height = sy;
+
 	if (createDepthTexture)
 	{
 		gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, texture, 0);
@@ -2219,18 +2219,18 @@ CL3D.Renderer.prototype.addRenderTargetTexture = function(sx, sy, createFloating
 	else
 	{
 		// render buffer
-		
+
 		var renderbuffer = gl.createRenderbuffer();
 		gl.bindRenderbuffer(gl.RENDERBUFFER, renderbuffer);
 		gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, sx, sy);
-		
+
 		gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
 		gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, renderbuffer);
 	}
-	
+
 	// for floating point buffers, we need to check if it worked (it won't on old mobile devices although
 	// they report it worked)
-	
+
 	if ( createFloatingPointTexture )
 	{
 		var fbstatus = gl.checkFramebufferStatus(gl.FRAMEBUFFER );
@@ -2244,16 +2244,16 @@ CL3D.Renderer.prototype.addRenderTargetTexture = function(sx, sy, createFloating
 	}
 
 	// reset
-	
+
 	gl.bindTexture(gl.TEXTURE_2D, null);
     gl.bindRenderbuffer(gl.RENDERBUFFER, null);
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
 	// store
-	
+
 	var t = new CL3D.Texture();
 	t.Name = "";
-	t.Texture = texture;	
+	t.Texture = texture;
 	t.Image = null;
 	t.Loaded = true;
 	t.CachedWidth = sx;
@@ -2262,19 +2262,19 @@ CL3D.Renderer.prototype.addRenderTargetTexture = function(sx, sy, createFloating
 	t.OriginalHeight = sy;
 	t.RTTFrameBuffer = rttFramebuffer;
 	t.IsFloatingPoint = createFloatingPointTexture;
-	
+
 	if (registerInTextureManagerWithThisName != null)
 	{
 		t.Name = registerInTextureManagerWithThisName;
 		this.TheTextureManager.addTexture(t);
 	}
-	
+
 	return t;
 }
 
 
  /**
- * Sets the current render target 
+ * Sets the current render target
  * @public
  * @param {@link Texture} texture Texture or null, which will become the new render target
  * @param clearBackBuffer To clear the buffer or not
@@ -2284,7 +2284,7 @@ CL3D.Renderer.prototype.addRenderTargetTexture = function(sx, sy, createFloating
 CL3D.Renderer.prototype.setRenderTarget = function(texture, clearBackBuffer, clearZBuffer, bgcolor)
 {
 	var gl = this.gl;
-		
+
 	if (texture != null)
 	{
 		gl.bindFramebuffer(gl.FRAMEBUFFER, texture.RTTFrameBuffer);
@@ -2294,46 +2294,46 @@ CL3D.Renderer.prototype.setRenderTarget = function(texture, clearBackBuffer, cle
 	{
 		gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 		gl.viewport(0, 0, this.width, this.height);
-	}	
-	
+	}
+
 	if (this.CurrentRenderTarget != null)
 	{
 		// update mip maps of render target
 		gl.bindTexture(gl.TEXTURE_2D, this.CurrentRenderTarget.Texture);
         gl.generateMipmap(gl.TEXTURE_2D);
 	}
-	
+
 	this.CurrentRenderTarget = texture;
-				
+
 	if (clearBackBuffer || clearZBuffer)
 	{
 		var mask = 0;
-		
+
 		if (clearBackBuffer)
 		{
 			mask = mask | gl.COLOR_BUFFER_BIT;
-			
-			gl.clearColor(	CL3D.getRed(bgcolor) / 255.0, 
-						CL3D.getGreen(bgcolor) / 255.0, 
-						CL3D.getBlue(bgcolor) / 255.0, 
-						1); 
+
+			gl.clearColor(	CL3D.getRed(bgcolor) / 255.0,
+						CL3D.getGreen(bgcolor) / 255.0,
+						CL3D.getBlue(bgcolor) / 255.0,
+						1);
 		}
-		
+
 		if (clearZBuffer)
 		{
 			gl.clearDepth(this.InvertedDepthTest ? 0.0 : 1.0);
 			mask = mask | gl.DEPTH_BUFFER_BIT;
 		}
-					
+
 		gl.clear(mask)
 	}
-	
+
 	return true;
 }
 
  /**
  * Returns the current render target, usually a {@link Texture} texture or null
- * @public 
+ * @public
  */
 CL3D.Renderer.prototype.getRenderTarget = function()
 {
@@ -2342,19 +2342,19 @@ CL3D.Renderer.prototype.getRenderTarget = function()
 
  /**
  * Returns the size of the current render target, or screen size if no render target
- * @public 
+ * @public
  */
 CL3D.Renderer.prototype.getRenderTargetSize = function()
 {
 	if (this.CurrentRenderTarget)
 		return new CL3D.Vect2d(this.CurrentRenderTarget.CachedWidth, this.CurrentRenderTarget.CachedHeight);
-	
+
 	return new CL3D.Vect2d(this.width, this.height);
 }
 
  /**
  * Sets if the depth test should be enabled or not.
- * @public 
+ * @public
  */
 CL3D.Renderer.prototype.setInvertedDepthTest = function(enable)
 {
@@ -2380,39 +2380,39 @@ CL3D.Renderer.prototype.replacePlaceholderTextureWithNewTextureContent = functio
  * Fills an existing {@link CL3D.Texture} with the content of a from a 2d canvas
  * @public
  * @param {Canvas} canvas a 2d canvas to be converted into a texture
- * @param {boolean} nonscaling optional parameter, if set to true, and the texture don't have a power-of-two size, the texture will not be scaled up, but copied without scaling. 
+ * @param {boolean} nonscaling optional parameter, if set to true, and the texture don't have a power-of-two size, the texture will not be scaled up, but copied without scaling.
  *        This is useful for font or 2D textures, for example, to make them less blurry.
  */
 CL3D.Renderer.prototype.updateTextureFrom2DCanvas = function(t, canvas, nonscaling)
 {
 	var gl = this.gl;
-	
+
 	var texture = t.Texture;
 	gl.bindTexture(gl.TEXTURE_2D, texture);
-	
+
 	var origwidth = canvas.width;
 	var origheight = canvas.height;
-	
+
 	if (canvas.videoWidth)
 		origwidth = canvas.videoWidth;
 	if (canvas.videoHeight)
 		origheight = canvas.videoHeight;
-		
+
 	var scaledUpWidth = origwidth;
 	var scaledUpHeight = origheight;
-	
+
 	 if (!this.isPowerOfTwo(origwidth) || !this.isPowerOfTwo(origheight))
 	 {
         // Scale up the texture to the next highest power of two dimensions.
-		
+
         var tmpcanvas = document.createElement("canvas");
         tmpcanvas.width = this.nextHighestPowerOfTwo(origwidth);
         tmpcanvas.height = this.nextHighestPowerOfTwo(origheight);
         var tmpctx = tmpcanvas.getContext("2d");
-		
+
 		tmpctx.fillStyle = "rgba(0, 255, 255, 1)";
 		tmpctx.fillRect(0, 0, tmpcanvas.width, tmpcanvas.height);
-		
+
 		if (nonscaling)
 			tmpctx.drawImage(canvas, 0, 0, origwidth, origheight, 0, 0, origwidth, origheight);
 		else
@@ -2422,17 +2422,17 @@ CL3D.Renderer.prototype.updateTextureFrom2DCanvas = function(t, canvas, nonscali
 		scaledUpWidth = tmpcanvas.width;
 		scaledUpHeight = tmpcanvas.height;
     }
-	
+
 	//CL3D.gCCDebugOutput.print("createTextureFrom2DCanvas orig " + origwidth + "x" + origheight + " and scaled" + scaledUpWidth + "x" + scaledUpHeight);
-	
+
 	this.fillTextureFromDOMObject(texture, canvas);
-	
+
 	//gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
     //gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
-	
+
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-		
+
 	gl.generateMipmap(gl.TEXTURE_2D);
 	gl.bindTexture(gl.TEXTURE_2D, null);
 }
@@ -2441,39 +2441,39 @@ CL3D.Renderer.prototype.updateTextureFrom2DCanvas = function(t, canvas, nonscali
  * Creates a {@link CL3D.Texture} from a 2d canvas
  * @public
  * @param {Canvas} canvas a 2d canvas to be converted into a texture
- * @param {boolean} nonscaling optional parameter, if set to true, and the texture don't have a power-of-two size, the texture will not be scaled up, but copied without scaling. 
+ * @param {boolean} nonscaling optional parameter, if set to true, and the texture don't have a power-of-two size, the texture will not be scaled up, but copied without scaling.
  *        This is useful for font or 2D textures, for example, to make them less blurry.
  */
 CL3D.Renderer.prototype.createTextureFrom2DCanvas = function(canvas, nonscaling)
 {
 	var gl = this.gl;
-	
+
 	var texture = gl.createTexture();
 	gl.bindTexture(gl.TEXTURE_2D, texture);
-	
+
 	var origwidth = canvas.width;
 	var origheight = canvas.height;
-	
+
 	if (canvas.videoWidth)
 		origwidth = canvas.videoWidth;
 	if (canvas.videoHeight)
 		origheight = canvas.videoHeight;
-		
+
 	var scaledUpWidth = origwidth;
 	var scaledUpHeight = origheight;
-	
+
 	 if (!this.isPowerOfTwo(origwidth) || !this.isPowerOfTwo(origheight))
 	 {
         // Scale up the texture to the next highest power of two dimensions.
-		
+
         var tmpcanvas = document.createElement("canvas");
         tmpcanvas.width = this.nextHighestPowerOfTwo(origwidth);
         tmpcanvas.height = this.nextHighestPowerOfTwo(origheight);
         var tmpctx = tmpcanvas.getContext("2d");
-		
+
 		//tmpctx.fillStyle = "rgba(0, 255, 255, 1)";
 		//tmpctx.fillRect(0, 0, tmpcanvas.width, tmpcanvas.height);
-		
+
 		if (nonscaling)
 			tmpctx.drawImage(canvas, 0, 0, origwidth, origheight, 0, 0, origwidth, origheight);
 		else
@@ -2483,45 +2483,45 @@ CL3D.Renderer.prototype.createTextureFrom2DCanvas = function(canvas, nonscaling)
 		scaledUpWidth = tmpcanvas.width;
 		scaledUpHeight = tmpcanvas.height;
     }
-	
+
 	//CL3D.gCCDebugOutput.print("createTextureFrom2DCanvas orig " + origwidth + "x" + origheight + " and scaled" + scaledUpWidth + "x" + scaledUpHeight);
-	
+
 	this.fillTextureFromDOMObject(texture, canvas);
-	
+
 	//gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
     //gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
-	
+
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-		
+
 	gl.generateMipmap(gl.TEXTURE_2D);
 	gl.bindTexture(gl.TEXTURE_2D, null);
-	
+
 	var t = new CL3D.Texture();
 	t.Name = "";
-	t.Texture = texture;	
+	t.Texture = texture;
 	t.Image = null;
 	t.Loaded = true;
 	t.CachedWidth = scaledUpWidth;
 	t.CachedHeight = scaledUpHeight;
 	t.OriginalWidth = origwidth;
 	t.OriginalHeight = origheight;
-	
+
 	return t;
 }
 
 /**
  * @private
  */
-CL3D.Renderer.prototype.isPowerOfTwo = function(x) 
+CL3D.Renderer.prototype.isPowerOfTwo = function(x)
 {
     return (x & (x - 1)) == 0;
 }
- 
+
 /**
  * @private
  */
-CL3D.Renderer.prototype.nextHighestPowerOfTwo = function(x) 
+CL3D.Renderer.prototype.nextHighestPowerOfTwo = function(x)
 {
     --x;
     for (var i = 1; i < 32; i <<= 1) {
@@ -2537,7 +2537,7 @@ CL3D.Renderer.prototype.nextHighestPowerOfTwo = function(x)
 CL3D.Renderer.prototype.fillTextureFromDOMObject = function(wgltex, domobj)
 {
 	var gl = this.gl;
-	
+
 	// new version replaced the old:
 	//  texImage2D(target, level, HTMLImageElement, [optional] flipY, [optional] premultiplyAlpha)
 	//  with the new
@@ -2546,27 +2546,27 @@ CL3D.Renderer.prototype.fillTextureFromDOMObject = function(wgltex, domobj)
 	try
 	{
 		// new version
-		
+
 		//void texImage2D(GLenum target, GLint level, GLenum internalformat,
-        //           GLenum format, GLenum type, HTMLImageElement image) raises (DOMException);		
-		
+        //           GLenum format, GLenum type, HTMLImageElement image) raises (DOMException);
+
 		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, domobj);
-		
+
 	}
 	catch(e)
-	{			
-		if (e.code != null && DOMException != null && DOMException['SECURITY_ERR'] != null && 
+	{
+		if (e.code != null && DOMException != null && DOMException['SECURITY_ERR'] != null &&
 		    e.code == DOMException['SECURITY_ERR'])
 		{
 			if (this.domainTextureLoadErrorPrinted == false)
 				CL3D.gCCDebugOutput.printError("<i>A security setting in the browser prevented loading a texture.<br/>Workaround: run this from a webserver, change security settings, or allow the specific domain.</i>", true);
-			
+
 			this.domainTextureLoadErrorPrinted = true;
 			return;
 		}
-			
+
 		//CL3D.gCCDebugOutput.print(browserVersion + "Could not texImage2D texture: " + e);
-		
+
 		try
 		{
 			// old version
@@ -2578,7 +2578,7 @@ CL3D.Renderer.prototype.fillTextureFromDOMObject = function(wgltex, domobj)
 			//CL3D.gCCDebugOutput.print("Could not texImage2D texture (2nd try):" + e2);
 		}
 	}
-	
+
 }
 
 /**
@@ -2587,14 +2587,14 @@ CL3D.Renderer.prototype.fillTextureFromDOMObject = function(wgltex, domobj)
 CL3D.Renderer.prototype.finalizeLoadedImageTexture = function(t)
 {
 	var gl = this.gl;
-	
-	var texture = gl.createTexture();	
+
+	var texture = gl.createTexture();
 	var objToCopyFrom = t.Image;
-	
+
 	if (!this.isPowerOfTwo(objToCopyFrom.width) || !this.isPowerOfTwo(objToCopyFrom.height))
 	{
 		// Scale up the texture to the next highest power of two dimensions.
-		
+
 		var tmpcanvas = document.createElement("canvas");
 		if (tmpcanvas != null)
 		{
@@ -2607,29 +2607,29 @@ CL3D.Renderer.prototype.finalizeLoadedImageTexture = function(t)
 			objToCopyFrom = tmpcanvas;
 		}
 	}
-	
+
 	gl.bindTexture(gl.TEXTURE_2D, texture);
-	
+
 	this.fillTextureFromDOMObject(texture, objToCopyFrom);
-	
+
 	//  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
 	//	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
     gl.generateMipmap(gl.TEXTURE_2D);
-	
+
 	// TODO: enable these lines for anisotropic filtering (looks much nicer)
 	/*var ext = gl.getExtension('EXT_texture_filter_anisotropic');
 	if (ext)
 	{
 		gl.texParameterf(gl.TEXTURE_2D, ext['TEXTURE_MAX_ANISOTROPY_EXT'], 4);
 	}*/
-	
+
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER,  gl.LINEAR_MIPMAP_NEAREST);
-	
+
     gl.bindTexture(gl.TEXTURE_2D, null);
-	
+
 	this.textureWasLoadedFlag = true;
-	
+
 	t.Texture = texture;
 }
 
@@ -2640,7 +2640,7 @@ CL3D.Renderer.prototype.getStaticBillboardMeshBuffer = function()
 {
 	if (this.StaticBillboardMeshBuffer == null)
 		this.createStaticBillboardMeshBuffer();
-	
+
 	return this.StaticBillboardMeshBuffer;
 }
 
@@ -2651,15 +2651,15 @@ CL3D.Renderer.prototype.createStaticBillboardMeshBuffer = function()
 {
 	if (this.StaticBillboardMeshBuffer != null)
 		return;
-		
+
 	var mb = null;
-		
+
 	mb = new CL3D.MeshBuffer();
 	var vtx1 = new CL3D.Vertex3D(true);
 	var vtx2 = new CL3D.Vertex3D(true);
 	var vtx3 = new CL3D.Vertex3D(true);
 	var vtx4 = new CL3D.Vertex3D(true);
-	
+
 	var indices = mb.Indices;
 	indices.push(0);
 	indices.push(2);
@@ -2667,33 +2667,33 @@ CL3D.Renderer.prototype.createStaticBillboardMeshBuffer = function()
 	indices.push(0);
 	indices.push(3);
 	indices.push(2);
-	
+
 	var vertices = mb.Vertices;
 	vertices.push(vtx1);
 	vertices.push(vtx2);
 	vertices.push(vtx3);
 	vertices.push(vtx4);
-	
+
 	vtx1.TCoords.X = 1;
 	vtx1.TCoords.Y = 1;
 	vtx1.Pos.set(1,-1,0);
-	
+
 	vtx2.TCoords.X = 1;
 	vtx2.TCoords.Y = 0;
 	vtx2.Pos.set(1,1,0);
-	
+
 	vtx3.TCoords.X = 0;
 	vtx3.TCoords.Y = 0;
 	vtx3.Pos.set(-1,1,0);
-	
+
 	vtx4.TCoords.X = 0;
-	vtx4.TCoords.Y = 1;	
+	vtx4.TCoords.Y = 1;
 	vtx4.Pos.set(-1,-1,0);
-	
+
 	this.StaticBillboardMeshBuffer = mb;
 }
 
-/** 
+/**
  * Quickly enables / Disables rendering with shadow map support without any state changes. If enabled, all materials drawn will
  * Use the shadow map and the light matrix for rendering their geometry from a light.
  * @public
@@ -2703,7 +2703,7 @@ CL3D.Renderer.prototype.quicklyEnableShadowMap = function(enable)
 	this.ShadowMapEnabled = enable;
 }
 
-/** 
+/**
  * @public
  **/
 CL3D.Renderer.prototype.isShadowMapEnabled = function()
@@ -2711,26 +2711,26 @@ CL3D.Renderer.prototype.isShadowMapEnabled = function()
 	return this.ShadowMapEnabled;
 }
 
-/** 
+/**
  * Enables / Disables rendering with shadow map support. If enabled, all materials drawn will
  * Use the shadow map and the light matrix for rendering their geometry from a light.
  * @public
  **/
-CL3D.Renderer.prototype.enableShadowMap = function(enable, 
-												   shadowMapTexture, 
+CL3D.Renderer.prototype.enableShadowMap = function(enable,
+												   shadowMapTexture,
 												   shadowMapLightMatrix,
-												   shadowMapTexture2, 
+												   shadowMapTexture2,
 												   shadowMapLightMatrix2)
 {
 	this.ShadowMapEnabled = enable;
 	this.ShadowMapTexture = shadowMapTexture;
 	this.ShadowMapTexture2 = shadowMapTexture2;
-	
+
 	if (shadowMapLightMatrix != null)
 		this.ShadowMapLightMatrix = shadowMapLightMatrix.clone();
 	else
 		this.ShadowMapLightMatrix = null;
-		
+
 	if (shadowMapLightMatrix2 != null)
 		this.ShadowMapLightMatrix2 = shadowMapLightMatrix2.clone();
 	else
@@ -2757,7 +2757,7 @@ CL3D.Renderer.prototype.vs_shader_2ddrawing_coloronly = GLSL`
     {
         gl_Position = vPosition;
     }`;
-	
+
 // drawing 2d rectangles with an image only
 CL3D.Renderer.prototype.vs_shader_2ddrawing_texture = GLSL`
 	#version 100
@@ -2772,19 +2772,19 @@ CL3D.Renderer.prototype.vs_shader_2ddrawing_texture = GLSL`
         gl_Position = vPosition;
 		v_texCoord1 = vTexCoord1.st;
     }`;
-	
+
 // 2D Fragment shader: simply set the color from a shader parameter (used for 2d drawing rectangles)
 CL3D.Renderer.prototype.fs_shader_simplecolor = GLSL`
 	#version 100
 	precision mediump float;
 
 	uniform vec4 vColor;
-	
+
     void main()
     {
         gl_FragColor = vColor;
 	}`;
-	
+
 // 2D fragment shader for drawing fonts: The font texture is white/gray on black. Draw the font using the white as alpha,
 // multiplied by a color as parameter
 CL3D.Renderer.prototype.fs_shader_2ddrawing_canvasfont = GLSL`
@@ -2794,7 +2794,7 @@ CL3D.Renderer.prototype.fs_shader_2ddrawing_canvasfont = GLSL`
 	uniform vec4 vColor;
 	uniform sampler2D texture1;
 	uniform sampler2D texture2;
-	
+
     varying vec2 v_texCoord1;
 
     void main()
@@ -2802,14 +2802,14 @@ CL3D.Renderer.prototype.fs_shader_2ddrawing_canvasfont = GLSL`
 	    vec2 texCoord = vec2(v_texCoord1.s, v_texCoord1.t);
         float alpha = texture2D(texture1, texCoord).r;
         gl_FragColor = vec4(vColor.rgb, alpha);
-    }`;								
+    }`;
 
 
 // simple normal 3d world 3d transformation shader
 CL3D.Renderer.prototype.vs_shader_normaltransform = GLSL`
 	#version 100
 	precision mediump float;
-	
+
 	uniform mat4 worldviewproj;
 
 	attribute vec4 vPosition;
@@ -2821,7 +2821,7 @@ CL3D.Renderer.prototype.vs_shader_normaltransform = GLSL`
 	varying vec4 v_color;
     varying vec2 v_texCoord1;
 	varying vec2 v_texCoord2;
-	
+
     void main()
     {
 		v_color = vColor;
@@ -2829,7 +2829,7 @@ CL3D.Renderer.prototype.vs_shader_normaltransform = GLSL`
         v_texCoord1 = vTexCoord1.st;
 		v_texCoord2 = vTexCoord2.st;
     }`;
-	
+
 // just like vs_shader_normaltransform but moves the positions a bit, like grass by the wind
 CL3D.Renderer.prototype.vs_shader_normaltransform_movegrass = GLSL`
 	#version 100
@@ -2860,7 +2860,7 @@ CL3D.Renderer.prototype.vs_shader_normaltransform_movegrass = GLSL`
 		v_texCoord2 = vTexCoord2.st;
     }`;
 
-// reusable part of vertex shaders calculating the light from directional, ambient and up to 4 point lights	
+// reusable part of vertex shaders calculating the light from directional, ambient and up to 4 point lights
 // our lighting works like this:
 // vertexToLight = lightPos - vertexPos;
 // distance = length(vertexToLight)
@@ -2869,7 +2869,7 @@ CL3D.Renderer.prototype.vs_shader_normaltransform_movegrass = GLSL`
 // angle = sin(normal.dotproduct(vertexToLight));
 // if (angle < 0) angle = 0;
 // intensity = angle * distanceFact;
-// color = intensity * lightcolor;		
+// color = intensity * lightcolor;
 CL3D.Renderer.prototype.vs_shader_light_part = GLSL`
 	vec3 n = normalize(vec3(vNormal.xyz));
 	vec4 currentLight = vec4(0, 0, 0, 1.0);
@@ -2932,12 +2932,12 @@ CL3D.Renderer.prototype.vs_shader_normaltransform_with_light = GLSL`
 		v_color = min(currentLight, vec4(1.0,1.0,1.0,1.0));
 		v_color.a = vColor.a;	// preserve vertex alpha
     }`;
-	
+
 // simple normal 3d world 3d transformation shader
 CL3D.Renderer.prototype.vs_shader_normaltransform_gouraud = GLSL`
 	#version 100
 	precision mediump float;
-	
+
 	uniform mat4 worldviewproj;
 
 	attribute vec4 vPosition;
@@ -2958,13 +2958,13 @@ CL3D.Renderer.prototype.vs_shader_normaltransform_gouraud = GLSL`
 		v_color = vColor;
     }`;
 
-	
+
  // 3d world 3d transformation shader generating a reflection in texture coordinate 2
  // normaltransform is the inverse transpose of the upper 3x3 part of the modelview matrix.
- // 
- // this is based on 
+ //
+ // this is based on
  // D3DTSS_TCI_CAMERASPACEREFLECTIONVECTOR from D3D9:
- // Use the reflection vector, transformed to camera space, as input texture coordinates. 
+ // Use the reflection vector, transformed to camera space, as input texture coordinates.
  // The reflection vector is computed from the input vertex position and normal vector.
 CL3D.Renderer.prototype.vs_shader_reflectiontransform = GLSL`
 	#version 100
@@ -2998,8 +2998,8 @@ CL3D.Renderer.prototype.vs_shader_reflectiontransform = GLSL`
 		v_texCoord2.x = (r.x / (2.0 * m)  + 0.5);
 		v_texCoord2.y = (r.y / (2.0 * m)  + 0.5);
 	}`;
-	
-	
+
+
 	// same shader as before, but now with light
 CL3D.Renderer.prototype.vs_shader_reflectiontransform_with_light = GLSL`
 	#version 100
@@ -3038,10 +3038,10 @@ CL3D.Renderer.prototype.vs_shader_reflectiontransform_with_light = GLSL`
 		v_texCoord2.y = r.y / (2.0 * m)  + 0.5;
 
 		${CL3D.Renderer.prototype.vs_shader_light_part}
-		
+
 		v_color = min(currentLight, vec4(1.0,1.0,1.0,1.0));
-    }`;	
-	
+    }`;
+
 // same as vs_shader_normaltransform_with_light but alsow with grass movement
 CL3D.Renderer.prototype.vs_shader_normaltransform_with_light_movegrass = GLSL`
 	#version 100
@@ -3078,12 +3078,12 @@ CL3D.Renderer.prototype.vs_shader_normaltransform_with_light_movegrass = GLSL`
 		${CL3D.Renderer.prototype.vs_shader_light_part}
 
 		currentLight = currentLight * vec4(vColor.x, vColor.y, vColor.z, 1.0);
-		
+
 		v_color = min(currentLight * 4.0, vec4(1.0,1.0,1.0,1.0));
 		v_color.a = vColor.a;	// preserve vertex alpha
     }`;
 
-// normal mapped material		
+// normal mapped material
 CL3D.Renderer.prototype.vs_shader_normalmappedtransform = GLSL`
 	#version 100
 	precision mediump float;
@@ -3148,7 +3148,7 @@ CL3D.Renderer.prototype.vs_shader_normalmappedtransform = GLSL`
 		// ambient light
 		ambientLight = arrLightColors[4].xyz;
     }`;
-	
+
 CL3D.Renderer.prototype.fs_shader_onlyfirsttexture = GLSL`
 	#version 100
 	precision mediump float;
@@ -3201,14 +3201,14 @@ CL3D.Renderer.prototype.fs_shader_onlyfirsttexture_gouraud_alpharef	= GLSL`
 			discard;
         gl_FragColor = clr * 4.0;
     }`;
-	
+
 CL3D.Renderer.prototype.fs_shader_lightmapcombine = GLSL`
 	#version 100
 	precision mediump float;
 
 	uniform sampler2D texture1;
 	uniform sampler2D texture2;
-	
+
     varying vec2 v_texCoord1;
 	varying vec2 v_texCoord2;
 
@@ -3238,8 +3238,8 @@ CL3D.Renderer.prototype.fs_shader_lightmapcombine_m4 = GLSL`
         vec4 col1 = texture2D(texture1, texCoord1);
 		vec4 col2 = texture2D(texture2, texCoord2);
 		gl_FragColor = col1 * col2 * 3.0;
-    }`;			
-	
+    }`;
+
 CL3D.Renderer.prototype.fs_shader_lightmapcombine_gouraud = GLSL`
 	#version 100
 	precision mediump float;
@@ -3260,7 +3260,7 @@ CL3D.Renderer.prototype.fs_shader_lightmapcombine_gouraud = GLSL`
 		vec4 final = col1 * col2 * v_color * 4.0;
 		gl_FragColor = vec4(final.x, final.y, final.z, col1.w);
     }`;
-	
+
 CL3D.Renderer.prototype.fs_shader_normalmapped = GLSL`
 	#version 100
 	precision mediump float;
@@ -3293,7 +3293,7 @@ CL3D.Renderer.prototype.fs_shader_normalmapped = GLSL`
 			float luminance = dot(lightvect, normalMapVector); // normal DOT light
 			luminance = clamp(luminance, 0.0, 1.0);	// clamp result to positive numbers
 			lightvect = luminance * v_lightColor[i];	// luminance * light color
-			
+
 			// add to previously calculated lights
 			totallight = totallight + lightvect;
 		}
@@ -3302,7 +3302,7 @@ CL3D.Renderer.prototype.fs_shader_normalmapped = GLSL`
 		// 0.25 because of new modulatex4 mode
 		gl_FragColor = colorMapSample * 0.25 * vec4(totallight.x, totallight.y, totallight.z, 0.0) * 4.0;
     }`;
-	
+
 CL3D.Renderer.prototype.fs_shader_vertex_alpha_two_textureblend	= GLSL`
 	#version 100
 	precision mediump float;
@@ -3428,8 +3428,8 @@ CL3D.Renderer.prototype.fs_shader_lightmapcombine_m4_fog = GLSL`
 		float fogFactor = clamp(exp2( -fogDensity * z * 1.442695), 0.0, 1.0);
 		gl_FragColor = mix(fogColor, tmpFragColor * 4.0, fogFactor);
 		gl_FragColor.a = tmpFragColor.a;
-    }`;		
-	
+    }`;
+
 CL3D.Renderer.prototype.fs_shader_vertex_alpha_two_textureblend_fog	= GLSL`
 	#version 100
 	precision mediump float;
@@ -3455,7 +3455,7 @@ CL3D.Renderer.prototype.fs_shader_vertex_alpha_two_textureblend_fog	= GLSL`
 		gl_FragColor = mix(fogColor, tmpFragColor * 4.0, fogFactor);
 		gl_FragColor.a = tmpFragColor.a;
     }`;
-	
+
 CL3D.Renderer.prototype.fs_shader_lightmapcombine_gouraud_fog = GLSL`
 	#version 100
 	precision mediump float;
@@ -3482,7 +3482,7 @@ CL3D.Renderer.prototype.fs_shader_lightmapcombine_gouraud_fog = GLSL`
 		gl_FragColor = mix(fogColor, tmpFragColor * 4.0, fogFactor);
 		gl_FragColor.a = tmpFragColor.a;
     }`;
-	
+
 // ----------------------------------------------------------------------------
 // Shadow map related shaders
 // ----------------------------------------------------------------------------
@@ -3499,7 +3499,7 @@ CL3D.Renderer.prototype.vs_shader_normaltransform_for_shadowmap = GLSL`
     {
         gl_Position = worldviewproj * vPosition;
     }`;
-	
+
 CL3D.Renderer.prototype.fs_shader_draw_depth_shadowmap_depth = GLSL`
 	#version 100
 	precision highp float;
@@ -3508,12 +3508,12 @@ CL3D.Renderer.prototype.fs_shader_draw_depth_shadowmap_depth = GLSL`
     {
 		gl_FragColor = vec4(gl_FragCoord.z);
 	}`;
-	
+
 // like vs_shader_normaltransform_for_shadowmap but for alpha ref materials
 CL3D.Renderer.prototype.vs_shader_normaltransform_alpharef_for_shadowmap = GLSL`
 	#version 100
 	precision highp float;
-	
+
 	uniform mat4 worldviewproj;
 	attribute vec4 vPosition;
 	attribute vec2 vTexCoord1;
@@ -3525,7 +3525,7 @@ CL3D.Renderer.prototype.vs_shader_normaltransform_alpharef_for_shadowmap = GLSL`
 		v_texCoord1 = vTexCoord1.st;
         gl_Position = worldviewproj * vPosition;
     }`;
-	
+
 // like vs_shader_normaltransform_alpharef_for_shadowmap but with moving grass
 CL3D.Renderer.prototype.vs_shader_normaltransform_alpharef_moving_grass_for_shadowmap = GLSL`
 	#version 100
@@ -3547,7 +3547,7 @@ CL3D.Renderer.prototype.vs_shader_normaltransform_alpharef_moving_grass_for_shad
         gl_Position = worldviewproj * grasspos;
 		v_texCoord1 = vTexCoord1.st;
 	}`;
-	
+
 // like fs_shader_draw_depth_shadowmap_depth but for alpha ref materials
 CL3D.Renderer.prototype.fs_shader_alpharef_draw_depth_shadowmap_depth = GLSL`
 	#version 100
@@ -3563,9 +3563,9 @@ CL3D.Renderer.prototype.fs_shader_alpharef_draw_depth_shadowmap_depth = GLSL`
 		if (diffuseColor.a < 0.5) discard;
 		gl_FragColor = vec4(gl_FragCoord.z);
 	}`;
-	
-// we only need to write gl_FragCoord.z for float rtt, but dont 
-// use those and pack this into rgba in case we have no floating point support: 
+
+// we only need to write gl_FragCoord.z for float rtt, but dont
+// use those and pack this into rgba in case we have no floating point support:
 CL3D.Renderer.prototype.fs_shader_draw_depth_shadowmap_rgbapack = GLSL`
 	#version 100
 	precision highp float;
@@ -3598,7 +3598,7 @@ CL3D.Renderer.prototype.vs_shader_normaltransform_with_shadowmap_lookup = GLSL`
 	attribute vec4 vColor;
     attribute vec2 vTexCoord1;
 	attribute vec2 vTexCoord2;
-	
+
 	varying vec4 v_color;
     varying vec2 v_texCoord1;
 	varying float v_backfaceValue;
@@ -3620,7 +3620,7 @@ CL3D.Renderer.prototype.vs_shader_normaltransform_with_shadowmap_lookup = GLSL`
 		v_color = min(currentLight * 4.0, vec4(1.0,1.0,1.0,1.0));
 		v_color.a = vColor.a;	// preserve vertex alpha
     }`;
-	
+
 // like fs_shader_onlyfirsttexture_gouraud_fog but also with shadow map
 CL3D.Renderer.prototype.fs_shader_onlyfirsttexture_gouraud_fog_shadow_map_rgbpack = GLSL`
 	#version 100
@@ -3664,7 +3664,7 @@ CL3D.Renderer.prototype.fs_shader_onlyfirsttexture_gouraud_fog_shadow_map_rgbpac
 		gl_FragColor = diffuseColor * visibility;
 		gl_FragColor.a = diffuseColor.a;
 	}`;
-	
+
 // header part for shadow maps above main function. Can be used to add test functions for shadow mapping
 CL3D.Renderer.prototype.fs_shader_shadowmap_header_part = GLSL`
 	`;
@@ -3674,7 +3674,7 @@ CL3D.Renderer.prototype.fs_shader_shadowmap_header_part = GLSL`
 if (CL3D.UseShadowCascade)
 {
 	// version with cascade shadow maps
-	
+
 	CL3D.Renderer.prototype.fs_shader_shadowmap_part = GLSL`
 		// shadow map 1 lookup
 		vec3 shadowCoord = (v_posFromLight.xyz / v_posFromLight.w) * 0.5 + 0.5;
@@ -3715,8 +3715,8 @@ if (CL3D.UseShadowCascade)
 }
 else
 {
-	// version without cascade shadow maps 
-	
+	// version without cascade shadow maps
+
 	CL3D.Renderer.prototype.fs_shader_shadowmap_part = GLSL`
 		// shadow map lookup
 		vec3 shadowCoord = (v_posFromLight.xyz / v_posFromLight.w) * 0.5 + 0.5;
@@ -3735,7 +3735,7 @@ else
 
 		vec4 colorWithShadow = diffuseColor * visibility * 4.0;
 		`;
-}		
+}
 
 // reusable part for mixing fog and shadow
 CL3D.Renderer.prototype.fs_shader_mixdiffusefogandshadow_part = GLSL`
@@ -3747,8 +3747,8 @@ CL3D.Renderer.prototype.fs_shader_mixdiffusefogandshadow_part = GLSL`
 	gl_FragColor = colorWithShadow * 4.0;
 	gl_FragColor.a = diffuseColor.a;
 	`;
-		
-	
+
+
 // Like fs_shader_onlyfirsttexture_gouraud_fog_shadow_map_rgbpack but with floating point tests
 CL3D.Renderer.prototype.fs_shader_onlyfirsttexture_gouraud_fog_shadow_map = GLSL`
 	#version 100
@@ -3769,18 +3769,18 @@ CL3D.Renderer.prototype.fs_shader_onlyfirsttexture_gouraud_fog_shadow_map = GLSL
 	varying float v_backfaceValue;
 	varying vec4 v_posFromLight;
 	varying vec4 v_posFromLight2;
-	
+
 	${CL3D.Renderer.prototype.fs_shader_shadowmap_header_part}
-	
+
     void main()
     {
 		// diffuse texture
 		vec4 diffuseColor = texture2D(texture1, v_texCoord1) * v_color;
-		
+
     	${CL3D.Renderer.prototype.fs_shader_shadowmap_part}
 		${CL3D.Renderer.prototype.fs_shader_mixdiffusefogandshadow_part}
-	}`;	
-	
+	}`;
+
 // like fs_shader_vertex_alpha_two_textureblend_fog but with shadow map support
 CL3D.Renderer.prototype.fs_shader_vertex_alpha_two_textureblend_fog_shadow_map = GLSL`
 	#version 100
@@ -3817,7 +3817,7 @@ CL3D.Renderer.prototype.fs_shader_vertex_alpha_two_textureblend_fog_shadow_map =
     ${CL3D.Renderer.prototype.fs_shader_shadowmap_part}
 	${CL3D.Renderer.prototype.fs_shader_mixdiffusefogandshadow_part}
 	}`;
-	
+
 // like fs_shader_onlyfirsttexture_gouraud_alpharef_fog but with shadow map support
 CL3D.Renderer.prototype.fs_shader_onlyfirsttexture_gouraud_alpharef_fog_shadow_map = GLSL`
 	#version 100
@@ -3846,11 +3846,11 @@ CL3D.Renderer.prototype.fs_shader_onlyfirsttexture_gouraud_alpharef_fog_shadow_m
         vec2 texCoord = vec2(v_texCoord1.s, v_texCoord1.t);
 		vec4 diffuseColor = texture2D(texture1, texCoord) * vec4(v_color.r, v_color.g, v_color.b, 1.0);
 		if (diffuseColor.a < 0.5) discard;
-		
+
 	${CL3D.Renderer.prototype.fs_shader_shadowmap_part}
 	${CL3D.Renderer.prototype.fs_shader_mixdiffusefogandshadow_part}
 	}`;
-	
+
 // same as vs_shader_normaltransform_with_light_movegrass but with shadow map loopup
 CL3D.Renderer.prototype.vs_shader_normaltransform_with_light_movegrass_with_shadowmap_lookup = GLSL`
 	#version 100
