@@ -12,10 +12,11 @@
  * @param engine {CL3D.CopperLicht} an instance of the 3d engine
  * @param functionToCall {function} a function which should be called when the scene node has been clicked
  */
-CL3D.AnimatorOnMove = function(scene, engine)
+CL3D.AnimatorOnMove = function(scene, engine, functionToCall)
 {
 	this.engine = engine;
 	this.SMGr = scene;
+	this.FunctionToCall = functionToCall;
 	
 	this.ActionHandlerOnEnter = null;
 	this.ActionHandlerOnLeave = null;
@@ -85,9 +86,12 @@ CL3D.AnimatorOnMove.prototype.animateNode = function(node, timeMs)
 				else
 				if (!bIsInside && this.ActionHandlerOnLeave)
 					this.ActionHandlerOnLeave.execute(node);
-					
+
 				return true;
 			}
+			else
+			if (!bIsInside && this.FunctionToCall)
+				this.FunctionToCall();
 		}
 	}
 	

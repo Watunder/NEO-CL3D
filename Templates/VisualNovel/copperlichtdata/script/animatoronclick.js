@@ -80,6 +80,60 @@ CL3D.AnimatorOnClick.prototype.animateNode = function(n, timeMs)
 /**
  * @private
  */
+CL3D.AnimatorOnClick.prototype.onMouseDown = function(event) 
+{
+	var n = this.TheObject;
+	if (!n)
+		return false;
+		
+	if (!(n.scene === this.SMGr))
+		return false;
+		
+	if (event.button == 2)
+	{
+		return false;
+	}
+	
+	var now = CL3D.CLTimer.getTime();
+	
+	if (now - this.engine.LastCameraDragTime < 250)
+		return false;
+		
+	var x = this.engine.getMousePosXFromEvent(event);
+	var y = this.engine.getMousePosYFromEvent(event);	
+		
+	if (this.engine.isInPointerLockMode())
+	{
+		var renderer = this.SMGr.getLastUsedRenderer();
+		if (!renderer)
+			return false;
+		x = renderer.getWidth() / 2; 
+		y = renderer.getHeight() / 2; 
+	}
+	
+	if (this.TheObject.Parent == null)
+	{
+		// object seems to be deleted 
+		this.TheObject = null;
+		return false;
+	}
+		
+	if (n.isActuallyVisible() &&
+		this.isOverNode(n, x, y))
+	{
+		this.LastTimeDoneSomething = true;
+		
+		if (this.FunctionToCall)
+			this.FunctionToCall();
+
+		this.SMGr.forceRedrawNextFrame(); // the animate might not be recalled after this element has been made invisible in this invokeAction()
+		return true;
+	}
+}
+
+/**
+ * @private
+ */
 CL3D.AnimatorOnClick.prototype.onMouseUp = function(event) 
 {
 	var n = this.TheObject;
@@ -122,9 +176,6 @@ CL3D.AnimatorOnClick.prototype.onMouseUp = function(event)
 		this.isOverNode(n, x, y))
 	{
 		this.LastTimeDoneSomething = true;
-		
-		if (this.FunctionToCall)
-			this.FunctionToCall();
 			
 		this.invokeAction(n);
 

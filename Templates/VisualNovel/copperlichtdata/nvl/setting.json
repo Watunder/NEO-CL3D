@@ -1,0 +1,28 @@
+{
+ "width":1280,
+ "savedata":{
+  "num":48,
+  "thumbnailwidth":295
+ },
+ "newgameplus":1,
+ "font":{
+  "edgecolor":"0x000000",
+  "shadowcolor":"0x000000",
+  "face":"宋体",
+  "color":"0xffffff",
+  "shadow":"false",
+  "edge":"true",
+  "size":22
+ },
+ "title_omake":"uititle_omake.tjs",
+ "history":{
+  "face":"宋体",
+  "bold":"false",
+  "linespace":26,
+  "size":20
+ },
+ "height":720,
+ "usemappfont":1,
+ "startfrom":"start.story",
+ "title":"NEO-CL3D Template"
+}

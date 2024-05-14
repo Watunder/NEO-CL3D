@@ -1,0 +1,17 @@
+[
+ {
+  "color":"0x999BFF",
+  "name":"主角",
+  "tag":"主角"
+ },
+ {
+  "color":"0xFFFF95",
+  "name":"默认"
+ },
+ {
+  "face":"face01_01",
+  "color":"0xCCFFCC",
+  "name":"NVL娘",
+  "tag":"nvl娘"
+ }
+]
