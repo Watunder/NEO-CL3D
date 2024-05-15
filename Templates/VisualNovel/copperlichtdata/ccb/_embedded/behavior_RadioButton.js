@@ -10,6 +10,57 @@
         <property name="Scale_Click" type="float" default = "0.9" />     
     </behavior>
 */
+var g_self = this;
+
+var _action_OnEnter = function(animater)
+{
+    this.animater = animater;
+};
+
+_action_OnEnter.prototype.execute = function(currentNode)
+{
+    // console.log("[Custom:Enter]")
+};
+
+var _action_OnClick = function(animater)
+{
+    this.animater = animater;
+};
+
+_action_OnClick.prototype.execute = function(currentNode)
+{   
+    // console.log("[Custom:Click]")
+    if (this.animater.scaled)
+    {
+        ccbSetSceneNodeProperty(this.animater.Radio, "Pos X (percent)", this.animater.originalClicked.x);
+        ccbSetSceneNodeProperty(this.animater.Radio, "Pos Y (percent)", this.animater.originalClicked.y);
+        ccbSetSceneNodeProperty(this.animater.Radio, "Width (percent)", this.animater.originalClicked.width);
+        ccbSetSceneNodeProperty(this.animater.Radio, "Height (percent)", this.animater.originalClicked.height);
+        
+        this.animater.scaled = false;
+        // console.log("[Origin:Click]")
+    }
+};
+
+var _action_OnLeave = function(animater)
+{
+    this.animater = animater;
+};
+
+_action_OnLeave.prototype.execute = function(currentNode)
+{
+    // console.log("[Custom:Leave]")
+    if (this.animater.scaled)
+    {
+        ccbSetSceneNodeProperty(this.animater.Radio, "Pos X (percent)", this.animater.overlayData.x);
+        ccbSetSceneNodeProperty(this.animater.Radio, "Pos Y (percent)", this.animater.overlayData.y);
+        ccbSetSceneNodeProperty(this.animater.Radio, "Width (percent)", this.animater.overlayData.width);
+        ccbSetSceneNodeProperty(this.animater.Radio, "Height (percent)", this.animater.overlayData.height);
+        
+        this.animater.scaled = false;
+        // console.log("[Origin:Leave]")
+    }
+};
 
 behavior_RadioButton = function()
 {
@@ -18,38 +69,10 @@ behavior_RadioButton = function()
     this.init = false;
     this.scaled = false;
     this.overlayData = false;
+
+    g_self = this;
 }
 
-function rgbaToInt(r, g, b, a)
-{
-    a = typeof a !== 'undefined' ? a : 255;
-    return (a << 24) + (r << 16) + (g << 8) + b;
-}
-
-function intToRgba(intValue)
-{
-    var r = (intValue >> 16) & 255;
-    var g = (intValue >> 8) & 255;
-    var b = intValue & 255;
-    var a = (intValue >> 24) & 255; // Alpha channel
-
-    return { r: r, g: g, b: b, a: a };
-}
-
-function RGB(decimalcolorcode)
-{
-    var color = (decimalcolorcode); // use the property type or put a decimal color value.
-    var Rr = (color & 0xff0000) >> 16; // get red color by bitwise operation  
-    var Gg = (color & 0x00ff00) >> 8; // get green color by bitwise operation 
-    var Bb = (color & 0x0000ff); // get blue color by bitwise operation 
-    var RrGgBb = new vector3d(Rr, Gg, Bb);
-    var r = (Rr / 255); // dividing red by 255 to clamp b/w 0-1 
-    var g = (Gg / 255); // dividing green by 255 to clamp b/w 0-1 
-    var b = (Bb / 255); // dividing blue by 255 to clamp b/w 0-1 
-    var rgb = new vector3d(r, g, b); // final rgb value to use in the editor
-
-    return RrGgBb;
-}
 // Function to animate overlay by scaling it equally while maintaining it at center
 function scaleOverlay(overlay, scaleFactor)
 {
@@ -81,12 +104,11 @@ function scaleOverlay(overlay, scaleFactor)
 
 behavior_RadioButton.prototype.onAnimate = function(currentNode)
 {
-
     this.Radio = currentNode;
-    this.Platform = ccbGetPlatform();
+    
     if (!this.init)
     {
-        ccbSetSceneNodeProperty(this.Radio, "Position Mode", "absolute (pixels)");
+        ccbSetSceneNodeProperty(this.Radio, "Position Mode", "relative (percent)");
         this.InActiveImage = ccbGetSceneNodeProperty(this.Radio, "Image");
         if (!this.Use_Image)
         {
@@ -97,13 +119,59 @@ behavior_RadioButton.prototype.onAnimate = function(currentNode)
 
         this.screenX = ccbGetScreenWidth();
         this.screenY = ccbGetScreenHeight();
+
+        var __action_OnClick = new _action_OnClick(this);
+        var animator1 = new CL3D.AnimatorOnClick(CL3D.gScriptingInterface.CurrentlyActiveScene, CL3D.gScriptingInterface.Engine, ()=>
+        {
+            if (!this.scaledup)
+            {
+                this.originalOverlay = {...this.overlayData};
+                this.originalClicked = scaleOverlay(this.originalOverlay, 1).originalOverlay;
+                var scaledClick = scaleOverlay(this.originalOverlay, this.Scale_Click).scaledOverlay;
+
+                ccbSetSceneNodeProperty(this.Radio, "Pos X (percent)", scaledClick.x);
+                ccbSetSceneNodeProperty(this.Radio, "Pos Y (percent)", scaledClick.y);
+                ccbSetSceneNodeProperty(this.Radio, "Width (percent)", scaledClick.width);
+                ccbSetSceneNodeProperty(this.Radio, "Height (percent)", scaledClick.height);
+                
+                this.scaled = true;
+                // console.log("[Origin:Pressed]")
+            }
+
+            ccbSetCopperCubeVariable(this.Variable, this.Value);
+            if (ccbGetCopperCubeVariable(this.Variable) == this.Value)
+            {
+                ccbInvokeAction(this.Action);
+            }
+        });
+        animator1.TheActionHandler = __action_OnClick;
+        
+        var animator2 = new CL3D.AnimatorOnMove(CL3D.gScriptingInterface.CurrentlyActiveScene, CL3D.gScriptingInterface.Engine, ()=>
+        {
+            if (this.scaled)
+            {
+                ccbSetSceneNodeProperty(this.Radio, "Pos X (percent)", this.overlayData.x);
+                ccbSetSceneNodeProperty(this.Radio, "Pos Y (percent)", this.overlayData.y);
+                ccbSetSceneNodeProperty(this.Radio, "Width (percent)", this.overlayData.width);
+                ccbSetSceneNodeProperty(this.Radio, "Height (percent)", this.overlayData.height);
+                
+                this.scaled = false;
+                // console.log("[Origin:Leave]")
+            }
+        });
+        animator2.ActionHandlerOnEnter = new _action_OnEnter(this);
+        animator2.ActionHandlerOnLeave = new _action_OnLeave(this);
+
+        currentNode.addAnimator(animator1);
+        currentNode.addAnimator(animator2);
+
         this.init = true;
     }
     this.mouseX = ccbGetMousePosX() * CL3D.engine.DPR;
     this.mouseY = ccbGetMousePosY() * CL3D.engine.DPR;
 
-    this.posX_Radio = ccbGetSceneNodeProperty(this.Radio, "Pos X (pixels)");
-    this.posY_Radio = ccbGetSceneNodeProperty(this.Radio, "Pos Y (pixels)");
+    this.posX_Radio = ccbGetSceneNodeProperty(this.Radio, "Pos X (percent)");
+    this.posY_Radio = ccbGetSceneNodeProperty(this.Radio, "Pos Y (percent)");
 
     var variable = ccbGetCopperCubeVariable(this.Variable);
     if (variable != this.Value)
@@ -116,13 +184,13 @@ behavior_RadioButton.prototype.onAnimate = function(currentNode)
         if (this.Use_Image) ccbSetSceneNodeProperty(this.Radio, "Image", this.Active_Image);
         else
         {
-            var Color = intToRgba(this.Active_Color);
-            Color = rgbaToInt(Color.r, Color.g, Color.b, this.Alpha);
+            var Color = CL3D.convertIntColor(this.Active_Color);
+            Color = CL3D.createColor(this.Alpha, Color.r, Color.g, Color.b);
             ccbSetSceneNodeProperty(this.Radio, "Background Color", Color);
         }
     }
-    this.Width_Radio = ccbGetSceneNodeProperty(this.Radio, "Width (pixels)");
-    this.Height_Radio = ccbGetSceneNodeProperty(this.Radio, "Height (pixels)");
+    this.Width_Radio = ccbGetSceneNodeProperty(this.Radio, "Width (percent)");
+    this.Height_Radio = ccbGetSceneNodeProperty(this.Radio, "Height (percent)");
     
     if (!this.overlayData) this.overlayData =
     {
@@ -136,67 +204,70 @@ behavior_RadioButton.prototype.onAnimate = function(currentNode)
 
 behavior_RadioButton.prototype.onMouseEvent = function(mouseEvent, mouseWheelDelta, node)
 {
-    this.scaleX_Radio = this.posX_Radio + this.Width_Radio;
-    this.scaleY_Radio = this.posY_Radio + this.Height_Radio;
-    if (this.mouseX >= this.posX_Radio && this.mouseX <= this.scaleX_Radio && this.mouseY >= this.posY_Radio && this.mouseY <= this.scaleY_Radio)
-    {
-        if (!this.scaled)
-        {
-            this.originalOverlay = scaleOverlay(this.overlayData, 1).originalOverlay;
-            var scaled = scaleOverlay(this.originalOverlay, this.Scale_Hover).scaledOverlay;
+    // this.scaleX_Radio = this.posX_Radio + this.Width_Radio;
+    // this.scaleY_Radio = this.posY_Radio + this.Height_Radio;
+    // if (this.mouseX >= this.posX_Radio && this.mouseX <= this.scaleX_Radio && this.mouseY >= this.posY_Radio && this.mouseY <= this.scaleY_Radio)
+    // {
+    //     if (!this.scaled)
+    //     {
+    //         this.originalOverlay = scaleOverlay(this.overlayData, 1).originalOverlay;
+    //         var scaled = scaleOverlay(this.originalOverlay, this.Scale_Hover).scaledOverlay;
 
-            ccbSetSceneNodeProperty(this.Radio, "Pos X (pixels)", scaled.x);
-            ccbSetSceneNodeProperty(this.Radio, "Pos Y (pixels)", scaled.y);
-            ccbSetSceneNodeProperty(this.Radio, "Width (pixels)", scaled.width);
-            ccbSetSceneNodeProperty(this.Radio, "Height (pixels)", scaled.height);
+    //         ccbSetSceneNodeProperty(this.Radio, "Pos X (pixels)", scaled.x);
+    //         ccbSetSceneNodeProperty(this.Radio, "Pos Y (pixels)", scaled.y);
+    //         ccbSetSceneNodeProperty(this.Radio, "Width (pixels)", scaled.width);
+    //         ccbSetSceneNodeProperty(this.Radio, "Height (pixels)", scaled.height);
 
-            this.scaled = true;
-        }
-        if (mouseEvent == 3)
-        {
-            if (!this.scaledup)
-            {
-                this.originalClicked = scaleOverlay(this.originalOverlay, 1).originalOverlay;
-                var scaledClick = scaleOverlay(this.originalOverlay, this.Scale_Click).scaledOverlay;
+    //         this.scaled = true;
+    //         // console.log("[Origin:????]")
+    //     }
+    //     if (mouseEvent == 3)
+    //     {
+    //         if (!this.scaledup)
+    //         {
+    //             this.originalClicked = scaleOverlay(this.originalOverlay, 1).originalOverlay;
+    //             var scaledClick = scaleOverlay(this.originalOverlay, this.Scale_Click).scaledOverlay;
 
-                ccbSetSceneNodeProperty(this.Radio, "Pos X (pixels)", scaledClick.x);
-                ccbSetSceneNodeProperty(this.Radio, "Pos Y (pixels)", scaledClick.y);
-                ccbSetSceneNodeProperty(this.Radio, "Width (pixels)", scaledClick.width);
-                ccbSetSceneNodeProperty(this.Radio, "Height (pixels)", scaledClick.height);
+    //             ccbSetSceneNodeProperty(this.Radio, "Pos X (pixels)", scaledClick.x);
+    //             ccbSetSceneNodeProperty(this.Radio, "Pos Y (pixels)", scaledClick.y);
+    //             ccbSetSceneNodeProperty(this.Radio, "Width (pixels)", scaledClick.width);
+    //             ccbSetSceneNodeProperty(this.Radio, "Height (pixels)", scaledClick.height);
                 
-                this.scaled = true;
-            }
+    //             this.scaled = true;
+    //             console.log("[Origin:Pressed]")
+    //         }
 
-            ccbSetCopperCubeVariable(this.Variable, this.Value);
-            if (ccbGetCopperCubeVariable(this.Variable) == this.Value)
-            {
-                ccbInvokeAction(this.Action);
-            }
-        }
-    }
-    else
-    {
-        if (this.scaled)
-        {
-            ccbSetSceneNodeProperty(this.Radio, "Pos X (pixels)", this.overlayData.x);
-            ccbSetSceneNodeProperty(this.Radio, "Pos Y (pixels)", this.overlayData.y);
-            ccbSetSceneNodeProperty(this.Radio, "Width (pixels)", this.overlayData.width);
-            ccbSetSceneNodeProperty(this.Radio, "Height (pixels)", this.overlayData.height);
+    //         ccbSetCopperCubeVariable(this.Variable, this.Value);
+    //         if (ccbGetCopperCubeVariable(this.Variable) == this.Value)
+    //         {
+    //             ccbInvokeAction(this.Action);
+    //         }
+    //     }
+    // }
+    // else
+    // {
+    //     if (this.scaled)
+    //     {
+    //         ccbSetSceneNodeProperty(this.Radio, "Pos X (pixels)", this.overlayData.x);
+    //         ccbSetSceneNodeProperty(this.Radio, "Pos Y (pixels)", this.overlayData.y);
+    //         ccbSetSceneNodeProperty(this.Radio, "Width (pixels)", this.overlayData.width);
+    //         ccbSetSceneNodeProperty(this.Radio, "Height (pixels)", this.overlayData.height);
             
-            this.scaled = false;
-        }
-    }
-    if (mouseEvent == 2)
-    {
-        if (this.scaled)
-        {
-            ccbSetSceneNodeProperty(this.Radio, "Pos X (pixels)", this.originalClicked.x);
-            ccbSetSceneNodeProperty(this.Radio, "Pos Y (pixels)", this.originalClicked.y);
-            ccbSetSceneNodeProperty(this.Radio, "Width (pixels)", this.originalClicked.width);
-            ccbSetSceneNodeProperty(this.Radio, "Height (pixels)", this.originalClicked.height);
+    //         this.scaled = false;
+    //         console.log("[Origin:Leave]")
+    //     }
+    // }
+    // if (mouseEvent == 2)
+    // {
+    //     if (this.scaled)
+    //     {
+    //         ccbSetSceneNodeProperty(this.Radio, "Pos X (pixels)", this.originalClicked.x);
+    //         ccbSetSceneNodeProperty(this.Radio, "Pos Y (pixels)", this.originalClicked.y);
+    //         ccbSetSceneNodeProperty(this.Radio, "Width (pixels)", this.originalClicked.width);
+    //         ccbSetSceneNodeProperty(this.Radio, "Height (pixels)", this.originalClicked.height);
             
-            this.scaled = false;
-        }
-    }
-
+    //         this.scaled = false;
+    //         console.log("[Origin:Click]")
+    //     }
+    // }
 }

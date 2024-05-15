@@ -228,6 +228,14 @@ CL3D.createColorF = function(c)
 	return r;
 }	
 
+CL3D.convertIntColor = function(c)
+{
+	var a = (c >> 24) & 255.0;
+	var r = (c >> 16) & 255.0;
+	var g = (c >> 8) & 255.0;
+	var b = (c) & 255.0;
+	return { r: r, g: g, b: b, a: a };
+}
 
 /**
  * @private

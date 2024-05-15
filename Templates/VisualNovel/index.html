@@ -104,6 +104,11 @@
 			event.preventDefault();
 		};
 
+		document.addEventListener("mouseout", (event) =>
+		{
+			Global.MouseOut = true;
+		});
+
 		// CL3D
 		var canvas = '3darea';
 		var file = 'copperlichtdata/dialoguetest_3d.ccbz';

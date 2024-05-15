@@ -22,6 +22,48 @@
 <property name="Drag_Action" type="action" />
     </behavior>
 */
+var g_self = this;
+
+var _action_OnEnter = function(animater)
+{
+    this.animater = animater;
+};
+
+_action_OnEnter.prototype.execute = function(currentNode)
+{
+    this.animater.KnobHover = true;
+    ccbInvokeAction(this.animater.Hover_Action);
+};
+
+var _action_OnClick = function(animater)
+{
+    this.animater = animater;
+};
+
+_action_OnClick.prototype.execute = function(currentNode)
+{
+
+};
+
+var _action_OnLeave = function(animater)
+{
+    this.animater = animater;
+};
+
+_action_OnLeave.prototype.execute = function(currentNode)
+{
+    this.animater.KnobHover = false;
+    
+    if (this.animater.scaledKnob && !this.animater.drag)
+    {
+        //ccbSetSceneNodeProperty(this.Knob,"Pos X (percent)",this.KnobData.x);
+        ccbSetSceneNodeProperty(this.animater.Knob, "Pos Y (percent)", this.animater.KnobData.y);
+        ccbSetSceneNodeProperty(this.animater.Knob, "Width (percent)", this.animater.KnobData.width);
+        ccbSetSceneNodeProperty(this.animater.Knob, "Height (percent)", this.animater.KnobData.height);
+
+        this.animater.scaledKnob = false;
+    }
+};
 
 behavior_Slider = function()
 {
@@ -40,36 +82,6 @@ function clamp(value, minValue, maxValue, clampMin, clampMax)
     var clampedValue = normalizedValue * (clampMax - clampMin) + clampMin;
 
     return Math.max(clampMin, Math.min(clampMax, clampedValue));
-}
-function rgbaToInt(r, g, b, a)
-{
-    a = typeof a !== 'undefined' ? a : 255;
-    return (a << 24) + (r << 16) + (g << 8) + b;
-}
-
-function intToRgba(intValue)
-{
-    var r = (intValue >> 16) & 255;
-    var g = (intValue >> 8) & 255;
-    var b = intValue & 255;
-    var a = (intValue >> 24) & 255; // Alpha channel
-
-    return { r: r, g: g, b: b, a: a };
-}
-
-function RGB(decimalcolorcode)
-{
-    var color = (decimalcolorcode); // use the property type or put a decimal color value.
-    var Rr = (color & 0xff0000) >> 16; // get red color by bitwise operation  
-    var Gg = (color & 0x00ff00) >> 8; // get green color by bitwise operation 
-    var Bb = (color & 0x0000ff); // get blue color by bitwise operation 
-    var RrGgBb = new vector3d(Rr, Gg, Bb);
-    var r = (Rr / 255); // dividing red by 255 to clamp b/w 0-1 
-    var g = (Gg / 255); // dividing green by 255 to clamp b/w 0-1 
-    var b = (Bb / 255); // dividing blue by 255 to clamp b/w 0-1 
-    var rgb = new vector3d(r, g, b); // final rgb value to use in the editor
-
-    return RrGgBb;
 }
 
 // Map value from one range to another
@@ -107,17 +119,6 @@ function scaleOverlay(overlay, scaleFactor)
     };
 }
 
-// Function to scale down the height of a slider while keeping it centered
-function JIC_Scale_Slider_Height(Slider, scale)
-{
-    var newHeight = Slider.height * scale;
-    var heightDiff = Slider.height - newHeight;
-    Slider.y += Math.round(heightDiff / 2);
-    Slider.height = newHeight;
-
-    return Slider;
-}
-
 behavior_Slider.prototype.onAnimate = function (currentNode)
 {
     this.KnobVisibility = ccbGetSceneNodeProperty(this.Knob, "Visible");
@@ -126,37 +127,58 @@ behavior_Slider.prototype.onAnimate = function (currentNode)
     if (!this.Slider_Visibility) { return false; }
     if (!this.init)
     {
-        this.Platform = ccbGetPlatform();
         this.Slider = this.Bar;
         ccbSetCopperCubeVariable(this.Variable, this.Initial_Value);
-        ccbSetSceneNodeProperty(this.Knob, "Position Mode", "absolute (pixels)");
-        ccbSetSceneNodeProperty(this.Slider, "Position Mode", "absolute (pixels)");
+        ccbSetSceneNodeProperty(this.Knob, "Position Mode", "relative (percent)");
+        ccbSetSceneNodeProperty(this.Slider, "Position Mode", "relative (percent)");
         this.screenX = ccbGetScreenWidth();
         this.screenY = ccbGetScreenHeight();
+
+        var animator1 = new CL3D.AnimatorOnClick(CL3D.gScriptingInterface.CurrentlyActiveScene, CL3D.gScriptingInterface.Engine, ()=>
+        {
+            if (!this.scaledup)
+            {
+                this.originalKnob = {...this.KnobData};
+                this.originalClickedKnob = scaleOverlay(this.originalKnob, 1).originalOverlay;
+                var scaledClickKnob = scaleOverlay(this.originalKnob, this.Scale_Click_Knob).scaledOverlay;
+
+                //ccbSetSceneNodeProperty(this.Knob,"Pos X (percent)",scaledClickKnob.x);
+                ccbSetSceneNodeProperty(this.Knob, "Pos Y (percent)", scaledClickKnob.y);
+                ccbSetSceneNodeProperty(this.Knob, "Width (percent)", scaledClickKnob.width);
+                ccbSetSceneNodeProperty(this.Knob, "Height (percent)", scaledClickKnob.height);
+
+                this.scaledKnob = true;
+            }
+            this.drag = true;
+            ccbInvokeAction(this.Drag_Action);
+        });
+        animator1.TheActionHandler = new _action_OnClick(this);
+        
+        var animator2 = new CL3D.AnimatorOnMove(CL3D.gScriptingInterface.CurrentlyActiveScene, CL3D.gScriptingInterface.Engine, ()=>
+        {
+
+        });
+        animator2.ActionHandlerOnEnter = new _action_OnEnter(this);
+        animator2.ActionHandlerOnLeave = new _action_OnLeave(this);
+
+        currentNode.addAnimator(animator1);
+        currentNode.addAnimator(animator2);
+        
         this.init = true;
     }
     this.mouseX = ccbGetMousePosX() * CL3D.engine.DPR;
     this.mouseY = ccbGetMousePosY() * CL3D.engine.DPR;
 
-    this.posX_Knob = ccbGetSceneNodeProperty(this.Knob, "Pos X (pixels)");
-    this.posY_Knob = ccbGetSceneNodeProperty(this.Knob, "Pos Y (pixels)");
-    this.posX_Slider = ccbGetSceneNodeProperty(this.Slider, "Pos X (pixels)");
-    this.posY_Slider = ccbGetSceneNodeProperty(this.Slider, "Pos Y (pixels)");
+    this.posX_Knob = ccbGetSceneNodeProperty(this.Knob, "Pos X (percent)");
+    this.posY_Knob = ccbGetSceneNodeProperty(this.Knob, "Pos Y (percent)");
+    this.posX_Slider = ccbGetSceneNodeProperty(this.Slider, "Pos X (percent)");
+    this.posY_Slider = ccbGetSceneNodeProperty(this.Slider, "Pos Y (percent)");
 
-    this.Width_Knob = ccbGetSceneNodeProperty(this.Knob, "Width (pixels)");
-    this.Height_Knob = ccbGetSceneNodeProperty(this.Knob, "Height (pixels)");
-    this.Width_Slider = ccbGetSceneNodeProperty(this.Slider, "Width (pixels)");
-    this.Height_Slider = ccbGetSceneNodeProperty(this.Slider, "Height (pixels)");
+    this.Width_Knob = ccbGetSceneNodeProperty(this.Knob, "Width (percent)");
+    this.Height_Knob = ccbGetSceneNodeProperty(this.Knob, "Height (percent)");
+    this.Width_Slider = ccbGetSceneNodeProperty(this.Slider, "Width (percent)");
+    this.Height_Slider = ccbGetSceneNodeProperty(this.Slider, "Height (percent)");
 
-    if (this.Platform == "webgl")
-    {
-        var bgEnable = true;
-    }
-    else
-    {
-        var bgEnable = ccbGetSceneNodeProperty(this.Slider, "Draw Background");
-    }
-    
     if (!this.valueboxOverlay)
     {
         this.valueboxOverlay = true;
@@ -172,53 +194,48 @@ behavior_Slider.prototype.onAnimate = function (currentNode)
         }
         else ccbSetSceneNodeProperty(sliderFill, "Image", "");
 
-        this.posX_SliderFill = ccbGetSceneNodeProperty(sliderFill, "Pos X (pixels)");
-        this.posY_SliderFill = ccbGetSceneNodeProperty(sliderFill, "Pos Y (pixels)");
+        this.posX_SliderFill = ccbGetSceneNodeProperty(sliderFill, "Pos X (percent)");
+        this.posY_SliderFill = ccbGetSceneNodeProperty(sliderFill, "Pos Y (percent)");
 
-        this.Width_SliderFill = ccbGetSceneNodeProperty(sliderFill, "Width (pixels)");
-        this.Height_SliderFill = ccbGetSceneNodeProperty(sliderFill, "Height (pixels)");
+        this.Width_SliderFill = ccbGetSceneNodeProperty(sliderFill, "Width (percent)");
+        this.Height_SliderFill = ccbGetSceneNodeProperty(sliderFill, "Height (percent)");
 
         ccbSetSceneNodeProperty(sliderFill, "Name", ccbGetSceneNodeProperty(this.Slider, "Name") + "#JIC_slider_fill");
-        if (!this.Use_Image && bgEnable == true)
+        if (!this.Use_Image)
         {
             var color = ccbGetSceneNodeProperty(sliderFill, "Background Color");
             var colorAlpha = ccbGetSceneNodeProperty(sliderFill, "Alpha");
 
-            var SliderFillColor = intToRgba(this.SliderFillColor);
-            SliderFillColor = rgbaToInt(SliderFillColor.r, SliderFillColor.g, SliderFillColor.b, colorAlpha);
+            var SliderFillColor = CL3D.convertIntColor(this.SliderFillColor);
+            SliderFillColor = CL3D.createColor(colorAlpha, SliderFillColor.r, SliderFillColor.g, SliderFillColor.b);
             if (this.AutoFillColor)
             {
-                color = intToRgba(color);
-                color = rgbaToInt((color.r + 255) / 2, (color.g + 255) / 2, (color.b + 255) / 2, color.a);
+                color = CL3D.convertIntColor(color);
+                color = CL3D.createColor(color.a, (color.r + 255) / 2, (color.g + 255) / 2, (color.b + 255) / 2);
                 ccbSetSceneNodeProperty(sliderFill, "Background Color", color);
             }
             else ccbSetSceneNodeProperty(sliderFill, "Background Color", SliderFillColor);
-            
         }
     }
     var sliderFill = ccbGetSceneNodeFromName(ccbGetSceneNodeProperty(this.Slider, "Name") + "#JIC_slider_fill");
-    var rectangle = { x: this.posX_SliderFill, y: this.posY_SliderFill, width: this.Width_SliderFill, height: this.Height_SliderFill };
-    var newheight = JIC_Scale_Slider_Height(rectangle, this.SliderFillHeight);
-    ccbSetSceneNodeProperty(sliderFill, "Pos Y (pixels)", newheight.y);
-    ccbSetSceneNodeProperty(sliderFill, "Height (pixels)", newheight.height - this.AdditionalHeight);
     
     if (this.FillFromCenter)
     {
         if (this.posX_Knob < this.posX_Slider + this.Width_Slider / 2) {
-            ccbSetSceneNodeProperty(sliderFill, "Pos X (pixels)", this.posX_Knob + this.Width_Knob);
-            ccbSetSceneNodeProperty(sliderFill, "Width (pixels)", this.posX_Slider - this.posX_Knob + this.Width_Slider / 2 - this.Width_Knob);
+            ccbSetSceneNodeProperty(sliderFill, "Pos X (percent)", this.posX_Knob + this.Width_Knob);
+            ccbSetSceneNodeProperty(sliderFill, "Width (percent)", this.posX_Slider - this.posX_Knob + this.Width_Slider / 2 - this.Width_Knob);
         }
         if (this.posX_Knob > this.posX_Slider + this.Width_Slider / 2) {
-            ccbSetSceneNodeProperty(sliderFill, "Pos X (pixels)", this.posX_Slider + this.Width_Slider / 2);
-            ccbSetSceneNodeProperty(sliderFill, "Width (pixels)", this.posX_Knob - this.posX_SliderFill - this.Width_Slider / 2 + 1);
+            ccbSetSceneNodeProperty(sliderFill, "Pos X (percent)", this.posX_Slider + this.Width_Slider / 2);
+            ccbSetSceneNodeProperty(sliderFill, "Width (percent)", this.posX_Knob - this.posX_SliderFill - this.Width_Slider / 2 + 1);
         }
     }
-    else ccbSetSceneNodeProperty(sliderFill, "Width (pixels)", this.posX_Knob - this.posX_Slider + (this.Width_Knob / 2));
+    else ccbSetSceneNodeProperty(sliderFill, "Width (percent)", this.posX_Knob - this.posX_Slider + (this.Width_Knob / 2));
 
     if (this.Reverse_SliderFill)
     {
-        ccbSetSceneNodeProperty(sliderFill, "Pos X (pixels)", this.posX_Knob + this.Width_Knob);
-        ccbSetSceneNodeProperty(sliderFill, "Width (pixels)", this.posX_Slider - this.posX_Knob + this.Width_Slider - this.Width_Knob);
+        ccbSetSceneNodeProperty(sliderFill, "Pos X (percent)", this.posX_Knob + this.Width_Knob);
+        ccbSetSceneNodeProperty(sliderFill, "Width (percent)", this.posX_Slider - this.posX_Knob + this.Width_Slider - this.Width_Knob);
     }
 
     var variable = ccbGetCopperCubeVariable(this.variable);
@@ -231,19 +248,19 @@ behavior_Slider.prototype.onAnimate = function (currentNode)
     if (this.drag)
     {
         // Calculate position based on mouseX
-        var newPos = ccbGetMousePosX() * CL3D.engine.DPR - (this.Width_Knob / 2);
+        var newPos = (ccbGetMousePosX() * CL3D.engine.DPR) / ccbGetScreenWidth() * 100 - (this.Width_Knob / 2);
         if (newPos < this.sliderMin) newPos = this.sliderMin;
         else if (newPos > this.sliderMax) newPos = this.sliderMax;
 
         // Set position of the Knob
-        ccbSetSceneNodeProperty(this.Knob, "Pos X (pixels)", newPos);
+        ccbSetSceneNodeProperty(this.Knob, "Pos X (percent)", newPos);
         var clampedValue = Math.round(clamp(newPos, this.sliderMin, this.sliderMax, this.Min, this.Max));
         ccbSetCopperCubeVariable(this.Variable, clampedValue);
     }
 
     var variableValue = ccbGetCopperCubeVariable(this.Variable);
     var newPos = mapValue(variableValue, this.Min, this.Max, this.sliderMin, this.sliderMax);
-    ccbSetSceneNodeProperty(this.Knob, "Pos X (pixels)", newPos);
+    ccbSetSceneNodeProperty(this.Knob, "Pos X (percent)", newPos);
     if (variableValue > this.Max)
         ccbSetCopperCubeVariable(this.Variable, this.Max);
     
@@ -254,13 +271,13 @@ behavior_Slider.prototype.onAnimate = function (currentNode)
     // if (this.drag) {
 
     // 	if (this.mouseX <= this.sliderMax+(this.Width_Knob/2) && this.mouseX >= this.sliderMin+(this.Width_Knob/2)) {
-    // 		ccbSetSceneNodeProperty(this.Knob, "Pos X (pixels)", ccbGetMousePosX() - (this.Width_Knob / 2));
+    // 		ccbSetSceneNodeProperty(this.Knob, "Pos X (percent)", ccbGetMousePosX() - (this.Width_Knob / 2));
     // 	}
-    // 	if (this.mouseX >= this.sliderMax+(this.Width_Knob/2)) { ccbSetSceneNodeProperty(this.Knob, "Pos X (pixels)", this.sliderMax); }
-    // 	if (this.mouseX <= this.sliderMin) { ccbSetSceneNodeProperty(this.Knob, "Pos X (pixels)", this.sliderMin); }
+    // 	if (this.mouseX >= this.sliderMax+(this.Width_Knob/2)) { ccbSetSceneNodeProperty(this.Knob, "Pos X (percent)", this.sliderMax); }
+    // 	if (this.mouseX <= this.sliderMin) { ccbSetSceneNodeProperty(this.Knob, "Pos X (percent)", this.sliderMin); }
     // }
-    // if (this.posX_Knob >= this.sliderMax+(this.Width_Knob/2)) { ccbSetSceneNodeProperty(this.Knob, "Pos X (pixels)", this.sliderMax);}
-    // if (this.posX_Knob+1 <= this.sliderMin) { ccbSetSceneNodeProperty(this.Knob, "Pos X (pixels)", this.sliderMin); }
+    // if (this.posX_Knob >= this.sliderMax+(this.Width_Knob/2)) { ccbSetSceneNodeProperty(this.Knob, "Pos X (percent)", this.sliderMax);}
+    // if (this.posX_Knob+1 <= this.sliderMin) { ccbSetSceneNodeProperty(this.Knob, "Pos X (percent)", this.sliderMin); }
     // var clampedValue = Math.round(clamp(this.posX_Knob, this.sliderMin, this.sliderMax, this.Min,this.Max));
     // ccbSetCopperCubeVariable(this.Variable, clampedValue);
 
@@ -270,103 +287,110 @@ behavior_Slider.prototype.onAnimate = function (currentNode)
 
 behavior_Slider.prototype.onMouseEvent = function (mouseEvent, mouseWheelDelta, node)
 {
-    if (!this.KnobVisibility && !this.Slider_Visibility) return false;
-    if (!this.Slider_Visibility) return false;
-
-    this.scaleX_Knob = this.posX_Knob + this.Width_Knob;
-    this.scaleY_Knob = this.posY_Knob + this.Height_Knob;
-    if (this.mouseX >= this.posX_Knob && this.mouseX <= this.scaleX_Knob && this.mouseY >= this.posY_Knob && this.mouseY <= this.scaleY_Knob)
+    if (!this.KnobVisibility && !this.Slider_Visibility)
     {
-        if (!this.scaledKnob)
-        {
-            this.originalKnob = scaleOverlay(this.KnobData, 1).originalOverlay;
-            var scaledKnob = scaleOverlay(this.originalKnob, this.Scale_Hover_Knob).scaledOverlay;
-
-            //ccbSetSceneNodeProperty(this.Knob,"Pos X (pixels)",scaledKnob.x);
-            ccbSetSceneNodeProperty(this.Knob, "Pos Y (pixels)", scaledKnob.y);
-            ccbSetSceneNodeProperty(this.Knob, "Width (pixels)", scaledKnob.width);
-            ccbSetSceneNodeProperty(this.Knob, "Height (pixels)", scaledKnob.height);
-
-            this.scaledKnob = true;
-        }
-        this.KnobHover = true;
-        ccbInvokeAction(this.Hover_Action);
-        if (mouseEvent == 3)
-        {
-            if (!this.scaledup)
-            {
-                this.originalClickedKnob = scaleOverlay(this.originalKnob, 1).originalOverlay;
-                var scaledClickKnob = scaleOverlay(this.originalKnob, this.Scale_Click_Knob).scaledOverlay;
-                
-                //ccbSetSceneNodeProperty(this.Knob,"Pos X (pixels)",scaledClickKnob.x);
-                ccbSetSceneNodeProperty(this.Knob, "Pos Y (pixels)", scaledClickKnob.y);
-                ccbSetSceneNodeProperty(this.Knob, "Width (pixels)", scaledClickKnob.width);
-                ccbSetSceneNodeProperty(this.Knob, "Height (pixels)", scaledClickKnob.height);
-                
-                this.scaledKnob = true;
-            }
-            this.drag = true;
-            ccbInvokeAction(this.Drag_Action);
-        }
+        return false;
     }
-    else
+    if (!this.Slider_Visibility)
     {
-        this.KnobHover = false;
-
-        if (this.scaledKnob && !this.drag)
-        {
-            //ccbSetSceneNodeProperty(this.Knob,"Pos X (pixels)",this.KnobData.x);
-            ccbSetSceneNodeProperty(this.Knob, "Pos Y (pixels)", this.KnobData.y);
-            ccbSetSceneNodeProperty(this.Knob, "Width (pixels)", this.KnobData.width);
-            ccbSetSceneNodeProperty(this.Knob, "Height (pixels)", this.KnobData.height);
-        }
-        this.scaledKnob = false;
+        return false;
     }
-    if (mouseEvent == 2)
+    // this.scaleX_Knob = this.posX_Knob + this.Width_Knob;
+    // this.scaleY_Knob = this.posY_Knob + this.Height_Knob;
+    // if (this.mouseX >= this.posX_Knob && this.mouseX <= this.scaleX_Knob && this.mouseY >= this.posY_Knob && this.mouseY <= this.scaleY_Knob)
+    // {
+    //     if (!this.scaledKnob)
+    //     {
+    //         // this.originalKnob = scaleOverlay(this.KnobData, 1).originalOverlay;
+    //         // var scaledKnob = scaleOverlay(this.originalKnob, this.Scale_Hover_Knob).scaledOverlay;
+            
+    //         // //ccbSetSceneNodeProperty(this.Knob,"Pos X (percent)",scaledKnob.x);
+    //         // ccbSetSceneNodeProperty(this.Knob, "Pos Y (percent)", scaledKnob.y);
+    //         // ccbSetSceneNodeProperty(this.Knob, "Width (percent)", scaledKnob.width);
+    //         // ccbSetSceneNodeProperty(this.Knob, "Height (percent)", scaledKnob.height);
+
+    //         // this.scaledKnob = true;
+    //     }
+    //     // this.KnobHover = true;
+    //     // ccbInvokeAction(this.Hover_Action);
+    //     if (mouseEvent == 3)
+    //     {
+    //         // if (!this.scaledup)
+    //         // {
+    //         //     this.originalClickedKnob = scaleOverlay(this.originalKnob, 1).originalOverlay;
+    //         //     var scaledClickKnob = scaleOverlay(this.originalKnob, this.Scale_Click_Knob).scaledOverlay;
+
+    //         //     //ccbSetSceneNodeProperty(this.Knob,"Pos X (percent)",scaledClickKnob.x);
+    //         //     ccbSetSceneNodeProperty(this.Knob, "Pos Y (percent)", scaledClickKnob.y);
+    //         //     ccbSetSceneNodeProperty(this.Knob, "Width (percent)", scaledClickKnob.width);
+    //         //     ccbSetSceneNodeProperty(this.Knob, "Height (percent)", scaledClickKnob.height);
+
+    //         //     this.scaledKnob = true;
+    //         // }
+    //         // this.drag = true;
+    //         // ccbInvokeAction(this.Drag_Action);
+    //     }
+    // }
+    // else
+    // {
+    //     // this.KnobHover = false;
+    
+    //     // if (this.scaledKnob && !this.drag)
+    //     // {
+    //     //     //ccbSetSceneNodeProperty(this.Knob,"Pos X (percent)",this.KnobData.x);
+    //     //     ccbSetSceneNodeProperty(this.Knob, "Pos Y (percent)", this.KnobData.y);
+    //     //     ccbSetSceneNodeProperty(this.Knob, "Width (percent)", this.KnobData.width);
+    //     //     ccbSetSceneNodeProperty(this.Knob, "Height (percent)", this.KnobData.height);
+
+    //     //     this.scaledKnob = false;
+    //     // }
+    // }
+    if (mouseEvent == 2 || Global.MouseOut)
     {
         this.drag = false;
         if (this.scaledKnob && this.originalClickedKnob)
         {
-            //ccbSetSceneNodeProperty(this.Knob,"Pos X (pixels)",this.originalClickedKnob.x);
-            ccbSetSceneNodeProperty(this.Knob, "Pos Y (pixels)", this.originalClickedKnob.y);
-            ccbSetSceneNodeProperty(this.Knob, "Width (pixels)", this.originalClickedKnob.width);
-            ccbSetSceneNodeProperty(this.Knob, "Height (pixels)", this.originalClickedKnob.height);
+            //ccbSetSceneNodeProperty(this.Knob,"Pos X (percent)",this.originalClickedKnob.x);
+            ccbSetSceneNodeProperty(this.Knob, "Pos Y (percent)", this.originalClickedKnob.y);
+            ccbSetSceneNodeProperty(this.Knob, "Width (percent)", this.originalClickedKnob.width);
+            ccbSetSceneNodeProperty(this.Knob, "Height (percent)", this.originalClickedKnob.height);
 
             this.scaledKnob = false;
         }
+        Global.MouseOut = false;
     }
-
-    this.scaleX_Slider = this.posX_Slider + this.Width_Slider;
-    this.scaleY_Slider = this.posY_Slider + this.Height_Slider;
-    if ((this.mouseX >= this.posX_Slider && this.mouseX <= this.scaleX_Slider && this.mouseY >= this.posY_Slider && this.mouseY <= this.scaleY_Slider) || this.KnobHover == true)
-    {
-        if (mouseEvent == 3)
-        {
-            ccbInvokeAction(this.Drag_Action);
-            if (!this.drag)
-            {
-                ccbSetSceneNodeProperty(this.Knob, "Pos X (pixels)", this.mouseX + (this.posX_Knob - this.scaleX_Knob));
-                this.drag = true;
-            }
-        }
-        if (this.EnableMouseScroll)
-        {
-            if (this.posX_Knob + (1 * this.ScrollMultiplier) > this.sliderMin && this.posX_Knob < this.sliderMax)
-            {
-                if (mouseWheelDelta == 1)
-                {
-                    var val = ccbGetCopperCubeVariable(this.Variable);
-                    ccbSetCopperCubeVariable(this.Variable, val + (1 * this.ScrollMultiplier));
-                }
-            }
-            if (this.posX_Knob > this.sliderMin && this.posX_Knob - (1 * this.ScrollMultiplier) < this.sliderMax)
-            {
-                if (mouseWheelDelta == -1)
-                {
-                    var val = ccbGetCopperCubeVariable(this.Variable);
-                    ccbSetCopperCubeVariable(this.Variable, val - (1 * this.ScrollMultiplier));
-                }
-            }
-        }
-    }
+    
+    // this.scaleX_Slider = this.posX_Slider + this.Width_Slider;
+    // this.scaleY_Slider = this.posY_Slider + this.Height_Slider;
+    // if ((this.mouseX >= this.posX_Slider && this.mouseX <= this.scaleX_Slider && this.mouseY >= this.posY_Slider && this.mouseY <= this.scaleY_Slider) || this.KnobHover == true)
+    // {
+    //     if (mouseEvent == 3)
+    //     {
+    //         ccbInvokeAction(this.Drag_Action);
+    //         if (!this.drag)
+    //         {
+    //             ccbSetSceneNodeProperty(this.Knob, "Pos X (percent)", this.mouseX + (this.posX_Knob - this.scaleX_Knob));
+    //             this.drag = true;
+    //         }
+    //     }
+    //     if (this.EnableMouseScroll)
+    //     {
+    //         if (this.posX_Knob + (1 * this.ScrollMultiplier) > this.sliderMin && this.posX_Knob < this.sliderMax)
+    //         {
+    //             if (mouseWheelDelta == 1)
+    //             {
+    //                 var val = ccbGetCopperCubeVariable(this.Variable);
+    //                 ccbSetCopperCubeVariable(this.Variable, val + (1 * this.ScrollMultiplier));
+    //             }
+    //         }
+    //         if (this.posX_Knob > this.sliderMin && this.posX_Knob - (1 * this.ScrollMultiplier) < this.sliderMax)
+    //         {
+    //             if (mouseWheelDelta == -1)
+    //             {
+    //                 var val = ccbGetCopperCubeVariable(this.Variable);
+    //                 ccbSetCopperCubeVariable(this.Variable, val - (1 * this.ScrollMultiplier));
+    //             }
+    //         }
+    //     }
+    // }
 }
