@@ -28,6 +28,8 @@ CL3D.Overlay2DSceneNode = function(engine)
 	this.Box = new CL3D.Box3d();
 
 	// size and position
+	this.TextureWidth = 0.5;
+	this.TextureHeight = 0.5;
 
 	this.PosAbsoluteX = 100;
 	this.PosAbsoluteY = 100;
@@ -48,6 +50,7 @@ CL3D.Overlay2DSceneNode = function(engine)
 
 	this.Texture = null; //:Texture;
 	this.TextureHover = null; // :Texture;
+	this.TextureMask = null; // TODO: mask
 	this.RetainAspectRatio = true; // :Boolean;
 	this.BlurImage = false;
 
@@ -322,6 +325,9 @@ CL3D.Overlay2DSceneNode.prototype.render = function(renderer)
 
 				rctTarget.w = width;
 				rctTarget.h = height;
+
+				this.TextureWidth = width / rctTarget.sw;
+				this.TextureHeight = height / rctTarget.sh;
 
 				rctDrawText = rctTarget;
 
@@ -602,6 +608,9 @@ CL3D.Overlay2DSceneNode.prototype.getScreenCoordinatesRect = function(adjustForV
 	//core::dimension2d<s32> screensize = driver->getScreenSize();
 
 	var retobj = new Object();
+
+	retobj.sw = w;
+	retobj.sh = h;
 
 	if (this.SizeModeIsAbsolute)
 	{

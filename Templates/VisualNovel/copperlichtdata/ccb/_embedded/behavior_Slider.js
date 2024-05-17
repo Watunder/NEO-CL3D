@@ -168,7 +168,10 @@ behavior_Slider.prototype.onAnimate = function (currentNode)
     }
     this.mouseX = ccbGetMousePosX() * CL3D.engine.DPR;
     this.mouseY = ccbGetMousePosY() * CL3D.engine.DPR;
-
+    
+    ccbSetSceneNodeProperty(this.Slider, "Width (percent)", ccbGetSceneNodeProperty(currentNode, "Texture Width (percent)"));
+    ccbSetSceneNodeProperty(this.Slider, "Height (percent)", ccbGetSceneNodeProperty(currentNode, "Texture Height (percent)"));
+    
     this.posX_Knob = ccbGetSceneNodeProperty(this.Knob, "Pos X (percent)");
     this.posY_Knob = ccbGetSceneNodeProperty(this.Knob, "Pos Y (percent)");
     this.posX_Slider = ccbGetSceneNodeProperty(this.Slider, "Pos X (percent)");
@@ -218,7 +221,9 @@ behavior_Slider.prototype.onAnimate = function (currentNode)
         }
     }
     var sliderFill = ccbGetSceneNodeFromName(ccbGetSceneNodeProperty(this.Slider, "Name") + "#JIC_slider_fill");
-    
+    ccbSetSceneNodeProperty(sliderFill, "Width (percent)", ccbGetSceneNodeProperty(currentNode, "Texture Width (percent)"));
+    ccbSetSceneNodeProperty(sliderFill, "Height (percent)", ccbGetSceneNodeProperty(currentNode, "Texture Height (percent)"));
+
     if (this.FillFromCenter)
     {
         if (this.posX_Knob < this.posX_Slider + this.Width_Slider / 2) {

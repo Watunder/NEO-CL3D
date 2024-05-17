@@ -350,6 +350,10 @@ CL3D.ScriptingInterface.prototype.getSceneNodePropertyFromOverlay = function(ove
 		return overlaynode.TextColor;
 	case 'Text':
 		return overlaynode.Text;
+	case 'Texture Width (percent)':
+		return overlaynode.TextureWidth * 100.0;
+	case 'Texture Height (percent)':
+		return overlaynode.TextureHeight * 100.0;
 	}
 
 	return null;

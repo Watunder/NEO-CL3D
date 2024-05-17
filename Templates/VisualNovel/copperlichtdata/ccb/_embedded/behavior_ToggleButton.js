@@ -226,11 +226,13 @@ behavior_ToggleButton.prototype.onAnimate = function(currentNode)
     this.Width_Bar = ccbGetSceneNodeProperty(this.Bar, "Width (percent)");
     this.Height_Bar = ccbGetSceneNodeProperty(this.Bar, "Height (percent)");
     
+    this.Width_Bar_Texture = ccbGetSceneNodeProperty(currentNode, "Texture Width (percent)");
+
     if (this.Animated)
     {
         if (this.toggle)
         {
-            ccbSetSceneNodeProperty(this.Knob, "Pos X (percent)", lerp(this.posX_Knob, this.posX_Bar + this.Width_Bar - this.Width_Knob - this.Additional_Position, 0.4));
+            ccbSetSceneNodeProperty(this.Knob, "Pos X (percent)", lerp(this.posX_Knob, this.posX_Bar + this.Width_Bar_Texture - this.Width_Knob - this.Additional_Position, 0.4));
         }
         else
         {
