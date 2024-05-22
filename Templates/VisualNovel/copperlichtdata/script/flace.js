@@ -472,12 +472,12 @@ CL3D.CopperLicht.prototype.isLoading = function()
 /**
  * @private
  */
-CL3D.CopperLicht.prototype.parseFile = function(filecontent, filename, importIntoExistingDocument)
+CL3D.CopperLicht.prototype.parseFile = function(filecontent, filename, importIntoExistingDocument, copyRootNodeChildren, newRootNodeChildrenParent)
 {
 	this.LoadingAFile = false;
 
 	var loader = new CL3D.FlaceLoader();
-	var doc = loader.loadFile(filecontent, filename, this.TheTextureManager, this.TheMeshCache, this);
+	var doc = loader.loadFile(filecontent, filename, this.TheTextureManager, this.TheMeshCache, this, copyRootNodeChildren, newRootNodeChildrenParent);
 	if (doc != null)
 	{
 		// var docJSON = JSON.stringify(JSON.decycle(doc));
@@ -511,11 +511,15 @@ CL3D.CopperLicht.prototype.parseFile = function(filecontent, filename, importInt
 		else
 		{
 			// import all scenes loaded into this current, already existing document.
-
-			for (var sceneNr=0; sceneNr<doc.Scenes.length; ++sceneNr)
+			if (!copyRootNodeChildren || !newRootNodeChildrenParent)
 			{
-				// CL3D.gCCDebugOutput.print("imported scene " + doc.Scenes[sceneNr].Name);
-				this.Document.addScene(doc.Scenes[sceneNr]);
+				for (var sceneNr=0; sceneNr<doc.Scenes.length; ++sceneNr)
+				{
+					// CL3D.gCCDebugOutput.print("imported scene " + doc.Scenes[sceneNr].Name);
+	
+					this.Document.addScene(doc.Scenes[sceneNr]);
+				}
+
 			}
 		}
 	}
@@ -1614,7 +1618,7 @@ CL3D.CopperLicht.prototype.createTextDialog = function(forLoadingDlg, text, load
 		content = "<p style=\"margin:0; padding-left:" + paddingleft + "px; padding-bottom:5px;\">" + text + "</p> ";
 
 		if (forLoadingDlg && !containsLogo)
-			content += "<img style=\"position:absolute; left:5px; top:3px;\" src=\"copperlichtdata/loading.gif\" />";
+			content += "<img style=\"position:absolute; left:5px; top:3px;\" src=\"scenes/copperlichtdata/loading.gif\" />";
 	}
 
 	dlg.innerHTML = content;

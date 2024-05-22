@@ -52,6 +52,9 @@ Global.SaveData =
 Global.IsSave = false;
 Global.IsLoad = false;
 
+Global.IsMenu = false;
+Global.IsOption = false;
+
 // //not used
 
 // import { YukaManager } from './dist/yuka-cl3d.mjs'

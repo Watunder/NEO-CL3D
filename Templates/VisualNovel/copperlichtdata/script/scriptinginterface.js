@@ -375,6 +375,8 @@ CL3D.AnimatorExtensionScript = function(scenemanager)
 	this.ScriptIndex = -1;
 	this.bIsAttachedToCamera = false;
 	this.SMGr = scenemanager;
+
+	this.firstTime = true;
 }
 CL3D.AnimatorExtensionScript.prototype = new CL3D.Animator();
 
@@ -449,7 +451,11 @@ CL3D.AnimatorExtensionScript.prototype.animateNode = function(n, timeMs)
 
 	if (this.ScriptIndex != -1)
 	{
-		this.initScript(n, engine, true);
+		if (this.firstTime)
+		{
+			this.initScript(n, engine, true);
+			this.firstTime = false;
+		}
 
 		// run script like this:
 		// _ccbScriptCache[0].onAnimate(ccbGetSceneNodeFromId(thescenenodeid), timeMs);
@@ -501,7 +507,7 @@ CL3D.AnimatorExtensionScript.prototype.initScript = function(n, engine, isCache)
 		executeCode += " = new " + this.JsClassName;
 		executeCode += "();";
 	}
-
+	
 	engine.executeCode(executeCode);
 
 	// also, we need to init the instance with the properties the user set for this extension

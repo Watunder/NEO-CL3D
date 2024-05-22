@@ -117,3 +117,13 @@ function _dispatch(macro, event)
 
     return _event;
 }
+
+function _addScenesFromDocument(filetoload, newRootNodeChildrenParent, functionToCallWhenLoaded)
+{
+    var loader = new CL3D.CCFileLoader(filetoload, filetoload.indexOf('.ccbz') != -1);
+    loader.load(function(filecontent)
+    {
+        CL3D.engine.parseFile(filecontent, filetoload, true, true, newRootNodeChildrenParent);
+        if (functionToCallWhenLoaded) functionToCallWhenLoaded();
+    });
+}

@@ -14,8 +14,11 @@ CL3D.FlaceLoader = function()
 		for(var c = 0; c < a.byteLength; c++) b += String.fromCharCode(a[c]);
 		return b
 	};
-	this.loadFile = function(a, b, c, e, f)
+	this.loadFile = function(a, b, c, e, f, g, h)
 	{
+		this.CopyRootNodeChildren = g;
+		this.NewRootNodeChildrenParent = h;
+
 		this.Filename = b;
 		this.TheTextureManager = c;
 		this.CursorControl = f;
@@ -58,7 +61,14 @@ CL3D.FlaceLoader = function()
 			switch (b)
 			{
 				case 1:
-					this.readDocument();
+					if (this.CopyRootNodeChildren)
+					{
+						this.readDocument2();
+					}
+					else
+					{
+						this.readDocument();
+					}
 					break;
 				case 12:
 					this.readEmbeddedFiles();
@@ -161,6 +171,32 @@ CL3D.FlaceLoader = function()
 					case 1:
 						b = new CL3D.PanoramaScene;
 						this.readPanoramaScene(b);
+						break;
+					default:
+						this.SkipToNextTag()
+				}
+				this.Document.addScene(b);
+				break;
+			default:
+				this.SkipToNextTag()
+		}
+	};
+	this.readDocument2 = function()
+	{
+		for(var a = this.NextTagPos; this.Data.bytesAvailable() > 0 && this.Data.getPosition() < a;) switch (this.readTag())
+		{
+			case 2:
+				var b = null;
+				switch (this.Data.readInt())
+				{
+					case 0:
+						b = {}; //temp
+						b.CurrentScene = CL3D.engine.Document.getCurrentScene();
+						b.getRootSceneNode = function(){return b.CurrentScene.RootNode};
+						b.registerSceneNodeAnimatorForEvents = b.CurrentScene.registerSceneNodeAnimatorForEvents;
+						b.RegisteredSceneNodeAnimatorsForEventsList = b.CurrentScene.RegisteredSceneNodeAnimatorsForEventsList;
+						b.RootNode = null;
+						this.readFreeScene2(b);
 						break;
 					default:
 						this.SkipToNextTag()
@@ -284,14 +320,33 @@ CL3D.FlaceLoader = function()
 				a.ShadowMapCameraViewDetailFactor = this.Data.readFloat();
 				break;
 			case 1012:
-				for(var c = 0; c < 6; ++c) a.PostEffectData[c].Active = this.Data.readBoolean();
-				a.PE_bloomBlurIterations = this.Data.readInt();
-				a.PE_bloomTreshold = this.Data.readFloat();
-				a.PE_blurIterations = this.Data.readInt();
-				a.PE_colorizeColor = this.Data.readInt();
-				a.PE_vignetteIntensity = this.Data.readFloat();
-				a.PE_vignetteRadiusA = this.Data.readFloat();
-				a.PE_vignetteRadiusB = this.Data.readFloat();
+				if (this.CopyRootNodeChildren)
+				{
+					this.SkipToNextTag();
+				}
+				else
+				{
+					for(var c = 0; c < 6; ++c) a.PostEffectData[c].Active = this.Data.readBoolean();
+					a.PE_bloomBlurIterations = this.Data.readInt();
+					a.PE_bloomTreshold = this.Data.readFloat();
+					a.PE_blurIterations = this.Data.readInt();
+					a.PE_colorizeColor = this.Data.readInt();
+					a.PE_vignetteIntensity = this.Data.readFloat();
+					a.PE_vignetteRadiusA = this.Data.readFloat();
+					a.PE_vignetteRadiusB = this.Data.readFloat();
+				}
+				break;
+			default:
+				this.SkipToNextTag()
+		}
+	};
+	this.readFreeScene2 = function(a)
+	{
+		var b = this.NextTagPos;
+		for(this.readScene(a); this.Data.bytesAvailable() > 0 && this.Data.getPosition() < b;) switch (this.readTag())
+		{
+			case 8:
+				this.ReadSceneGraph(a);
 				break;
 			default:
 				this.SkipToNextTag()
@@ -348,8 +403,21 @@ CL3D.FlaceLoader = function()
 	{
 		if(this.readTag() == 26)
 		{
-			a.Name = this.ReadString();
-			a.BackgroundColor = this.Data.readInt()
+			if (this.CopyRootNodeChildren)
+			{
+				a.Name = this.ReadString();
+				var folder = new CL3D.DummyTransformationSceneNode();
+				folder.Name = a.Name;
+				//folder.Visible = false;
+				this.NewRootNodeChildrenParent.addChild(folder);
+				a.RootNode = folder;
+				this.SkipToNextTag();
+			}
+			else
+			{
+				a.Name = this.ReadString();
+				a.BackgroundColor = this.Data.readInt()
+			}
 		}
 		else this.JumpBackFromTagReading()
 	};
@@ -385,9 +453,12 @@ CL3D.FlaceLoader = function()
 				o = 0;
 			if(c == 0)
 			{
-				b.Visible = k;
-				b.Name = i;
-				b.Culling = l
+				if (!this.CopyRootNodeChildren)
+				{
+					b.Visible = k;
+					b.Name = i;
+					b.Culling = l
+				}
 			}
 			for(; this.Data.bytesAvailable() > 0 && this.Data.getPosition() < e;) switch (this.readTag())
 			{
@@ -640,7 +711,7 @@ CL3D.FlaceLoader = function()
 							d.updateAbsolutePosition();
 							break;
 						default:
-							if(c == 0) a.AmbientLight = this.ReadColorF();
+							if(c == 0 && !this.CopyRootNodeChildren) a.AmbientLight = this.ReadColorF();
 							this.SkipToNextTag();
 							break
 					}
