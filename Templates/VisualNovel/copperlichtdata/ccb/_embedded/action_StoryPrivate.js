@@ -11,156 +11,157 @@
 
 // Global variables
 
-action_StoryPrivate = function()
+globalThis.action_StoryPrivate = class action_StoryPrivate
 {
-
-};
-
-// called when the action is executed 
-action_StoryPrivate.prototype.execute = function(currentNode)
-{
-	//var scene = CL3D.gScriptingInterface.CurrentlyActiveScene;
-	var obj = null;
-
-	if(typeof(this.Event) == "string")
-		obj = JSON.parse(this.Event);
-	else
-	if(typeof(this.Event) == "object")
-		obj = this.Event;
-
-	if (obj == null)
-		return;
-
-	switch (obj.name)
+	constructor()
 	{
-		case "SHOW":
+
+	}
+
+	// called when the action is executed 
+	execute(currentNode)
+	{
+		//var scene = CL3D.gScriptingInterface.CurrentlyActiveScene;
+		let obj = null;
+
+		if (typeof (this.Event) == "string")
+			obj = JSON.parse(this.Event);
+
+		else if (typeof (this.Event) == "object")
+			obj = this.Event;
+
+		if (obj == null)
+			return;
+
+		switch (obj.name)
 		{
-			var node_bg, behavior_bg;
-			var node_fg, behavior_fg;
-			if (obj.bg != null)
+			case "SHOW":
 			{
-				node_bg = ccbGetChildSceneNode(this.BG_overlayFolder, Number(obj.bg));
-				behavior_bg = _ccbScriptCache[node_bg.getAnimatorOfType("?").ScriptIndex];
+				let node_bg, behavior_bg;
+				let node_fg, behavior_fg;
+				if (obj.bg != null)
+				{
+					node_bg = ccbGetChildSceneNode(this.BG_overlayFolder, Number(obj.bg));
+					behavior_bg = _ccbScriptCache[node_bg.getAnimatorOfType("?").ScriptIndex];
+				}
+				if (obj.fg != null)
+				{
+					node_fg = ccbGetChildSceneNode(this.FG_overlayFolder, Number(obj.fg));
+					behavior_fg = _ccbScriptCache[node_fg.getAnimatorOfType("?").ScriptIndex];
+				}
 			}
-			if (obj.fg != null)
+			break;
+
+			case "HIDE":
 			{
-				node_fg = ccbGetChildSceneNode(this.FG_overlayFolder, Number(obj.fg));
-				behavior_fg = _ccbScriptCache[node_fg.getAnimatorOfType("?").ScriptIndex];
+				let node_bg, behavior_bg;
+				let node_fg, behavior_fg;
+				if (obj.bg != null) {
+					node_bg = ccbGetChildSceneNode(this.BG_overlayFolder, Number(obj.bg));
+					behavior_bg = _ccbScriptCache[node_bg.getAnimatorOfType("?").ScriptIndex];
+				}
+				if (obj.fg != null) {
+					node_fg = ccbGetChildSceneNode(this.FG_overlayFolder, Number(obj.fg));
+					behavior_fg = _ccbScriptCache[node_fg.getAnimatorOfType("?").ScriptIndex];
+				}
 			}
-		}
-		break;
+			break;
 
-		case "HIDE":
-		{
-			var node_bg, behavior_bg;
-			var node_fg, behavior_fg;
-			if (obj.bg != null)
+			case "MOVE":
 			{
-				node_bg = ccbGetChildSceneNode(this.BG_overlayFolder, Number(obj.bg));
-				behavior_bg = _ccbScriptCache[node_bg.getAnimatorOfType("?").ScriptIndex];
+				let node = ccbGetChildSceneNode(this.FG_overlayFolder, Number(obj.fg));
+				let behavior = _ccbScriptCache[node.getAnimatorOfType("extensionscript").ScriptIndex];
+
+				Global.Emitter.emit("pass_behavior", behavior);
+
+				behavior.Enable_MOVE = true;
+				behavior.EndPos.x = Number(obj.x);
+				behavior.EndPos.y = Number(obj.y);
+				behavior.EndPos.z = Number(obj.z);
+
+				behavior.Actor.removeAllKeyframes();
+				behavior.Actor.keyframe(0, behavior.StartPos);
+				behavior.Actor.keyframe(obj.t, behavior.EndPos, "easeOutSine");
 			}
-			if (obj.fg != null)
+			break;
+
+			case "BTN":
 			{
-				node_fg = ccbGetChildSceneNode(this.FG_overlayFolder, Number(obj.fg));
-				behavior_fg = _ccbScriptCache[node_fg.getAnimatorOfType("?").ScriptIndex];
+				/// TODO
+				let node = ccbGetChildSceneNode(ccbGetSceneNodeFromName("menu"), Number(obj.index) + 7);
+				let behavior = node.getAnimatorOfType("button");
+
+				Global.Emitter.emit("pass_behavior", behavior);
+
+				node.Visible = true;
+				node.Text = obj.text;
+				node.PosRelativeX = obj.x;
+				node.PosRelativeY = obj.y;
+				node.SizeRelativeWidth = obj.w;
+				node.SizeRelativeHeight = obj.h;
+
+				behavior.JSCode = obj.js;
+				///
+				Global.IsOption = true;
 			}
-		}
-		break;
+			break;
 
-		case "MOVE":
-		{
-			var node = ccbGetChildSceneNode(this.FG_overlayFolder, Number(obj.fg));
-			var behavior = _ccbScriptCache[node.getAnimatorOfType("extensionscript").ScriptIndex];
-			
-			Global.Emitter.emit("pass_behavior", behavior);
-
-			behavior.Enable_MOVE = true;
-			behavior.EndPos.x = Number(obj.x);
-			behavior.EndPos.y = Number(obj.y);
-			behavior.EndPos.z = Number(obj.z);
-
-			behavior.Actor.removeAllKeyframes();
-			behavior.Actor.keyframe(0, behavior.StartPos);
-			behavior.Actor.keyframe(obj.t, behavior.EndPos, "easeOutSine");
-		}
-		break;
-
-		case "BTN":
-		{
-			var node = ccbGetChildSceneNode(this.BTN_overlayFolder, Number(obj.index) + 7);
-			var behavior = node.getAnimatorOfType("button");
-			
-			Global.Emitter.emit("pass_behavior", behavior);	
-
-			node.Visible = true;
-			node.Text = obj.text;
-			node.PosRelativeX = obj.x;
-			node.PosRelativeY = obj.y;
-			node.SizeRelativeWidth = obj.w;
-			node.SizeRelativeHeight = obj.h;
-
-			behavior.JSCode = obj.js;
-		}
-		break;
-
-		// Dialog
-		case "character":
-		{
-			var behavior = _ccbScriptCache[3];
-			
-			Global.Emitter.emit("pass_behavior", behavior);	
-
-			ccbSetSceneNodeProperty(ccbGetChildSceneNode(ccbGetSceneNodeFromName("character"), 0), 'Text', obj.default);
-		}
-		break;
-
-		case "expression":
-		{
-			var behavior = _ccbScriptCache[3];
-			
-			Global.Emitter.emit("pass_behavior", behavior);	
-			
-			ccbSetSceneNodeProperty(ccbGetChildSceneNode(ccbGetSceneNodeFromName("expression"), 0), 'Text', obj.default);
-		}
-		break;
-
-		case "text":
-		{
-			var behavior = _ccbScriptCache[3];
-			
-			Global.Emitter.emit("pass_behavior", behavior);	
-
-			if (Object.keys(obj).length > 2)
+			// Dialog
+			case "character":
 			{
-				var _style = {};
-				if (obj.color)
-					_style.color = obj.color;
-				if (obj.size)
-					_style.size = obj.size;
-				
-				Global.Emitter.emit("set_dialogue_obj", {text: obj.default + " ", style: _style})
+				let behavior = _ccbScriptCache[3];
+
+				Global.Emitter.emit("pass_behavior", behavior);
+
+				ccbSetSceneNodeProperty(ccbGetChildSceneNode(ccbGetSceneNodeFromName("character"), 0), 'Text', obj.default);
 			}
-			else
-				Global.Emitter.emit("set_dialogue_text", obj.default + " ")
+			break;
+
+			case "expression":
+			{
+				let behavior = _ccbScriptCache[3];
+
+				Global.Emitter.emit("pass_behavior", behavior);
+
+				ccbSetSceneNodeProperty(ccbGetChildSceneNode(ccbGetSceneNodeFromName("expression"), 0), 'Text', obj.default);
+			}
+			break;
+
+			case "text":
+			{
+				let behavior = _ccbScriptCache[3];
+
+				Global.Emitter.emit("pass_behavior", behavior);
+
+				if (Object.keys(obj).length > 2) {
+					let _style = {};
+					if (obj.color)
+						_style.color = obj.color;
+					if (obj.size)
+						_style.size = obj.size;
+
+					Global.Emitter.emit("set_dialogue_obj", { text: obj.default + " ", style: _style });
+				}
+				else
+					Global.Emitter.emit("set_dialogue_text", obj.default + " ");
+			}
+			break;
+
+			case "sound":
+			{
+			}
+			break;
+
+			case "console":
+			{
+				console.log(obj.text);
+			}
+			break;
+
+			default:
+			{
+			}
+			break;
 		}
-		break;
-
-		case "sound":
-		{
-
-		}
-		break;		
-
-		case "console":
-		{
-			console.log(obj.text);
-		}
-		break;
-
-		default:
-		{
-
-		}
-		break;
 	}
 };

@@ -210,6 +210,21 @@ CL3D.ScriptingInterface.prototype.executeCode = function(code)
 /**
  * @private
  */
+CL3D.ScriptingInterface.prototype.importCode = function(code)
+{
+	try
+	{
+		return import("data:text/javascript;charset=utf-8," + encodeURIComponent(code));
+	}
+	catch(err)
+	{
+		CL3D.gCCDebugOutput.jsConsolePrint(err);
+	}
+}
+
+/**
+ * @private
+ */
 CL3D.ScriptingInterface.prototype.getUniqueCounterID = function()
 {
 	++this.nUniqueCounterID;
@@ -481,6 +496,9 @@ CL3D.AnimatorExtensionScript.prototype.animateNode = function(n, timeMs)
  */
 CL3D.AnimatorExtensionScript.prototype.initScript = function(n, engine, isCache)
 {
+	if (engine.executeCode("typeof " + this.JsClassName + "== 'undefined'"))
+		return;
+
 	var executeCode = "";
 
 	// need to initialize script
@@ -816,6 +834,10 @@ CL3D.Action.ActionExtensionScript.prototype.execute = function(currentNode, scen
 		return;
 
 	var engine = CL3D.ScriptingInterface.getScriptingInterface();
+
+	if (engine.executeCode("typeof " + this.JsClassName + "== 'undefined'"))
+		return;
+
 	var executeCode = "";
 
 	// need to initialize script

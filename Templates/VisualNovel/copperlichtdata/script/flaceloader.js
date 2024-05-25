@@ -1428,9 +1428,9 @@ CL3D.FlaceLoader = function()
 					{
 						CL3D.gCCDebugOutput.printError("error reading script: " + f)
 					}
-					// var blob = new Blob([b], {type: "text/plain;charset=utf-8"});
-					// saveAs(blob, c + ".js");
-					b != null && CL3D.ScriptingInterface.getScriptingInterface().executeCode(b)
+					var blob = new Blob([b], {type: "text/plain;charset=utf-8"});
+					saveAs(blob, c + ".js");
+					b != null && CL3D.ScriptingInterface.getScriptingInterface().importCode(b)
 				}
 				this.SkipToNextTag();
 				break;
