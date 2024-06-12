@@ -1,0 +1,19 @@
+{
+  "type": "module",
+  "name": "neo_frameworks",
+  "version": "0.0.0",
+  "description": "",
+  "keywords": [],
+  "maintainers": [
+    "Watunder (https://github.com/Watunder)"
+  ],
+  "contributors": [
+    "Watunder (https://github.com/Watunder)"
+  ],
+  "license": "",
+  "repository": {},
+  "scripts": {},
+  "dependencies": {},
+  "devDependencies": {},
+  "optionalDependencies": {}
+}

@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "cl3d": "workspace:*",
+    "mitt": "workspace:*",
+    "rekapi": "workspace:*",
+    "ss6player-lib": "workspace:*"
+  }
+}
