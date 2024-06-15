@@ -7,14 +7,13 @@
 		<property name="Dialogue_overlayFolder" type="scenenode" />
 		<property name="SceneNode" type="scenenode" />
         <property name="Interval" type="integer" default="10"  />
-		<property name="Speed" type="integer" default="5"  />
 		<property name="Enable_Animation" type="bool" default="false"  />
 	</behavior>
 */
 
 // Global variables
 
-import { Global } from "./lib/global.js";
+import { Global } from "./lib/global";
 
 export default class behavior_TextAnimation
 {
@@ -185,10 +184,7 @@ export default class behavior_TextAnimation
 			// ccbSetSceneNodeProperty(this.SceneNode, 'Text', result);
 			if (this.Enable_Animation)
 			{
-				if (this.speed)
-					this.index += this.speed;
-				else
-					this.index += this.Speed;
+				this.index++;
 
 				this.delay = true;
 			}

@@ -11,7 +11,7 @@
 
 // Global variables
 
-import { Global } from "./lib/global.js";
+import { Global } from "./lib/global";
 
 export default class action_StoryPrivate
 {

@@ -16,7 +16,7 @@
 
 // Global variables
 
-import { Global, FrameEvent } from "./lib/global.js";
+import { Global, FrameEvent } from "./lib/global";
 import * as CL3D from "cl3d";
 
 let g_file = "copperlichtdata/scenario/start.story";

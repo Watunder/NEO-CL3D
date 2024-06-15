@@ -5,7 +5,7 @@
 
 //Global Variables
 
-import { Global, Actor } from "./lib/global.js";
+import { Global, RekapiActor } from "./lib/global";
 
 export default class behavior_MeshAnimation
 {
@@ -34,7 +34,7 @@ export default class behavior_MeshAnimation
 			if (!Global.Rekapi)
 				return;
 
-			this.Actor = new Actor(
+			this.Actor = new RekapiActor(
 			{
 				context: node,
 				render: (context, state) =>

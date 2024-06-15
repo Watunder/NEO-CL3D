@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en-us">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>EffekseerForWebGL</title>
+
+  <body>
+    <canvas id="canvas" width="320" height="240" class="screen" oncontextmenu="event.preventDefault()"></canvas>
+    <br>
+    <div id="buttons">
+
+      <input type="button" onclick="context.stopAll(); latestHandle = null;" value="stop" id='stop'></input>
+      <input type="button" onclick="callExists();" value="exists?"></input>
+      <input type="button" onclick="callEstimateBoundingBox();" value="callEstimateBoundingBox"></input>
+      <input type="button" onclick="window.step(5);" value="step" id='step'></input>
+
+
+    </div>
+    <br>
+    <script type='text/javascript'>
+      function capturePNG() {
+          return document.getElementById('canvas').toDataURL('image/png').substring(21)
+      }
+      var main = function (tests) {
+        var canvas = document.getElementById("canvas");
+
+        var scene = new THREE.Scene();
+        var width = canvas.width;
+        var height = canvas.height;
+        var fov = 30;
+        var aspect = width / height;
+        var near = 1;
+        var far = 1000;
+        var camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+        var target = new THREE.Vector3(0, 0, 0);
+        var effects = {};
+        camera.position.set(20, 20, 20);
+        camera.lookAt(target);
+        three_camera = camera;
+
+        var renderer = new THREE.WebGLRenderer({ canvas: canvas , preserveDrawingBuffer: true});
+        renderer.setSize(width, height);
+        //document.body.appendChild( renderer.domElement );
+        effekseer.initRuntime('../Release/effekseer.wasm', () => {
+          context = effekseer.createContext();
+
+          context.init(renderer.context);
+          var buttons = document.getElementById("buttons");
+          tests.map(function (path) {
+            var name = path.substr(path.lastIndexOf("/")+1)
+              effects[name] = context.loadEffect(path);
+              var btn = document.createElement('input');
+              btn.type = 'button';
+              btn.value = name;
+              btn.id = name;
+              btn.addEventListener('click', function () {
+                  console.log('Play : ' + name);
+                  context.play(effects[name], 0, 0, 0);
+              });
+              buttons.appendChild(btn)
+
+          })
+
+
+          var grid = new THREE.GridHelper(20, 10, 0xffffff, 0xffffff);
+          scene.add(grid);
+
+          var directionalLight = new THREE.DirectionalLight(0xffffff);
+          directionalLight.position.set(0, 0.7, 0.7);
+          scene.add(directionalLight);
+
+          var geometry = new THREE.BoxGeometry(2, 2, 2);
+          var material = new THREE.MeshPhongMaterial({ color: 0xff0000 });
+
+          function renderLoop() {
+
+            context.update();
+
+            renderer.render(scene, camera);
+            context.setProjectionMatrix(camera.projectionMatrix.elements);
+            context.setCameraMatrix(camera.matrixWorldInverse.elements);
+            context.draw();
+          };
+
+          for (let i = 0; i < 20; i++) {
+            requestAnimationFrame(renderLoop);
+          }
+
+          window.step = function (frame) {
+            for (let i = 0; i < 20; i++) {
+              requestAnimationFrame(renderLoop);
+            }
+          }
+
+        }, () => { });
+      };
+      window.addEventListener('DOMContentLoaded', function () {
+          var xhr = new XMLHttpRequest
+          xhr.onload = function() {
+              main(JSON.parse(xhr.response))
+          }
+          xhr.open('GET', 'test-list.json')
+          xhr.send(null)
+      }, false);
+    </script>
+    <script src="three.min.js"></script>
+    <script src="../Release/effekseer.js"></script>
+  </body>
+
+</html>

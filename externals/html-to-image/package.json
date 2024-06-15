@@ -1,0 +1,6 @@
+{
+  "type": "module",
+  "name": "html-to-image",
+  "main": "./dist/html-to-image.js",
+  "typings": "./dist/types/index.d.ts"
+}

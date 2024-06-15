@@ -12,7 +12,9 @@
   ],
   "license": "",
   "repository": {},
-  "scripts": {},
+  "scripts": {
+    "build": "npx rollup -c"
+  },
   "dependencies": {},
   "devDependencies": {},
   "optionalDependencies": {}

@@ -1,8 +1,39 @@
-import mitt from 'mitt';
-import { Rekapi } from 'rekapi';
-export { Actor } from 'rekapi';
-import { Utils, Player, SsPartType, PART_FLAG } from 'ss6player-lib';
-import * as CL3D from 'cl3d';
+import AmmoLib from './ammo.js';
+import effekseerLib from './effekseer.js';
+import mitt from './mitt.js';
+import { Rekapi, Actor } from './rekapi.js';
+import * as CL3D from './cl3d.js';
+import { Utils, Player, SsPartType, PART_FLAG } from './ss6player-lib.js';
+
+class AnimatorRigidPhysicsBody extends CL3D.Animator {
+    constructor() {
+        super();
+
+        this.BodyType = "";
+
+        this.AdditionalRotation = new CL3D.Vect3d(0, 0, 0);
+        this.AdditionalPosition = new CL3D.Vect3d(0, 0, 0);
+
+        this.Density = 1;
+
+        this.Radius = 10;
+        this.Height = 10;
+        this.Size = new CL3D.Vect3d(0, 0, 0);
+
+        this.DoActionImpact = false;
+        this.ActionOnImpact = null;
+    }
+
+    /**
+     * Animates the scene node it is attached to and returns true if scene node was modified.
+     * @public
+     * @param {CL3D.SceneNode} node The Scene node which needs to be animated this frame.
+     * @param {Integer} timeMs The time in milliseconds since the start of the scene.
+     */
+    animateNode(node, timeMs) {
+
+    }
+}
 
 const nameList =
 {
@@ -268,12 +299,12 @@ class SimpleMeshSceneNode extends CL3D.SceneNode {
 
     OnRegisterSceneNode(scene) {
         if (this.Visible) {
-            if (this.Parent.Type == "ss6") {
+            if (this.Parent._Type == "ss6") {
                 scene.registerNodeForRendering(this, CL3D.Scene.TRANSPARENT_SOLID_AFTER_ZBUFFER_CLEAR);
                 CL3D.SceneNode.prototype.OnRegisterSceneNode.call(this, scene);
             }
 
-            else if (this.Parent.Type == "ss6ui") {
+            else if (this.Parent._Type == "ss6ui") {
                 scene.registerNodeForRendering(this, CL3D.Scene.RENDER_MODE_2DOVERLAY);
                 CL3D.SceneNode.prototype.OnRegisterSceneNode.call(this, scene);
             }
@@ -1756,6 +1787,21 @@ class ImmediateEvent {
 	}
 }
 
+/**
+ * @type {import("ammo").default}
+ */
+const Ammo = await AmmoLib();
+
+/**
+ * @type {import("effekseer").default}
+ */
+const effekseer = effekseerLib;
+
+class RekapiActor extends Actor {
+    constructor(config) {
+        super(config);
+    }
+}
 const Global = {
     Emitter: mitt(),
     Rekapi: new Rekapi(),
@@ -1783,4 +1829,4 @@ Global.Emitter.on("set_behavior_state", (behavior) => {
     Global.StateList[behavior.StateIndex] = behavior.State;
 });
 
-export { FrameEvent, Global, ImmediateEvent, SS6Player, SS6PlayerInstanceKeyParam, SS6Project };
+export { Ammo, AnimatorRigidPhysicsBody, FrameEvent, Global, ImmediateEvent, RekapiActor, SS6Player, SS6PlayerInstanceKeyParam, SS6Project, effekseer };

@@ -1,0 +1,154 @@
+# 1.62e
+
+Updated Effekseer
+
+Fixed a bug where multiple context causes an error
+
+# 1.62d
+
+Update Effekseer
+
+Fixed memory leak about EffekseerContext
+
+Fixed typo about setSetLogEnabled
+
+# 1.62c
+
+Update Effekseer
+
+# 1.62b
+
+default image.crossOrigin is changed into none.
+
+Update Effekseer
+
+# 1.62a
+
+Update Effekseer
+
+# 1.61e
+
+Fix a bug where setDynamicInput was invalid function.
+
+Update Effekseer
+
+
+# 1.61c
+
+Update Effekseer
+
+# 1.61b
+
+Update Effekseer
+
+# 1.61a
+
+Update Effekseer
+
+# 1.60e
+
+Update Effekseer
+
+Improved three.js to work without state restoration.
+
+Added a sample without state restoration.
+
+Fixed a bug where TypeScript samples could not be executed.
+
+Changed the version of three.js used in the sample to the latest version.
+
+# 1.60d
+
+Update Effekseer
+
+# 1.60c
+
+Update Effekseer
+
+# 1.60b
+
+Update Effekseer
+
+# 1.6
+
+Supported Distortion
+Updated Effekseer to 1.6
+Updated emscipten to 1.39.14
+
+# 1.53c
+
+Update Effekseer to 1.53c
+
+# 1.53b
+
+Optimized a performance. This version is much faster than 1.53a
+Removed a limitation about memory size.
+
+# 1.53a
+
+Update Effekseer to 1.53a
+
+# 1.53
+
+Remove EffekseerEffectGetColorImageCount and gltf
+
+Please use EfkEfcProperty.js
+
+# 1.52n
+
+Fixed a bug where rendering is not correct when premultipied alpha is enabled
+
+# 1.52m
+
+Update Effekseer to 1.52m
+
+# 1.52k
+
+image.crossOrigin is changed into use-credentials.
+
+Update Effekseer to 1.52k
+
+# 1.52j
+
+Update Effekseer to 1.52j
+
+# 1.52i
+
+Update Effekseer to 1.52i
+
+# 1.52h
+
+Update Effekseer to 1.52h
+
+Fixed a bug that non-power-of-two image is collapsed.
+
+# 1.52g
+
+Update Effekseer to 1.52g
+
+Fixed a restoration of states about ActiveTexture
+
+# 1.52f
+
+Fixed a restoration of states about textures is wrong
+
+# 1.52b
+
+Fixed a bug where particles are not shown with Line of SpawnMethod
+
+# 1.52a
+
+Fixed a bug that a behavior of rotated billboard is something wrong when an angle is about 90 degree
+
+# 1.52
+
+Update Effekseer to 1.52
+
+# 1.50
+
+Update Effekseer to 1.50
+
+## Broken change
+
+- A scale parameter is added in loadEffect's arguments. 
+- Arguments are added in onerror callback.

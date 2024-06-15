@@ -1,0 +1,7 @@
+{
+  "type": "module",
+  "dependencies": {
+    "cl3d": "workspace:*",
+    "binarystream": "workspace:*"
+  }
+}

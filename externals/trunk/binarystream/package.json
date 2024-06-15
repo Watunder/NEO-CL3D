@@ -1,0 +1,6 @@
+{
+    "type": "module",
+    "name": "binarystream",
+    "main": "./dist/BinaryStream.js",
+    "typings": "./dist/types/BinaryStream.d.ts"
+}

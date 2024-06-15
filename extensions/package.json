@@ -1,0 +1,14 @@
+{
+  "type": "module",
+  "dependencies": {
+    "ammo": "workspace:*",
+    "cl3d": "workspace:*",
+    "effekseer": "workspace:*",
+    "fairygui-dom": "workspace:*",
+    "html-to-image": "workspace:*",
+    "mitt": "workspace:*",
+    "rekapi": "workspace:*",
+    "ss6player-lib": "workspace:*",
+    "binarystream": "workspace:*"
+  }
+}

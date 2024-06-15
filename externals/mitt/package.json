@@ -2,18 +2,17 @@
   "name": "mitt",
   "version": "3.0.1",
   "description": "Tiny 200b functional Event Emitter / pubsub.",
-  "module": "dist/mitt.mjs",
+  "module": "dist/mitt.js",
   "main": "dist/mitt.js",
-  "jsnext:main": "dist/mitt.mjs",
+  "jsnext:main": "dist/mitt.js",
   "umd:main": "dist/mitt.umd.js",
   "source": "src/index.ts",
   "typings": "index.d.ts",
   "exports": {
     "types": "./index.d.ts",
-    "module": "./dist/mitt.mjs",
-    "import": "./dist/mitt.mjs",
-    "require": "./dist/mitt.js",
-    "default": "./dist/mitt.mjs"
+    "module": "./dist/mitt.js",
+    "import": "./dist/mitt.js",
+    "default": "./dist/mitt.js"
   },
   "scripts": {
     "test": "npm-run-all --silent typecheck lint mocha test-types",
@@ -21,7 +20,7 @@
     "test-types": "tsc test/test-types-compilation.ts --noEmit --strict",
     "lint": "eslint src test --ext ts --ext js",
     "typecheck": "tsc --noEmit",
-    "bundle": "microbundle -f es,cjs,umd",
+    "bundle": "microbundle -f es,umd",
     "build": "npm-run-all --silent clean -p bundle -s docs",
     "clean": "rimraf dist",
     "docs": "documentation readme src/index.ts --section API -q --parse-extension ts",

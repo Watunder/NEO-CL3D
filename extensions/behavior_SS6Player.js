@@ -10,7 +10,47 @@
 
 //Global Variables
 
-import { SS6Project, SS6Player, SS6PlayerInstanceKeyParam } from "./lib/global.js";
+import { SS6Project, SS6Player, SS6PlayerInstanceKeyParam } from "./lib/global";
+import * as CL3D from "cl3d";
+
+class _action_OnEnter
+{
+	constructor(animater)
+	{
+		this.animater = animater;
+	}
+
+	execute(currentNode)
+	{
+
+	}
+};
+
+class _action_OnClick
+{
+	constructor(animater)
+	{
+		this.animater = animater;
+	}
+
+	execute(currentNode)
+	{
+
+	}
+};
+
+class _action_OnLeave
+{
+	constructor(animater)
+	{
+		this.animater = animater;
+	}
+
+	execute(currentNode)
+	{
+		
+	}
+};
 
 export default class behavior_SS6Player extends SS6PlayerInstanceKeyParam
 {
@@ -26,6 +66,8 @@ export default class behavior_SS6Player extends SS6PlayerInstanceKeyParam
 
 	constructor()
 	{
+		super();
+
 		this.Type = "ss6";
 	}
 
@@ -58,12 +100,12 @@ export default class behavior_SS6Player extends SS6PlayerInstanceKeyParam
 		// first time
 		if (this.LastTime == null)
 		{
-			node.Type = this.Type;
+			node._Type = this.Type;
 
 			this.project = new SS6Project(this.ProjectName, () =>
 			{
 				this.player = new SS6Player(node, this.project, this.AnimePackName, this.AnimeName);
-				this.player.SetAnimationSpeed(60, false);
+				this.player.SetAnimationSpeed(60 / this.player.fps, false);
 				this.player.Play();
 			});
 

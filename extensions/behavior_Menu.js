@@ -8,7 +8,7 @@
 
 // Global variables
 
-import { Global } from "./lib/global.js";
+import { Global } from "./lib/global";
 import * as CL3D from "cl3d";
 
 let g_self = null;
