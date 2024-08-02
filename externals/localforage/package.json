@@ -1,0 +1,6 @@
+{
+    "type": "module",
+    "name": "localforage",
+    "main": "dist/localforage.js",
+    "typings": "typings/localforage.d.ts"
+}
