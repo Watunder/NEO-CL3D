@@ -1,0 +1,6 @@
+{
+  "type": "module",
+  "name": "async-preloader",
+  "main": "./dist/async-preloader.js",
+  "typings": "./dist/types/index.d.ts"
+}
