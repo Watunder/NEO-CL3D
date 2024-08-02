@@ -1,0 +1,4 @@
+{
+    "name": "fmodstudio",
+    "main": "esm/fmodstudio.js"
+}
