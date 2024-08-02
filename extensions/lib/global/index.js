@@ -1,5 +1,6 @@
 import AmmoLib from "ammo";
 import effekseerLib from "effekseer";
+import FmodLib from 'fmodstudio';
 
 import mitt from "mitt";
 import { Rekapi, Actor } from "rekapi";
@@ -24,6 +25,11 @@ export const Ammo = await AmmoLib();
  * @type {import("effekseer").default}
  */
 export const effekseer = effekseerLib;
+
+/**
+ * @type {import('fmodstudio').FMOD}
+ */
+export const FMOD = await FmodLib({});
 
 export class RekapiActor extends Actor {
     constructor(config) {
