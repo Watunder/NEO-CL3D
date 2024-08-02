@@ -10,6 +10,7 @@ const DebugPostEffects = false;
 const UseShadowCascade = true;
 const Extensions = {
 	draw: () => { },
+	setWorld: () => { },
 	readAnimator: (loader, type, rootSceneNode, sceneManager) => { },
 };
 
@@ -9020,6 +9021,37 @@ class Renderer {
 		return t;
 	}
 	/**
+	 * Creates a {@link CL3D.Texture} from pixels
+	 * @public
+	 * @param {ArrayBufferView} pixels source data for the texture
+	 * @param {Number} width the width of the texture
+	 * @param {Number} height the height of the texture
+	 */
+	createTextureFromPixels(pixels, width, height) {
+		let texture = gl.createTexture();
+		gl.bindTexture(gl.TEXTURE_2D, texture);
+
+		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, width, height, 0, gl.RGB, gl.UNSIGNED_BYTE, pixels);
+
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+
+		gl.generateMipmap(gl.TEXTURE_2D);
+		gl.bindTexture(gl.TEXTURE_2D, null);
+
+		let t = new Texture();
+		t.Name = "";
+		t.Texture = texture;
+		t.Image = null;
+		t.Loaded = true;
+		t.CachedWidth = width;
+		t.CachedHeight = height;
+		t.OriginalWidth = width;
+		t.OriginalHeight = height;
+
+		return t;
+	}
+	/**
 	 * @private
 	 */
 	isPowerOfTwo(x) {
@@ -16424,9 +16456,9 @@ class AnimatorTimer extends Animator {
 
 
 /**
- * A scene node is a node in the hierarchical scene graph. Every scene node may have children, which are also scene 
- * nodes. Children move relative to their parent's position. If the parent of a node is not visible, its children 
- * won't be visible either. In this way, it is for example easily possible to attach a light to a moving car, 
+ * A scene node is a node in the hierarchical scene graph. Every scene node may have children, which are also scene
+ * nodes. Children move relative to their parent's position. If the parent of a node is not visible, its children
+ * won't be visible either. In this way, it is for example easily possible to attach a light to a moving car,
  * or to place a walking character on a moving platform on a moving ship.
  * <br/> <br/>
  * Concrete implementations are for example: {@link CL3D.CameraSceneNode}, {@link CL3D.BillboardSceneNode}, {@link CL3D.PathSceneNode}, {@link CL3D.MeshSceneNode}, {@link CL3D.SkyBoxSceneNode}.
@@ -16455,14 +16487,14 @@ class SceneNode {
 	/**
 	 * Scale of the scene node, relative to its parent, in degrees. Default is (1,1,1)
 	 * This is the scale of this node relative to its parent. If you want the absolute scale, use {@link getAbsoluteTransformation}().getScale()
-	 * If you change this value, be sure to call {@link updateAbsolutePosition}() afterwards to make the change be reflected immediately. 
+	 * If you change this value, be sure to call {@link updateAbsolutePosition}() afterwards to make the change be reflected immediately.
 	 * @type {CL3D.Vect3d}
 	 * @public
 	 */
 	Scale = null;
 
 	/**
-	 * Defines whether the node should be visible (if all of its parents are visible). 
+	 * Defines whether the node should be visible (if all of its parents are visible).
 	 * This is only an option set by the user, but has nothing to do with geometry culling.
 	 * @type Boolean
 	 * @public
@@ -16505,8 +16537,13 @@ class SceneNode {
 		this.Culling = 0;
 		this.Id = -1;
 		this.Parent = null;
-
+		/**
+		 * @type {CL3D.SceneNode[]}
+		 */
 		this.Children = new Array();
+		/**
+		 * @type {CL3D.Animator[]}
+		 */
 		this.Animators = new Array();
 
 		this.AbsoluteTransformation = new Matrix4();
@@ -21658,7 +21695,7 @@ class VideoStream
  * @constructor
  * @private
  */
-class BinaryStream {
+class StringBinary {
 	constructor(data) {
 		this._buffer = data;
 		this._length = data.length;
@@ -22696,47 +22733,8 @@ class Buffer {
 
 /*
  * Interfaces:
- * b64 = base64encode(data);
  * data = base64decode(b64);
  */
-
-// outcommented here because we don't need it in flace
-/*
-var base64EncodeChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-base64encode = function(str) {
-    var out, i, len;
-    var c1, c2, c3;
-
-    len = str.length;
-    i = 0;
-    out = "";
-    while(i < len) {
-	c1 = str.charCodeAt(i++) & 0xff;
-	if(i == len)
-	{
-	    out += base64EncodeChars.charAt(c1 >> 2);
-	    out += base64EncodeChars.charAt((c1 & 0x3) << 4);
-	    out += "==";
-	    break;
-	}
-	c2 = str.charCodeAt(i++);
-	if(i == len)
-	{
-	    out += base64EncodeChars.charAt(c1 >> 2);
-	    out += base64EncodeChars.charAt(((c1 & 0x3)<< 4) | ((c2 & 0xF0) >> 4));
-	    out += base64EncodeChars.charAt((c2 & 0xF) << 2);
-	    out += "=";
-	    break;
-	}
-	c3 = str.charCodeAt(i++);
-	out += base64EncodeChars.charAt(c1 >> 2);
-	out += base64EncodeChars.charAt(((c1 & 0x3)<< 4) | ((c2 & 0xF0) >> 4));
-	out += base64EncodeChars.charAt(((c2 & 0xF) << 2) | ((c3 & 0xC0) >>6));
-	out += base64EncodeChars.charAt(c3 & 0x3F);
-    }
-    return out;
-}
-*/
 
 /**
  * @const
@@ -25608,27 +25606,30 @@ class CCDocument {
 	constructor() {
 		this.CurrentScene = -1;
 		this.ApplicationTitle = "";
+		/**
+		 * @type {CL3D.Free3dScene[]}
+		 */
 		this.Scenes = new Array();
-		//this.UpdateMode = CL3D.Scene.REDRAW_WHEN_SCENE_CHANGED; 
+		//this.UpdateMode = CL3D.Scene.REDRAW_WHEN_SCENE_CHANGED;
 		this.UpdateMode = Scene.REDRAW_EVERY_FRAME;
 		this.WaitUntilTexturesLoaded = false;
-		
+
 		this.CanvasWidth = 320;
 		this.CanvasHeight = 200;
 	}
-	
+
 	addScene(s)
 	{
 		this.Scenes.push(s);
 	}
-	
+
 	getCurrentScene(s)
 	{
 		if (this.CurrentScene < 0 || this.CurrentScene >= this.Scenes.length)
 			return null;
 		return this.Scenes[this.CurrentScene];
 	}
-	
+
 	setCurrentScene(s)
 	{
 		for (var i=0; i<this.Scenes.length; ++i)
@@ -25813,8 +25814,8 @@ class FlaceLoader {
 	}
 
 	/**
-	 * @param {ArrayBuffer} buffer 
-	 * @returns 
+	 * @param {ArrayBuffer} buffer
+	 * @returns
 	 */
 	ArrayBufferToString(buffer)
 	{
@@ -25824,15 +25825,35 @@ class FlaceLoader {
 		return data;
 	}
 
-	/** 
-	 * @param {ArrayBuffer|String} filecontent 
-	 * @param {String} filename 
-	 * @param {CL3D.TextureManager} textureManager 
-	 * @param {CL3D.MeshCache} meshCache 
-	 * @param {CL3D.CopperLicht} cursorControl 
-	 * @param {Boolean} copyRootNodeChildren 
-	 * @param {CL3D.SceneNode} newRootNodeChildrenParent 
-	 * @returns 
+	StringToUint8Array(str)
+	{
+		let buf = new ArrayBuffer(str.length);
+		let bufView = new Uint8Array(buf);
+		for (let index=0; index < str.length; index++) {
+		  bufView[index] = str.charCodeAt(index);
+		}
+		return bufView;
+	}
+
+	StringToUint16Array(str)
+	{
+		let buf = new ArrayBuffer(str.length*2);
+		let bufView = new Uint16Array(buf);
+		for (let index=0; index < str.length; index++) {
+		  bufView[index] = str.charCodeAt(index);
+		}
+		return bufView;
+	}
+
+	/**
+	 * @param {ArrayBuffer|String} filecontent
+	 * @param {String} filename
+	 * @param {CL3D.TextureManager} textureManager
+	 * @param {CL3D.MeshCache} meshCache
+	 * @param {CL3D.CopperLicht} cursorControl
+	 * @param {Boolean} copyRootNodeChildren
+	 * @param {CL3D.SceneNode} newRootNodeChildrenParent
+	 * @returns
 	 */
 	async loadFile(filecontent, filename, textureManager, meshCache, cursorControl, copyRootNodeChildren, newRootNodeChildrenParent)
 	{
@@ -25858,7 +25879,7 @@ class FlaceLoader {
 		else if(this.Filename.indexOf(".ccbjs") != -1) filecontent = base64decode(filecontent);
 		this.Document = new CCDocument;
 		this.setRootPath();
-		this.Data = new BinaryStream(filecontent);
+		this.Data = new StringBinary(filecontent);
 		if(!await this.parseFile()) return null;
 		this.StoredFileContent = filecontent;
 		return this.Document;
@@ -25930,7 +25951,7 @@ class FlaceLoader {
 	}
 
 	/**
-	 * @param {CL3D.Matrix4} mat4 
+	 * @param {CL3D.Matrix4} mat4
 	 */
 	ReadIntoExistingMatrix(mat4)
 	{
@@ -25961,7 +25982,7 @@ class FlaceLoader {
 			if(sourceRead + extraBytesToRead >= sourceEnd) return chars.join("");
 			for(let z = extraBytesToRead; z >= 0; --z)
 			{
-				ch += bytes[sourceRead]; 
+				ch += bytes[sourceRead];
 				++sourceRead;
 				if(z != 0) ch <<= 6;
 			}
@@ -26038,7 +26059,7 @@ class FlaceLoader {
 								this.registerSceneNodeAnimatorForEvents = this.CurrentScene.registerSceneNodeAnimatorForEvents;
 								this.RegisteredSceneNodeAnimatorsForEventsList = this.CurrentScene.RegisteredSceneNodeAnimatorsForEventsList;
 							}
-							
+
 							getRootSceneNode() {
 								return this.CurrentScene.RootNode;
 							}
@@ -26056,17 +26077,17 @@ class FlaceLoader {
 		}
 	}
 
-	/** 
-	 * @param {ArrayBuffer|String} filecontent 
-	 * @param {CL3D.Free3dScene} scene 
-	 * @param {Number} sceneindex 
-	 * @param {String} filename 
-	 * @param {CL3D.TextureManager} textureManager 
-	 * @param {CL3D.MeshCache} meshCache 
-	 * @param {CL3D.CopperLicht} cursorControl 
-	 * @param {Boolean} copyRootNodeChildren 
-	 * @param {CL3D.SceneNode} newRootNodeChildrenParent 
-	 * @returns 
+	/**
+	 * @param {ArrayBuffer|String} filecontent
+	 * @param {CL3D.Free3dScene} scene
+	 * @param {Number} sceneindex
+	 * @param {String} filename
+	 * @param {CL3D.TextureManager} textureManager
+	 * @param {CL3D.MeshCache} meshCache
+	 * @param {CL3D.CopperLicht} cursorControl
+	 * @param {Boolean} copyRootNodeChildren
+	 * @param {CL3D.SceneNode} newRootNodeChildrenParent
+	 * @returns
 	 */
 	reloadScene(filecontent, scene, sceneindex, filename, textureManager, meshCache, cursorControl)
 	{
@@ -26074,7 +26095,7 @@ class FlaceLoader {
 		this.TheTextureManager = textureManager;
 		this.TheMeshCache = meshCache;
 		this.CursorControl = cursorControl;
-		this.Data = new BinaryStream(filecontent);
+		this.Data = new StringBinary(filecontent);
 		this.setRootPath();
 		this.Data.readSI32();
 		this.Data.readSI32();
@@ -26149,7 +26170,7 @@ class FlaceLoader {
 	}
 
 	/**
-	 * @param {CL3D.Free3dScene} scene 
+	 * @param {CL3D.Free3dScene} scene
 	 */
 	readFreeScene(scene)
 	{
@@ -26207,7 +26228,7 @@ class FlaceLoader {
 	}
 
 	/**
-	 * @param {CL3D.Free3dScene} scene 
+	 * @param {CL3D.Free3dScene} scene
 	 */
 	readFreeScene2(scene)
 	{
@@ -26299,7 +26320,7 @@ class FlaceLoader {
 	}
 
 	/**
-	 * @param {CL3D.Free3dScene} scene 
+	 * @param {CL3D.Free3dScene} scene
 	 */
 	ReadSceneGraph(scene)
 	{
@@ -26314,7 +26335,7 @@ class FlaceLoader {
 	}
 
 	/**
-	 * @param {Object} params 
+	 * @param {Object} params
 	 */
 	AddSceneNodeParams(node, params)
 	{
@@ -26330,9 +26351,9 @@ class FlaceLoader {
 	}
 
 	/**
-	 * @param {CL3D.Free3dScene} scene 
-	 * @param {CL3D.SceneNode} node 
-	 * @param {Number} depth 
+	 * @param {CL3D.Free3dScene} scene
+	 * @param {CL3D.SceneNode} node
+	 * @param {Number} depth
 	 */
 	ReadSceneNode(scene, node, depth)
 	{
@@ -26351,7 +26372,7 @@ class FlaceLoader {
 				bIsVisible: this.Data.readBoolean(),
 				culling: this.Data.readInt()
 			};
-				
+
 			if(depth == 0)
 			{
 				if (!this.CopyRootNodeChildren)
@@ -26500,7 +26521,7 @@ class FlaceLoader {
 	}
 
 	/**
-	 * @param {CL3D.MeshSceneNode} node 
+	 * @param {CL3D.MeshSceneNode} node
 	 */
 	readFlaceMeshNode(node)
 	{
@@ -26666,7 +26687,7 @@ class FlaceLoader {
 
 	/**
 	 * @ignore
-	 * @param {CL3D.HotspotSceneNode} node 
+	 * @param {CL3D.HotspotSceneNode} node
 	 */
 	readFlaceHotspotNode(node)
 	{
@@ -26686,7 +26707,7 @@ class FlaceLoader {
 
 	/**
 	 * @ignore
-	 * @param {CL3D.HotspotSceneNode} node  
+	 * @param {CL3D.HotspotSceneNode} node
 	 */
 	readHotspotData(node)
 	{
@@ -26718,7 +26739,7 @@ class FlaceLoader {
 	}
 
 	/**
-	 * @param {CL3D.CameraSceneNode} node 
+	 * @param {CL3D.CameraSceneNode} node
 	 */
 	readFlaceCameraNode(node)
 	{
@@ -26734,7 +26755,7 @@ class FlaceLoader {
 	}
 
 	/**
-	 * @param {CL3D.WaterSurfaceSceneNode} node 
+	 * @param {CL3D.WaterSurfaceSceneNode} node
 	 */
 	readWaterNode(node)
 	{
@@ -26751,7 +26772,7 @@ class FlaceLoader {
 	}
 
 	/**
-	 * @param {CL3D.LightSceneNode} node 
+	 * @param {CL3D.LightSceneNode} node
 	 */
 	readFlaceLightNode(node)
 	{
@@ -26766,7 +26787,7 @@ class FlaceLoader {
 	}
 
 	/**
-	 * @param {CL3D.BillboardSceneNode} node 
+	 * @param {CL3D.BillboardSceneNode} node
 	 */
 	readFlaceBillBoardNode(node)
 	{
@@ -26778,7 +26799,7 @@ class FlaceLoader {
 	}
 
 	/**
-	 * @param {CL3D.SoundSceneNode} node 
+	 * @param {CL3D.SoundSceneNode} node
 	 */
 	readFlace3DSoundNode(node)
 	{
@@ -26796,7 +26817,7 @@ class FlaceLoader {
 	}
 
 	/**
-	 * @param {CL3D.PathSceneNode} node 
+	 * @param {CL3D.PathSceneNode} node
 	 */
 	readFlacePathNode(node)
 	{
@@ -26809,7 +26830,7 @@ class FlaceLoader {
 	}
 
 	/**
-	 * @param {CL3D.ParticleSystemSceneNode} node 
+	 * @param {CL3D.ParticleSystemSceneNode} node
 	 */
 	readParticleSystemSceneNode(node)
 	{
@@ -26852,7 +26873,7 @@ class FlaceLoader {
 	}
 
 	/**
-	 * @param {CL3D.Mobile2DInputSceneNode} node 
+	 * @param {CL3D.Mobile2DInputSceneNode} node
 	 */
 	readFlace2DMobileInput(node)
 	{
@@ -26883,7 +26904,7 @@ class FlaceLoader {
 	}
 
 	/**
-	 * @param {CL3D.Overlay2DSceneNode} node 
+	 * @param {CL3D.Overlay2DSceneNode} node
 	 */
 	readFlace2DOverlay(node)
 	{
@@ -26922,9 +26943,9 @@ class FlaceLoader {
 	}
 
 	/**
-	 * @param {CL3D.SceneNode} node 
-	 * @param {CL3D.Scene} scene 
-	 * @returns 
+	 * @param {CL3D.SceneNode} node
+	 * @param {CL3D.Scene} scene
+	 * @returns
 	 */
 	ReadAnimator(node, scene)
 	{
@@ -27164,8 +27185,8 @@ class FlaceLoader {
 	}
 
 	/**
-	 * @param {Array} props 
-	 * @param {CL3D.Free3dScene} scene 
+	 * @param {Array} props
+	 * @param {CL3D.Free3dScene} scene
 	 */
 	ReadExtensionScriptProperties(props, scene)
 	{
@@ -27206,8 +27227,8 @@ class FlaceLoader {
 	}
 
 	/**
-	 * @param {CL3D.Scene} scene 
-	 * @returns 
+	 * @param {CL3D.Scene} scene
+	 * @returns
 	 */
 	ReadActionHandlerSection(scene)
 	{
@@ -27221,8 +27242,8 @@ class FlaceLoader {
 	}
 
 	/**
-	 * @param {CL3D.ActionHandler} actionHandler 
-	 * @param {CL3D.Scene} scene 
+	 * @param {CL3D.ActionHandler} actionHandler
+	 * @param {CL3D.Scene} scene
 	 */
 	ReadActionHandler(actionHandler, scene)
 	{
@@ -27276,7 +27297,7 @@ class FlaceLoader {
 	}
 
 	/**
-	 * @param {CL3D.AnimatedMeshSceneNode} node 
+	 * @param {CL3D.AnimatedMeshSceneNode} node
 	 */
 	readFlaceAnimatedMeshNode(node)
 	{
@@ -27316,8 +27337,8 @@ class FlaceLoader {
 	}
 
 	/**
-	 * @param {CL3D.AnimatedMeshSceneNode} nodeToLink 
-	 * @returns 
+	 * @param {CL3D.AnimatedMeshSceneNode} nodeToLink
+	 * @returns
 	 */
 	ReadAnimatedMeshRef(nodeToLink)
 	{
@@ -27337,8 +27358,8 @@ class FlaceLoader {
 	}
 
 	/**
-	 * @param {CL3D.SkinnedMesh|CL3D.SkinnedMeshJoint} mesh 
-	 * @param {Number} size 
+	 * @param {CL3D.SkinnedMesh|CL3D.SkinnedMeshJoint} mesh
+	 * @param {Number} size
 	 */
 	readSkinnedMesh(mesh, size)
 	{
@@ -27364,7 +27385,7 @@ class FlaceLoader {
 					let parentIndex = this.Data.readInt();
 					loadedJoints.push(joint);
 					parentIndex >= 0 && parentIndex < loadedJoints.length && loadedJoints[parentIndex].Children.push(joint);
-					
+
 					let attachedMeshesCount = this.Data.readInt();
 					for(let index = 0; index < attachedMeshesCount; ++index) joint.AttachedMeshes.push(this.Data.readInt());
 
@@ -27442,9 +27463,9 @@ class FlaceLoader {
 	}
 
 	/**
-	 * @param {Number} actionType 
-	 * @param {CL3D.Scene} scene 
-	 * @returns 
+	 * @param {Number} actionType
+	 * @param {CL3D.Scene} scene
+	 * @returns
 	 */
 	ReadAction(actionType, scene)
 	{
@@ -28092,7 +28113,7 @@ class CopperLicht {
 
 		var me = this;
 		this.LoadingAFile = true;
-		var l = new CCFileLoader(filetoload, filetoload.indexOf('.ccb') != -1 || filetoload.indexOf('.ccp') != -1, this.IsBrowser);
+		var l = new CCFileLoader(filetoload, filetoload.indexOf('.ccbz') != -1 || filetoload.indexOf('.ccp') != -1, this.IsBrowser);
 		l.load(async (p) => { await me.parseFile(p, filetoload, importIntoExistingDocument); if (functionToCallWhenLoaded) functionToCallWhenLoaded(); });
 
 		return true;
@@ -28132,8 +28153,8 @@ class CopperLicht {
 	 */
 	makeWholePageSize() {
 		if (this.tmpWidth != globalThis.innerWidth || this.tmpHeight != globalThis.innerHeight) {
-			this.tmpWidth = globalThis.innerWidth || globalThis.clientWidth;
-			this.tmpHeight = globalThis.innerHeight || globalThis.clientHeight;
+			this.tmpWidth = globalThis.innerWidth;
+			this.tmpHeight = globalThis.innerHeight;
 	
 			this.MainElement.style.width = this.tmpWidth + "px";
 			this.MainElement.style.height = this.tmpHeight + "px";
@@ -28491,6 +28512,7 @@ class CopperLicht {
 
 			// create collision geometry
 			scene.CollisionWorld = scene.createCollisionGeometry(true);
+			Extensions.setWorld(scene.CollisionWorld);
 			this.setCollisionWorldForAllSceneNodes(scene.getRootSceneNode(), scene.CollisionWorld);
 		}
 
@@ -29079,6 +29101,9 @@ class CopperLicht {
 		if (this.MainElement == null)
 			return;
 
+		this.MainElement.setAttribute("width", globalThis.innerWidth);
+		this.MainElement.setAttribute("height", globalThis.innerHeight);
+
 		var dlg_div = document.createElement("div");
 		this.MainElement.parentNode.appendChild(dlg_div);
 
@@ -29291,7 +29316,7 @@ class CopperLicht {
 
 let getSdlInfoImpl = () => { };
 
-if (typeof globalThis.Image == "undefined") {
+if (typeof globalThis.NodeJS != 'undefined') {
     await import('@kmamal/sdl').then(async (module) => {
         getSdlInfoImpl = () => {
             return module.default.info;
@@ -30575,4 +30600,18 @@ globalThis.ccbAICommand = (node, command, param) => {
 	}
 };
 
-export { Action, ActionChangeSceneNodePosition, ActionChangeSceneNodeRotation, ActionChangeSceneNodeScale, ActionChangeSceneNodeTexture, ActionCloneSceneNode, ActionDeleteSceneNode, ActionExecuteJavaScript, ActionExtensionScript, ActionHandler, ActionIfVariable, ActionMakeSceneNodeInvisible, ActionOpenWebpage, ActionPlayMovie, ActionPlaySound, ActionRestartBehaviors, ActionRestartScene, ActionSetActiveCamera, ActionSetCameraTarget, ActionSetOrChangeAVariable, ActionSetOverlayText, ActionSetSceneNodeAnimation, ActionShoot, ActionStopSound, ActionStopSpecificSound, ActionStoreLoadVariable, ActionSwitchToScene, AnimatedMeshSceneNode, Animator, Animator3rdPersonCamera, AnimatorAnimateTexture, AnimatorCameraFPS, AnimatorCameraModelViewer, AnimatorCollisionResponse, AnimatorExtensionScript, AnimatorFlyCircle, AnimatorFlyStraight, AnimatorFollowPath, AnimatorGameAI, AnimatorKeyboardControlled, AnimatorMobileInput, AnimatorOnClick, AnimatorOnFirstFrame, AnimatorOnKeyPress, AnimatorOnMove, AnimatorOnProximity, AnimatorRotation, AnimatorTimer, BillboardSceneNode, BinaryStream, BoundingBoxTriangleSelector, Box3d, CCDocument, CCFileLoader, CLTimer, CameraSceneNode, ColorF, CopperCubeVariable, CopperCubeVariables, CopperLicht, CubeSceneNode, DEGTORAD, DebugPostEffects, DummyTransformationSceneNode, ExtensionScriptProperty, Extensions, FlaceLoader, Free3dScene, Global_PostEffectsDisabled, HALF_PI, HotspotSceneNode, Light, LightSceneNode, Line3d, Material, Matrix4, Mesh, MeshBuffer, MeshCache, MeshSceneNode, MeshTriangleSelector, MetaTriangleSelector, Mobile2DInputSceneNode, NamedAnimationRange, OctTreeTriangleSelector, Overlay2DSceneNode, PI, PI64, Particle, ParticleSystemSceneNode, PathSceneNode, Plane3d, PlayingSound, Quaternion, RADTODEG, RECIPROCAL_PI, Renderer, SAnimatedDummySceneNodeChild, SOctTreeNode, Scene, SceneNode, ScriptingInterface, SkinnedMesh, SkinnedMeshJoint, SkinnedMeshPositionKey, SkinnedMeshRotationKey, SkinnedMeshScaleKey, SkinnedMeshWeight, SkyBoxSceneNode, SoundManager, SoundSceneNode, SoundSource, TOLERANCE, TerrainSceneNode, Texture, TextureManager, Triangle3d, TriangleSelector, UseShadowCascade, Vect2d, Vect3d, Vertex3D, VideoStream, ViewFrustrum, WaterSurfaceSceneNode, base64DecodeChars, base64decode, clamp, cloneVertex3D, convertIntColor, createColor, createColorF, createSimpleVertex, createVertex, degToRad, equals, fract, gCCDebugInfoEnabled, gCurrentJScriptNode, gDocument, gScriptingInterface, gSoundManager, gTextureManager, getAlpha, getBlue, getGreen, getInterpolatedColor, getRed, isone, iszero, max3, min3, radToDeg, sgn, startCopperLichtFromFile, vector3d };
+globalThis.moduleLog = async (moduleName, exportName) => {
+    const __dirName = getDirName();
+    const modulePath = `${__dirName}/${moduleName}`;
+
+    await doFetch(modulePath).then((response) => {
+        if (!response.ok)
+            throw new Error(`Could not open file '${modulePath}' (status: ${response.status})`);
+    });
+
+    const module = await import(modulePath);
+
+    return console.log({ [exportName]: module[exportName] });
+};
+
+export { Action, ActionChangeSceneNodePosition, ActionChangeSceneNodeRotation, ActionChangeSceneNodeScale, ActionChangeSceneNodeTexture, ActionCloneSceneNode, ActionDeleteSceneNode, ActionExecuteJavaScript, ActionExtensionScript, ActionHandler, ActionIfVariable, ActionMakeSceneNodeInvisible, ActionOpenWebpage, ActionPlayMovie, ActionPlaySound, ActionRestartBehaviors, ActionRestartScene, ActionSetActiveCamera, ActionSetCameraTarget, ActionSetOrChangeAVariable, ActionSetOverlayText, ActionSetSceneNodeAnimation, ActionShoot, ActionStopSound, ActionStopSpecificSound, ActionStoreLoadVariable, ActionSwitchToScene, AnimatedMeshSceneNode, Animator, Animator3rdPersonCamera, AnimatorAnimateTexture, AnimatorCameraFPS, AnimatorCameraModelViewer, AnimatorCollisionResponse, AnimatorExtensionScript, AnimatorFlyCircle, AnimatorFlyStraight, AnimatorFollowPath, AnimatorGameAI, AnimatorKeyboardControlled, AnimatorMobileInput, AnimatorOnClick, AnimatorOnFirstFrame, AnimatorOnKeyPress, AnimatorOnMove, AnimatorOnProximity, AnimatorRotation, AnimatorTimer, BillboardSceneNode, BoundingBoxTriangleSelector, Box3d, CCDocument, CCFileLoader, CLTimer, CameraSceneNode, ColorF, CopperCubeVariable, CopperCubeVariables, CopperLicht, CubeSceneNode, DEGTORAD, DebugPostEffects, DummyTransformationSceneNode, ExtensionScriptProperty, Extensions, FlaceLoader, Free3dScene, Global_PostEffectsDisabled, HALF_PI, HotspotSceneNode, Light, LightSceneNode, Line3d, Material, Matrix4, Mesh, MeshBuffer, MeshCache, MeshSceneNode, MeshTriangleSelector, MetaTriangleSelector, Mobile2DInputSceneNode, NamedAnimationRange, OctTreeTriangleSelector, Overlay2DSceneNode, PI, PI64, Particle, ParticleSystemSceneNode, PathSceneNode, Plane3d, PlayingSound, Quaternion, RADTODEG, RECIPROCAL_PI, Renderer, SAnimatedDummySceneNodeChild, SOctTreeNode, Scene, SceneNode, ScriptingInterface, SkinnedMesh, SkinnedMeshJoint, SkinnedMeshPositionKey, SkinnedMeshRotationKey, SkinnedMeshScaleKey, SkinnedMeshWeight, SkyBoxSceneNode, SoundManager, SoundSceneNode, SoundSource, StringBinary, TOLERANCE, TerrainSceneNode, Texture, TextureManager, Triangle3d, TriangleSelector, UseShadowCascade, Vect2d, Vect3d, Vertex3D, VideoStream, ViewFrustrum, WaterSurfaceSceneNode, base64DecodeChars, base64decode, clamp, cloneVertex3D, convertIntColor, createColor, createColorF, createSimpleVertex, createVertex, degToRad, equals, fract, gCCDebugInfoEnabled, gCurrentJScriptNode, gDocument, gScriptingInterface, gSoundManager, gTextureManager, getAlpha, getBlue, getGreen, getInterpolatedColor, getRed, isone, iszero, max3, min3, radToDeg, sgn, startCopperLichtFromFile, vector3d };
