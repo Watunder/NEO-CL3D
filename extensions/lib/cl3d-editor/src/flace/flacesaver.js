@@ -1,5 +1,5 @@
-import * as CL3D from "../../../../../../src/main.js";
-import BinaryStream from "../binarystream.js";
+import * as CL3D from "../../../.././../../src/main.js";
+import BinaryStream from "binarystream";
 import { saveFile } from "../share/saveFile.js";
 
 export class FlaceSaver {
@@ -155,7 +155,7 @@ export class FlaceSaver {
             let flag = 0;
             let name = "";
             let filesize = 0;
-            let pos = this.startTag();
+            let pos = this.startFlag();
             {
                 if (false) {
                     // mesh cache
