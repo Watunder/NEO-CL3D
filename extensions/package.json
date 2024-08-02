@@ -1,14 +1,17 @@
 {
   "type": "module",
   "dependencies": {
+    "@heroiclabs/nakama-js": "^2.8.0",
     "ammo": "workspace:*",
+    "binarystream": "workspace:*",
     "cl3d": "workspace:*",
     "effekseer": "workspace:*",
     "fairygui-dom": "workspace:*",
+    "fmodstudio": "workspace:*",
     "html-to-image": "workspace:*",
+    "localforage": "workspace:*",
     "mitt": "workspace:*",
     "rekapi": "workspace:*",
-    "ss6player-lib": "workspace:*",
-    "binarystream": "workspace:*"
+    "ss6player-lib": "workspace:*"
   }
 }
