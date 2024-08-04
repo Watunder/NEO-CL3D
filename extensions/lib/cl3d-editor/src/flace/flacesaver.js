@@ -23,6 +23,7 @@ export class FlaceSaver {
             this.savePublishSettings();
 
             for (let index = 0; index < (CL3D.gDocument.Scenes.length); ++index) {
+                this.Data.write(new Uint8Array(18)); // unknown data definition
                 let pos = this.startTag(2);
                 {
                     this.Data.writeInt32LE(0);
@@ -402,7 +403,7 @@ export class FlaceSaver {
 
         pos = this.startTag(26);
         {
-            this.saveString("CL3D");
+            this.saveString(scene.Name);
             this.Data.writeInt32LE(this.rgbToInt(65, 65, 65));
         }
         this.endTag(pos);
