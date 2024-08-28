@@ -1,5 +1,7 @@
 {
   "type": "module",
+  "name": "cl3d-editor",
+  "main": "./dist/cl3d-editor.js",
   "dependencies": {
     "cl3d": "workspace:*",
     "binarystream": "workspace:*"

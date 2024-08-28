@@ -1,4 +1,4 @@
-import * as CL3D from "../../../.././../../src/main.js";
+import * as CL3D from "cl3d";
 import BinaryStream from "binarystream";
 import { saveFile } from "../share/saveFile.js";
 
@@ -369,17 +369,14 @@ export class FlaceSaver {
             switch (index)
 			{
 				case 0:
-                    if (mat.Tex1) {
-                        let path = mat.Tex1.Name;
-                        this.saveString(path);
-                    }
+                    mat.Tex1 ? this.saveString(mat.Tex1.Name) : this.saveString("");
 					break;
 				case 1:
-                    if (mat.Tex2) {
-                        let path = mat.Tex2.Name;
-                        this.saveString(path);
-                    }
+                    mat.Tex2 ? this.saveString(mat.Tex2.Name) : this.saveString("");
 					break;
+                default:
+                    this.saveString("");
+                    break;
 			}
 			this.Data.writeBoolean();
 			this.Data.writeBoolean();
@@ -530,7 +527,9 @@ export class FlaceSaver {
                 {
                     this.saveSceneNodeParams(currentNode);
 
-                    let pos = this.startTag(10)
+                    let pos = 0;
+
+                    pos = this.startTag(10)
                     {
                         switch (currentNode.Type) {
                             case 2037085030:
@@ -566,6 +565,7 @@ export class FlaceSaver {
                                 console.log("DummyTransformationSceneNode");
                                 break;
                             case 1868837478:
+                                this.saveFlaceOverlay2DNode(currentNode);
                                 console.log("Overlay2DSceneNode");
                                 break;
                             case 1668575334:
@@ -598,21 +598,22 @@ export class FlaceSaver {
                     }
 
                     if (currentNode.MeshBuffer) {
-                        pos = this.startTag(11);
+                        let pos = this.startTag(11);
                         {
                             this.saveMaterial(currentNode.MeshBuffer.Mat);
                         }
                         this.endTag(pos);
+                        this.Data.write(new Uint8Array(18)); // unknown data definition
                     }
-
-                    if (currentNode.OwnedMesh && currentNode.OwnedMesh.MeshBuffers.length > 0) {
-                        pos = this.startTag(11);
+                    else if (currentNode.OwnedMesh && currentNode.OwnedMesh.MeshBuffers.length > 0) {
+                        let pos = this.startTag(11);
                         {
                             for (let index = 0; index < currentNode.OwnedMesh.MeshBuffers.length; ++index) {
                                 this.saveMaterial(currentNode.OwnedMesh.MeshBuffers[index].Mat);
                             }
                         }
                         this.endTag(pos);
+                        this.Data.write(new Uint8Array(18)); // unknown data definition
                     }
 
                     if (currentNode.Children.length > 0) {
@@ -649,4 +650,43 @@ export class FlaceSaver {
 		this.Data.writeFloat32LE(node.ZFar);
 		this.Data.writeBoolean(node.Active);
 	}
+
+	/**
+	 * @param {CL3D.Overlay2DSceneNode} node
+	 */
+    saveFlaceOverlay2DNode(node)
+    {
+        node.BlurImage ? this.Data.writeInt32LE(1) : this.Data.writeInt32LE(0);
+        this.Data.writeBoolean(node.SizeModeIsAbsolute);
+		if(node.SizeModeIsAbsolute)
+		{
+            this.Data.writeInt32LE(node.PosAbsoluteX);
+            this.Data.writeInt32LE(node.PosAbsoluteY);
+            this.Data.writeInt32LE(node.SizeAbsoluteWidth);
+            this.Data.writeInt32LE(node.SizeAbsoluteHeight);
+		}
+		else
+		{
+            this.Data.writeFloat32LE(node.PosRelativeX);
+            this.Data.writeFloat32LE(node.PosRelativeY);
+            this.Data.writeFloat32LE(node.SizeRelativeWidth);
+            this.Data.writeFloat32LE(node.SizeRelativeHeight);
+		}
+        this.Data.writeBoolean(node.ShowBackGround);
+        this.Data.writeInt32LE(node.BackGroundColor);
+        node.Texture ? this.saveString(node.Texture.Name) : this.saveString("");
+        node.TextureHover ? this.saveString(node.TextureHover.Name) : this.saveString("");
+        this.Data.writeBoolean(node.RetainAspectRatio);
+        this.Data.writeBoolean(node.DrawText);
+        this.Data.writeByte(node.TextAlignment);
+        this.saveString(node.Text);
+        this.saveString(node.FontName);
+        this.Data.writeInt32LE(node.TextColor);
+        this.Data.writeBoolean(node.AnimateOnHover);
+        this.Data.writeBoolean(node.OnHoverSetFontColor);
+        this.Data.writeInt32LE(node.HoverFontColor);
+        this.Data.writeBoolean(node.OnHoverSetBackgroundColor);
+        this.Data.writeInt32LE(node.HoverBackgroundColor);
+        this.Data.writeBoolean(node.OnHoverDrawTexture);
+    }
 };
