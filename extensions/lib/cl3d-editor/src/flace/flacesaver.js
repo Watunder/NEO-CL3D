@@ -340,6 +340,12 @@ export class FlaceSaver {
                 this.Data.writeInt32LE();
                 this.saveActionHandler(animator.TheActionHandler);
                 break;
+            case "extensionscript":
+                this.Data.writeInt32LE(117);
+                this.saveString(animator.JsClassName);
+                this.Data.writeInt32LE();
+                this.saveExtensionScriptProperties(animator.Properties);
+                break;
         }
     }
 
@@ -622,6 +628,49 @@ export class FlaceSaver {
                 }
                 this.endTag(pos);
             }
+        }
+    }
+    
+    /**
+	 * @param {CL3D.ExtensionScriptProperty[]} props
+	 */
+    saveExtensionScriptProperties(props)
+    {
+        const propCount = props.length;
+        this.Data.writeInt32LE(propCount);
+		for(let index = 0; index < propCount; ++index)
+		{
+            const prop = props[index];
+
+            this.Data.writeInt32LE(prop.Type);
+            this.saveString(prop.Name);
+
+            switch (prop.Type)
+			{
+				case 1:
+					this.Data.writeFloat32LE(prop.FloatValue);
+					break;
+				case 2:
+                    this.saveString(prop.StringValue);
+					break;
+				case 6:
+					this.write3DVectF(prop.VectorValue);
+					break;
+				case 7:
+					this.saveString(prop.TextureValue);
+					break;
+				case 9:
+                    this.saveActionHandler(prop.ActionHandlerValue);
+					break;
+				case 0:
+				case 4:
+				case 5:
+				case 8:
+				case 3:
+				default:
+					this.Data.writeInt32LE(prop.IntValue);
+					break;
+			}
         }
     }
 
