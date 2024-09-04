@@ -151,26 +151,23 @@ export class FlaceSaver {
 
     saveEmbeddedFiles()
     {
-        let pos = this.startTag(13);
-        {
-            let flag = 0;
-            let name = "";
-            let filesize = 0;
-            let pos = this.startFlag();
-            {
-                if (false) {
-                    // mesh cache
-                    flag += 4;
-                }
+        // mesh cache
 
-                if (false) {
-                    // script
+        // exrension script
+        for (let index = 0; index < (CL3D.gDocument.Scripts.length); ++index) {
+            let pos = this.startTag(13);
+            {
+                let flag = 0;
+                let pos = this.startFlag();
+                {
+                    this.saveString("");
+                    this.saveString(CL3D.gDocument.Scripts[index]);
                     flag += 8;
                 }
+                this.endFlag(pos, flag);
             }
-            this.endFlag(pos, flag);
+            this.endTag(pos);
         }
-        this.endTag(pos);
     }
 
     savePublishSettings()
@@ -183,20 +180,22 @@ export class FlaceSaver {
      */
     saveActionHandler(actionHandler)
     {
-        if (actionHandler) this.Data.writeInt32LE(1);
-        else this.Data.writeInt32LE(0);
+        if (actionHandler) {
+            this.Data.writeInt32LE(1);
 
-        let pos = this.startTag(29);
-        {
-            let pos = this.startTag(30);
+            let pos = this.startTag(29);
             {
-                for (let index = 0; index < actionHandler.Actions.length; ++index) {
-                    this.saveAction(actionHandler.Actions[index]);
+                let pos = this.startTag(30);
+                {
+                    for (let index = 0; index < actionHandler.Actions.length; ++index) {
+                        this.saveAction(actionHandler.Actions[index]);
+                    }
                 }
+                this.endTag(pos);
             }
             this.endTag(pos);
         }
-        this.endTag(pos);
+        else this.Data.writeInt32LE(0);
     }
 
     /**
@@ -327,9 +326,147 @@ export class FlaceSaver {
                         flag += 1;
                         this.Data.writeInt32LE(TimeDisplacement);
                     }
-
                     if(animator.EndMode == 3 || animator.EndMode == 4) {
                         this.saveActionHandler(animator.TheActionHandler);
+                    }
+                }
+                this.endFlag(pos, flag);
+                break;
+            case "onclick":
+                this.Data.writeInt32LE(107);
+                this.Data.writeBoolean(animator.BoundingBoxTestOnly);
+                this.Data.writeBoolean(animator.CollidesWithWorld);
+                this.Data.writeInt32LE();
+                this.saveActionHandler(animator.TheActionHandler);
+                break;
+            case "onproximity":
+                this.Data.writeInt32LE(108);
+                this.Data.writeInt32LE(animator.EnterType);
+                this.Data.writeInt32LE(animator.ProximityType);
+                this.Data.writeFloat32LE(animator.Range);
+                this.Data.writeInt32LE(animator.SceneNodeToTest);
+                flag = 0;
+                pos = this.startFlag();
+                {
+                    if (animator.AreaType == 1) {
+                        flag += 1;
+                        this.write3DVectF(animator.RangeBox);
+                    }
+                }
+                this.endFlag(pos, flag);
+                this.saveActionHandler(animator.TheActionHandler);
+                break;
+            case "animatetexture":
+                this.Data.writeInt32LE(109);
+                this.Data.writeInt32LE(animator.TextureChangeType);
+                this.Data.writeInt32LE(animator.TimePerFrame);
+                this.Data.writeInt32LE(animator.TextureIndexToChange);
+                this.Data.writeBoolean(animator.Loop);
+                let tanimcount = animator.Textures.length;
+                this.Data.writeInt32LE(tanimcount);
+                for (let index = 0; index < tanimcount; ++index) {
+                    this.saveString(animator.Textures[index].Name);
+                }
+                break;
+            case "onmove":
+                this.Data.writeInt32LE(110);
+                this.Data.writeBoolean(animator.BoundingBoxTestOnly);
+                this.Data.writeBoolean(animator.CollidesWithWorld);
+                this.Data.writeInt32LE();
+                this.saveActionHandler(animator.ActionHandlerOnLeave);
+                this.saveActionHandler(animator.ActionHandlerOnEnter);
+                break;
+            case "timer":
+                this.Data.writeInt32LE(111);
+                this.Data.writeInt32LE(animator.TickEverySeconds);
+                this.Data.writeInt32LE();
+                this.saveActionHandler(animator.TheActionHandler);
+                break;
+            case "keypress":
+                this.Data.writeInt32LE(112);
+                this.Data.writeInt32LE(animator.KeyPressType);
+                this.Data.writeInt32LE(animator.KeyCode);
+                this.Data.writeBoolean(animator.IfCameraOnlyDoIfActive);
+                this.Data.writeInt32LE();
+                this.saveActionHandler(animator.TheActionHandler);
+                break;
+            case "gameai":
+                this.Data.writeInt32LE(113);
+                this.Data.writeInt32LE(animator.AIType);
+                this.Data.writeFloat32LE(animator.MovementSpeed);
+                this.Data.writeFloat32LE(animator.ActivationRadius);
+                this.Data.writeBoolean(animator.CanFly);
+                this.Data.writeInt32LE(animator.Health);
+                this.saveString(animator.Tags);
+                this.saveString(animator.AttacksAIWithTags);
+                this.Data.writeBoolean(animator.PatrolRadius);
+                this.Data.writeInt32LE(animator.RotationSpeedMs);
+                this.write3DVectF(animator.AdditionalRotationForLooking);
+                this.saveString(animator.StandAnimation);
+                this.saveString(animator.WalkAnimation);
+                this.saveString(animator.DieAnimation);
+                this.saveString(animator.AttackAnimation);
+                if (animator.AIType == 3) this.Data.writeInt32LE(animator.PathIdToFollow);
+                flag = 0;
+                pos = this.startFlag();
+                {
+                    if (animator.PatrolWaitTimeMs) {
+                        animator.PatrolWaitTimeMs = 1E4;
+                        if(animator.MovementSpeed != 0) animator.PatrolWaitTimeMs = animator.PatrolRadius / (animator.MovementSpeed / 1E3);
+                        this.Data.writeInt32LE(animator.PatrolWaitTimeMs);
+                    }
+                    else {
+                        flag += 1;
+                        this.Data.writeInt32LE();
+                    }
+                }
+                this.endFlag(pos, flag);
+                this.saveActionHandler(animator.ActionHandlerOnAttack);
+                this.saveActionHandler(animator.ActionHandlerOnActivate);
+                this.saveActionHandler(animator.ActionHandlerOnHit);
+                this.saveActionHandler(animator.ActionHandlerOnDie);
+                break;
+            case "3rdpersoncamera":
+                this.Data.writeInt32LE(114);
+                this.Data.writeInt32LE(animator.SceneNodeIDToFollow);
+                this.write3DVectF(animator.AdditionalRotationForLooking);
+                this.Data.writeInt32LE(animator.FollowMode);
+                this.Data.writeFloat32LE(animator.FollowSmoothingSpeed);
+                this.Data.writeFloat32LE(animator.TargetHeight);
+                flag = 0;
+                pos = this.startFlag();
+                {
+                    if (animator.CollidesWithWorld) {
+                        flag += 1;
+                    }
+                }
+                this.endFlag(pos, flag);
+                break;
+            case "keyboardcontrolled":
+                this.Data.writeInt32LE(115);
+                this.Data.writeInt32LE();
+                this.Data.writeFloat32LE(animator.RunSpeed);
+                this.Data.writeFloat32LE(animator.MoveSpeed);
+                this.Data.writeFloat32LE(animator.RotateSpeed);
+                this.Data.writeFloat32LE(animator.JumpSpeed);
+                this.write3DVectF(animator.AdditionalRotationForLooking);
+                this.saveString(animator.StandAnimation);
+                this.saveString(animator.WalkAnimation);
+                this.saveString(animator.JumpAnimation);
+                this.saveString(animator.RunAnimation);
+                flag = 0;
+                pos = this.startFlag();
+                {
+                    if (animator.DisableWithoutActiveCamera) {
+                        flag += 1;
+                    }
+                    if (animator.UseAcceleration) {
+                        flag += 2;
+                        this.Data.writeFloat32LE(animator.AccelerationSpeed);
+                        this.Data.writeFloat32LE(animator.DecelerationSpeed);
+                    }
+                    if (animator.PauseAfterJump) {
+                        flag += 4;
                     }
                 }
                 this.endFlag(pos, flag);
@@ -509,14 +646,13 @@ export class FlaceSaver {
             this.endTag(pos);
 
             if (node.Animators.length > 0) {
-                pos = this.startTag(25);
-                {
-                    for (let index = 0; index < node.Animators.length; ++index) {
+                for (let index = 0; index < node.Animators.length; ++index) {
+                    pos = this.startTag(25);
+                    {
                         this.saveAnimator(node.Animators[index]);
                     }
+                    this.endTag(pos);
                 }
-                this.endTag(pos);
-
             }
 
             this.saveSceneNode(scene, node, depth + 1);
@@ -594,17 +730,17 @@ export class FlaceSaver {
                     this.endTag(pos);
 
                     if (currentNode.Animators.length > 0) {
-                        pos = this.startTag(25);
-                        {
-                            for (let index = 0; index < currentNode.Animators.length; ++index) {
+                        for (let index = 0; index < currentNode.Animators.length; ++index) {
+                            pos = this.startTag(25);
+                            {
                                 this.saveAnimator(currentNode.Animators[index]);
                             }
+                            this.endTag(pos);
                         }
-                        this.endTag(pos);
                     }
 
                     if (currentNode.MeshBuffer) {
-                        let pos = this.startTag(11);
+                        pos = this.startTag(11);
                         {
                             this.saveMaterial(currentNode.MeshBuffer.Mat);
                         }
@@ -612,14 +748,14 @@ export class FlaceSaver {
                         this.Data.write(new Uint8Array(18)); // unknown data definition
                     }
                     else if (currentNode.OwnedMesh && currentNode.OwnedMesh.MeshBuffers.length > 0) {
-                        let pos = this.startTag(11);
-                        {
-                            for (let index = 0; index < currentNode.OwnedMesh.MeshBuffers.length; ++index) {
+                        for (let index = 0; index < currentNode.OwnedMesh.MeshBuffers.length; ++index) {
+                            pos = this.startTag(11);
+                            {
                                 this.saveMaterial(currentNode.OwnedMesh.MeshBuffers[index].Mat);
                             }
+                            this.endTag(pos);
+                            this.Data.write(new Uint8Array(18)); // unknown data definition
                         }
-                        this.endTag(pos);
-                        this.Data.write(new Uint8Array(18)); // unknown data definition
                     }
 
                     if (currentNode.Children.length > 0) {
@@ -630,7 +766,7 @@ export class FlaceSaver {
             }
         }
     }
-    
+
     /**
 	 * @param {CL3D.ExtensionScriptProperty[]} props
 	 */
