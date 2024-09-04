@@ -204,16 +204,263 @@ export class FlaceSaver {
     saveAction(action)
     {
         let type = action.Type;
+        let flag = 0;
+        let pos = 0;
         //console.log(`Action - ${type}`);
         switch(type)
         {
+            case "MakeSceneNodeInvisible":
+                this.Data.writeInt32LE(0);
+				this.Data.writeInt32LE(action.InvisibleMakeType);
+				this.Data.writeInt32LE(action.SceneNodeToMakeInvisible);
+				this.Data.writeBoolean(action.ChangeCurrentSceneNode);
+				this.Data.writeInt32LE();
+				break;
+            case "ChangeSceneNodePosition":
+                this.Data.writeInt32LE(1);
+                this.Data.writeInt32LE(action.PositionChangeType);
+                this.Data.writeInt32LE(action.SceneNodeToChangePosition);
+                this.Data.writeBoolean(action.ChangeCurrentSceneNode);
+                this.write3DVectF(action.Vector);
+                if(action.PositionChangeType == 4) this.write3DVectF(action.Area3DEnd);
+                this.Data.writeBoolean(action.RelativeToCurrentSceneNode);
+                this.Data.writeInt32LE(action.SceneNodeRelativeTo);
+                flag = 0;
+                pos = this.startFlag();
+                {
+                    if (action.UseAnimatedMovement) {
+                        flag += 1;
+                        this.Data.writeInt32LE(action.TimeNeededForMovementMs);
+                    }
+                }
+                this.endFlag(pos, flag);
+                break;
+            case "ChangeSceneNodeRotation":
+                this.Data.writeInt32LE(2);
+                this.Data.writeInt32LE(action.RotationChangeType);
+                this.Data.writeInt32LE(action.SceneNodeToChangeRotation);
+                this.Data.writeBoolean(action.ChangeCurrentSceneNode);
+                this.write3DVectF(action.Vector);
+                flag = 0;
+                pos = this.startFlag();
+                {
+                    if (action.RotateAnimated) {
+                        flag += 1;
+                        this.Data.writeInt32LE(action.TimeNeededForRotationMs);
+                    }
+                }
+                this.endFlag(pos, flag);
+                break;
+            case "ChangeSceneNodeScale":
+                this.Data.writeInt32LE(3);
+                this.Data.writeInt32LE(action.ScaleChangeType);
+                this.Data.writeInt32LE(action.SceneNodeToChangeScale);
+                this.Data.writeBoolean(action.ChangeCurrentSceneNode);
+                this.write3DVectF(action.Vector);
+                this.Data.writeInt32LE();
+                break;
+            case "ChangeSceneNodeTexture":
+                this.Data.writeInt32LE(4);
+                this.Data.writeInt32LE(action.TextureChangeType);
+                this.Data.writeInt32LE(action.SceneNodeToChange);
+                this.Data.writeBoolean(action.ChangeCurrentSceneNode);
+                this.saveString(action.TheTexture.Name);
+                if(action.TextureChangeType == 1) this.Data.writeInt32LE(action.IndexToChange);
+                this.Data.writeInt32LE();
+                break;
+            case "PlaySound":
+                this.Data.writeInt32LE(5);
+                flag = 0;
+                pos = this.startFlag();
+                {
+                    if (action.PlayLooped) {
+                        flag += 1;
+                    }
+                }
+                this.endFlag(pos, flag);
+                this.saveString(action.TheSound.Name);
+                this.Data.writeFloat32LE(action.MinDistance);
+                this.Data.writeFloat32LE(action.MaxDistance);
+                this.Data.writeFloat32LE(action.Volume);
+                this.Data.writeBoolean(action.PlayAs2D);
+                this.Data.writeInt32LE(action.SceneNodeToPlayAt);
+                this.Data.writeBoolean(action.PlayAtCurrentSceneNode);
+                this.write3DVectF(action.Position3D);
+                break;
+            case "StopSound":
+                this.Data.writeInt32LE(6);
+                this.Data.writeInt32LE(action.SoundChangeType);
+                break;
+            case "ExecuteJavaScript":
+                this.Data.writeInt32LE(7);
+                this.Data.writeInt32LE();
+                this.saveString(action.JScript);
+                break;
+            case "OpenWebpage":
+                this.Data.writeInt32LE(8);
+                this.Data.writeInt32LE();
+                this.saveString(action.Webpage);
+                this.saveString(action.Target);
+                break;
+            case "SetSceneNodeAnimation":
+                this.Data.writeInt32LE(9);
+                this.Data.writeInt32LE(action.SceneNodeToChangeAnim);
+                this.Data.writeBoolean(action.ChangeCurrentSceneNode);
+                this.Data.writeBoolean(action.Loop);
+                this.saveString(action.AnimName);
+                this.Data.writeInt32LE();
+                break;
+            case "SwitchToScene":
+                this.Data.writeInt32LE(10);
+                this.saveString(action.SceneName);
+                this.Data.writeInt32LE();
+                break;
+            case "SetActiveCamera":
+                this.Data.writeInt32LE(11);
+                this.Data.writeInt32LE(action.CameraToSetActive);
+                this.Data.writeInt32LE();
+                break;
+            case "SetCameraTarget":
+                this.Data.writeInt32LE(12);
+                this.Data.writeInt32LE(action.PositionChangeType);
+                this.Data.writeInt32LE(action.SceneNodeToChangePosition);
+                this.Data.writeBoolean(action.ChangeCurrentSceneNode);
+                this.write3DVectF(action.Vector);
+                this.Data.writeBoolean(action.RelativeToCurrentSceneNode);
+                this.Data.writeInt32LE(action.SceneNodeRelativeTo);
+                flag = 0;
+                pos = this.startFlag();
+                {
+                    if (action.UseAnimatedMovement) {
+                        flag += 1;
+                        this.Data.writeInt32LE(action.TimeNeededForMovementMs);
+                    }
+                }
+                this.endFlag(pos, flag);
+                break;
+            case "Shoot":
+                this.Data.writeInt32LE(13);
+                this.Data.writeInt32LE(action.ShootType);
+                this.Data.writeInt32LE(action.Damage);
+                this.Data.writeFloat32LE(action.BulletSpeed);
+                this.Data.writeInt32LE(action.SceneNodeToUseAsBullet);
+                this.Data.writeFloat32LE(action.WeaponRange);
+                flag = 0;
+                pos = this.startFlag();
+                {
+                    if (action.SceneNodeToShootFrom) {
+                        flag += 1;
+                        this.Data.writeInt32LE(action.SceneNodeToShootFrom);
+                        this.Data.writeBoolean(action.ShootToCameraTarget);
+                        this.write3DVectF(action.AdditionalDirectionRotation);
+                    }
+                    if (action.ActionHandlerOnImpact) {
+                        flag += 2;
+                        this.saveActionHandler(action.ActionHandlerOnImpact);
+                    }
+                    if (action.ShootDisplacement) {
+                        flag += 4;
+                        this.write3DVectF(action.ShootDisplacement);
+                    }
+                }
+                break;
+            case "QuitApplication":
+                this.Data.writeInt32LE(14);
+                // TODO
+                break;
+            case "SetOverlayText":
+                this.Data.writeInt32LE(15);
+                this.Data.writeInt32LE();
+                this.Data.writeInt32LE(action.SceneNodeToChange);
+                this.Data.writeBoolean(action.ChangeCurrentSceneNode);
+                this.saveString(action.Text);
+                break;
             case "SetOrChangeAVariable":
                 this.Data.writeInt32LE(16);
                 this.Data.writeInt32LE();
-				this.saveString(action.VariableName);
-				this.Data.writeInt32LE(action.Operation);
-				this.Data.writeInt32LE(action.ValueType);
-				this.saveString(action.Value);
+                this.saveString(action.VariableName);
+                this.Data.writeInt32LE(action.Operation);
+                this.Data.writeInt32LE(action.ValueType);
+                this.saveString(action.Value);
+                break;
+            case "IfVariable":
+                this.Data.writeInt32LE(17);
+                flag = 0;
+                pos = this.startFlag();
+                {
+                    this.saveString(action.VariableName);
+                    this.Data.writeInt32LE(action.ComparisonType);
+                    this.Data.writeInt32LE(action.ValueType);
+                    this.saveString(action.Value);
+                    this.saveActionHandler(action.TheActionHandler);
+
+                    if (action.TheElseActionHandler) {
+                        flag += 1;
+                        this.saveActionHandler(action.TheElseActionHandler);
+                    }
+                }
+                this.endFlag(pos, flag);
+                break;
+            case "RestartBehaviors":
+                this.Data.writeInt32LE(18);
+                this.Data.writeInt32LE(action.SceneNodeToRestart);
+                this.Data.writeBoolean(action.ChangeCurrentSceneNode);
+                this.Data.writeInt32LE();
+                break;
+            case "StoreLoadVariable":
+                this.Data.writeInt32LE(19);
+                this.Data.writeInt32LE();
+                this.saveString(action.VariableName);
+                this.Data.writeBoolean(action.Load);
+                break;
+            case "RestartScene":
+                this.Data.writeInt32LE(20);
+                this.Data.writeInt32LE();
+                this.saveString(action.SceneName);
+                break;
+            case "CloneSceneNode":
+                this.Data.writeInt32LE(21);
+                this.Data.writeInt32LE(action.SceneNodeToClone);
+                this.Data.writeBoolean(action.CloneCurrentSceneNode);
+                this.Data.writeInt32LE();
+                this.saveActionHandler(action.TheActionHandler);
+                break;
+            case "DeleteSceneNode":
+                this.Data.writeInt32LE(22);
+                this.Data.writeInt32LE(action.SceneNodeToDelete);
+                this.Data.writeBoolean(action.DeleteCurrentSceneNode);
+                this.Data.writeInt32LE(action.TimeAfterDelete);
+                this.Data.writeInt32LE();
+                break;
+            case "ExtensionScript":
+                this.Data.writeInt32LE(23);
+                this.saveString(action.JsClassName);
+                this.Data.writeInt32LE();
+                this.saveExtensionScriptProperties(action.Properties);
+                break;
+            case "PlayMovie":
+                this.Data.writeInt32LE(24);
+                flag = 0;
+                pos = this.startFlag();
+                {
+                    if (action.PlayLooped) {
+                        flag += 1;
+                    }
+                }
+                this.endFlag(pos, flag);
+                this.Data.writeInt32LE(action.Command);
+                this.saveString(action.VideoFileName);
+                this.Data.writeInt32LE();
+                this.Data.writeInt32LE(action.SceneNodeToPlayAt);
+                this.Data.writeBoolean(action.PlayAtCurrentSceneNode);
+                this.Data.writeInt32LE(action.MaterialIndex);
+                this.saveActionHandler(action.ActionHandlerFinished);
+                this.saveActionHandler(action.ActionHandlerFailed);
+                break;
+            case "StopSpecificSound":
+                this.Data.writeInt32LE(25);
+                this.Data.writeInt32LE();
+                this.saveString(action.TheSound.Name);
                 break;
         }
     }
@@ -337,6 +584,7 @@ export class FlaceSaver {
                 this.Data.writeBoolean(animator.BoundingBoxTestOnly);
                 this.Data.writeBoolean(animator.CollidesWithWorld);
                 this.Data.writeInt32LE();
+                console.log(animator.TheActionHandler.Actions);
                 this.saveActionHandler(animator.TheActionHandler);
                 break;
             case "onproximity":
