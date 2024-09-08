@@ -193,8 +193,8 @@ export default class behavior_Slider
 
 			this.init = true;
 		}
-		this.mouseX = ccbGetMousePosX() * CL3D.engine.DPR;
-		this.mouseY = ccbGetMousePosY() * CL3D.engine.DPR;
+		this.mouseX = ccbGetMousePosX() * ccbGetDevicePixelRatio();
+		this.mouseY = ccbGetMousePosY() * ccbGetDevicePixelRatio();
 
 		ccbSetSceneNodeProperty(this.Slider, "Width (percent)", ccbGetSceneNodeProperty(currentNode, "Texture Width (percent)"));
 		ccbSetSceneNodeProperty(this.Slider, "Height (percent)", ccbGetSceneNodeProperty(currentNode, "Texture Height (percent)"));
@@ -282,7 +282,7 @@ export default class behavior_Slider
 		if (this.drag)
 		{
 			// Calculate position based on mouseX
-			let newPos = (ccbGetMousePosX() * CL3D.engine.DPR) / ccbGetScreenWidth() * 100 - (this.Width_Knob / 2);
+			let newPos = (ccbGetMousePosX() * ccbGetDevicePixelRatio()) / ccbGetScreenWidth() * 100 - (this.Width_Knob / 2);
 			if (newPos < this.sliderMin) newPos = this.sliderMin;
 			else if (newPos > this.sliderMax) newPos = this.sliderMax;
 
