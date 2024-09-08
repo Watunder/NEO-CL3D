@@ -150,26 +150,23 @@ export class FlaceSaver {
 
     saveEmbeddedFiles()
     {
-        let pos = this.startTag(13);
-        {
-            let flag = 0;
-            let name = "";
-            let filesize = 0;
-            let pos = this.startFlag();
-            {
-                if (false) {
-                    // mesh cache
-                    flag += 4;
-                }
+        // mesh cache
 
-                if (false) {
-                    // script
+        // exrension script
+        for (let index = 0; index < (CL3D.gDocument.Scripts.length); ++index) {
+            let pos = this.startTag(13);
+            {
+                let flag = 0;
+                let pos = this.startFlag();
+                {
+                    this.saveString("");
+                    this.saveString(CL3D.gDocument.Scripts[index]);
                     flag += 8;
                 }
+                this.endFlag(pos, flag);
             }
-            this.endFlag(pos, flag);
+            this.endTag(pos);
         }
-        this.endTag(pos);
     }
 
     savePublishSettings()
@@ -204,16 +201,263 @@ export class FlaceSaver {
     saveAction(action)
     {
         let type = action.Type;
+        let flag = 0;
+        let pos = 0;
         //console.log(`Action - ${type}`);
         switch(type)
         {
+            case "MakeSceneNodeInvisible":
+                this.Data.writeInt32LE(0);
+				this.Data.writeInt32LE(action.InvisibleMakeType);
+				this.Data.writeInt32LE(action.SceneNodeToMakeInvisible);
+				this.Data.writeBoolean(action.ChangeCurrentSceneNode);
+				this.Data.writeInt32LE();
+				break;
+            case "ChangeSceneNodePosition":
+                this.Data.writeInt32LE(1);
+                this.Data.writeInt32LE(action.PositionChangeType);
+                this.Data.writeInt32LE(action.SceneNodeToChangePosition);
+                this.Data.writeBoolean(action.ChangeCurrentSceneNode);
+                this.write3DVectF(action.Vector);
+                if(action.PositionChangeType == 4) this.write3DVectF(action.Area3DEnd);
+                this.Data.writeBoolean(action.RelativeToCurrentSceneNode);
+                this.Data.writeInt32LE(action.SceneNodeRelativeTo);
+                flag = 0;
+                pos = this.startFlag();
+                {
+                    if (action.UseAnimatedMovement) {
+                        flag += 1;
+                        this.Data.writeInt32LE(action.TimeNeededForMovementMs);
+                    }
+                }
+                this.endFlag(pos, flag);
+                break;
+            case "ChangeSceneNodeRotation":
+                this.Data.writeInt32LE(2);
+                this.Data.writeInt32LE(action.RotationChangeType);
+                this.Data.writeInt32LE(action.SceneNodeToChangeRotation);
+                this.Data.writeBoolean(action.ChangeCurrentSceneNode);
+                this.write3DVectF(action.Vector);
+                flag = 0;
+                pos = this.startFlag();
+                {
+                    if (action.RotateAnimated) {
+                        flag += 1;
+                        this.Data.writeInt32LE(action.TimeNeededForRotationMs);
+                    }
+                }
+                this.endFlag(pos, flag);
+                break;
+            case "ChangeSceneNodeScale":
+                this.Data.writeInt32LE(3);
+                this.Data.writeInt32LE(action.ScaleChangeType);
+                this.Data.writeInt32LE(action.SceneNodeToChangeScale);
+                this.Data.writeBoolean(action.ChangeCurrentSceneNode);
+                this.write3DVectF(action.Vector);
+                this.Data.writeInt32LE();
+                break;
+            case "ChangeSceneNodeTexture":
+                this.Data.writeInt32LE(4);
+                this.Data.writeInt32LE(action.TextureChangeType);
+                this.Data.writeInt32LE(action.SceneNodeToChange);
+                this.Data.writeBoolean(action.ChangeCurrentSceneNode);
+                this.saveString(action.TheTexture.Name);
+                if(action.TextureChangeType == 1) this.Data.writeInt32LE(action.IndexToChange);
+                this.Data.writeInt32LE();
+                break;
+            case "PlaySound":
+                this.Data.writeInt32LE(5);
+                flag = 0;
+                pos = this.startFlag();
+                {
+                    if (action.PlayLooped) {
+                        flag += 1;
+                    }
+                }
+                this.endFlag(pos, flag);
+                this.saveString(action.TheSound.Name);
+                this.Data.writeFloat32LE(action.MinDistance);
+                this.Data.writeFloat32LE(action.MaxDistance);
+                this.Data.writeFloat32LE(action.Volume);
+                this.Data.writeBoolean(action.PlayAs2D);
+                this.Data.writeInt32LE(action.SceneNodeToPlayAt);
+                this.Data.writeBoolean(action.PlayAtCurrentSceneNode);
+                this.write3DVectF(action.Position3D);
+                break;
+            case "StopSound":
+                this.Data.writeInt32LE(6);
+                this.Data.writeInt32LE(action.SoundChangeType);
+                break;
+            case "ExecuteJavaScript":
+                this.Data.writeInt32LE(7);
+                this.Data.writeInt32LE();
+                this.saveString(action.JScript);
+                break;
+            case "OpenWebpage":
+                this.Data.writeInt32LE(8);
+                this.Data.writeInt32LE();
+                this.saveString(action.Webpage);
+                this.saveString(action.Target);
+                break;
+            case "SetSceneNodeAnimation":
+                this.Data.writeInt32LE(9);
+                this.Data.writeInt32LE(action.SceneNodeToChangeAnim);
+                this.Data.writeBoolean(action.ChangeCurrentSceneNode);
+                this.Data.writeBoolean(action.Loop);
+                this.saveString(action.AnimName);
+                this.Data.writeInt32LE();
+                break;
+            case "SwitchToScene":
+                this.Data.writeInt32LE(10);
+                this.saveString(action.SceneName);
+                this.Data.writeInt32LE();
+                break;
+            case "SetActiveCamera":
+                this.Data.writeInt32LE(11);
+                this.Data.writeInt32LE(action.CameraToSetActive);
+                this.Data.writeInt32LE();
+                break;
+            case "SetCameraTarget":
+                this.Data.writeInt32LE(12);
+                this.Data.writeInt32LE(action.PositionChangeType);
+                this.Data.writeInt32LE(action.SceneNodeToChangePosition);
+                this.Data.writeBoolean(action.ChangeCurrentSceneNode);
+                this.write3DVectF(action.Vector);
+                this.Data.writeBoolean(action.RelativeToCurrentSceneNode);
+                this.Data.writeInt32LE(action.SceneNodeRelativeTo);
+                flag = 0;
+                pos = this.startFlag();
+                {
+                    if (action.UseAnimatedMovement) {
+                        flag += 1;
+                        this.Data.writeInt32LE(action.TimeNeededForMovementMs);
+                    }
+                }
+                this.endFlag(pos, flag);
+                break;
+            case "Shoot":
+                this.Data.writeInt32LE(13);
+                this.Data.writeInt32LE(action.ShootType);
+                this.Data.writeInt32LE(action.Damage);
+                this.Data.writeFloat32LE(action.BulletSpeed);
+                this.Data.writeInt32LE(action.SceneNodeToUseAsBullet);
+                this.Data.writeFloat32LE(action.WeaponRange);
+                flag = 0;
+                pos = this.startFlag();
+                {
+                    if (action.SceneNodeToShootFrom) {
+                        flag += 1;
+                        this.Data.writeInt32LE(action.SceneNodeToShootFrom);
+                        this.Data.writeBoolean(action.ShootToCameraTarget);
+                        this.write3DVectF(action.AdditionalDirectionRotation);
+                    }
+                    if (action.ActionHandlerOnImpact) {
+                        flag += 2;
+                        this.saveActionHandler(action.ActionHandlerOnImpact);
+                    }
+                    if (action.ShootDisplacement) {
+                        flag += 4;
+                        this.write3DVectF(action.ShootDisplacement);
+                    }
+                }
+                break;
+            case "QuitApplication":
+                this.Data.writeInt32LE(14);
+                // TODO
+                break;
+            case "SetOverlayText":
+                this.Data.writeInt32LE(15);
+                this.Data.writeInt32LE();
+                this.Data.writeInt32LE(action.SceneNodeToChange);
+                this.Data.writeBoolean(action.ChangeCurrentSceneNode);
+                this.saveString(action.Text);
+                break;
             case "SetOrChangeAVariable":
                 this.Data.writeInt32LE(16);
                 this.Data.writeInt32LE();
-				this.saveString(action.VariableName);
-				this.Data.writeInt32LE(action.Operation);
-				this.Data.writeInt32LE(action.ValueType);
-				this.saveString(action.Value);
+                this.saveString(action.VariableName);
+                this.Data.writeInt32LE(action.Operation);
+                this.Data.writeInt32LE(action.ValueType);
+                this.saveString(action.Value);
+                break;
+            case "IfVariable":
+                this.Data.writeInt32LE(17);
+                flag = 0;
+                pos = this.startFlag();
+                {
+                    this.saveString(action.VariableName);
+                    this.Data.writeInt32LE(action.ComparisonType);
+                    this.Data.writeInt32LE(action.ValueType);
+                    this.saveString(action.Value);
+                    this.saveActionHandler(action.TheActionHandler);
+
+                    if (action.TheElseActionHandler) {
+                        flag += 1;
+                        this.saveActionHandler(action.TheElseActionHandler);
+                    }
+                }
+                this.endFlag(pos, flag);
+                break;
+            case "RestartBehaviors":
+                this.Data.writeInt32LE(18);
+                this.Data.writeInt32LE(action.SceneNodeToRestart);
+                this.Data.writeBoolean(action.ChangeCurrentSceneNode);
+                this.Data.writeInt32LE();
+                break;
+            case "StoreLoadVariable":
+                this.Data.writeInt32LE(19);
+                this.Data.writeInt32LE();
+                this.saveString(action.VariableName);
+                this.Data.writeBoolean(action.Load);
+                break;
+            case "RestartScene":
+                this.Data.writeInt32LE(20);
+                this.Data.writeInt32LE();
+                this.saveString(action.SceneName);
+                break;
+            case "CloneSceneNode":
+                this.Data.writeInt32LE(21);
+                this.Data.writeInt32LE(action.SceneNodeToClone);
+                this.Data.writeBoolean(action.CloneCurrentSceneNode);
+                this.Data.writeInt32LE();
+                this.saveActionHandler(action.TheActionHandler);
+                break;
+            case "DeleteSceneNode":
+                this.Data.writeInt32LE(22);
+                this.Data.writeInt32LE(action.SceneNodeToDelete);
+                this.Data.writeBoolean(action.DeleteCurrentSceneNode);
+                this.Data.writeInt32LE(action.TimeAfterDelete);
+                this.Data.writeInt32LE();
+                break;
+            case "ExtensionScript":
+                this.Data.writeInt32LE(23);
+                this.saveString(action.JsClassName);
+                this.Data.writeInt32LE();
+                this.saveExtensionScriptProperties(action.Properties);
+                break;
+            case "PlayMovie":
+                this.Data.writeInt32LE(24);
+                flag = 0;
+                pos = this.startFlag();
+                {
+                    if (action.PlayLooped) {
+                        flag += 1;
+                    }
+                }
+                this.endFlag(pos, flag);
+                this.Data.writeInt32LE(action.Command);
+                this.saveString(action.VideoFileName);
+                this.Data.writeInt32LE();
+                this.Data.writeInt32LE(action.SceneNodeToPlayAt);
+                this.Data.writeBoolean(action.PlayAtCurrentSceneNode);
+                this.Data.writeInt32LE(action.MaterialIndex);
+                this.saveActionHandler(action.ActionHandlerFinished);
+                this.saveActionHandler(action.ActionHandlerFailed);
+                break;
+            case "StopSpecificSound":
+                this.Data.writeInt32LE(25);
+                this.Data.writeInt32LE();
+                this.saveString(action.TheSound.Name);
                 break;
         }
     }
@@ -333,6 +577,145 @@ export class FlaceSaver {
                 }
                 this.endFlag(pos, flag);
                 break;
+            case "onclick":
+                this.Data.writeInt32LE(107);
+                this.Data.writeBoolean(animator.BoundingBoxTestOnly);
+                this.Data.writeBoolean(animator.CollidesWithWorld);
+                this.Data.writeInt32LE();
+                this.saveActionHandler(animator.TheActionHandler);
+                break;
+            case "onproximity":
+                this.Data.writeInt32LE(108);
+                this.Data.writeInt32LE(animator.EnterType);
+                this.Data.writeInt32LE(animator.ProximityType);
+                this.Data.writeFloat32LE(animator.Range);
+                this.Data.writeInt32LE(animator.SceneNodeToTest);
+                flag = 0;
+                pos = this.startFlag();
+                {
+                    if (animator.AreaType == 1) {
+                        flag += 1;
+                        this.write3DVectF(animator.RangeBox);
+                    }
+                }
+                this.endFlag(pos, flag);
+                this.saveActionHandler(animator.TheActionHandler);
+                break;
+            case "animatetexture":
+                this.Data.writeInt32LE(109);
+                this.Data.writeInt32LE(animator.TextureChangeType);
+                this.Data.writeInt32LE(animator.TimePerFrame);
+                this.Data.writeInt32LE(animator.TextureIndexToChange);
+                this.Data.writeBoolean(animator.Loop);
+                let tanimcount = animator.Textures.length;
+                this.Data.writeInt32LE(tanimcount);
+                for (let index = 0; index < tanimcount; ++index) {
+                    this.saveString(animator.Textures[index].Name);
+                }
+                break;
+            case "onmove":
+                this.Data.writeInt32LE(110);
+                this.Data.writeBoolean(animator.BoundingBoxTestOnly);
+                this.Data.writeBoolean(animator.CollidesWithWorld);
+                this.Data.writeInt32LE();
+                this.saveActionHandler(animator.ActionHandlerOnLeave);
+                this.saveActionHandler(animator.ActionHandlerOnEnter);
+                break;
+            case "timer":
+                this.Data.writeInt32LE(111);
+                this.Data.writeInt32LE(animator.TickEverySeconds);
+                this.Data.writeInt32LE();
+                this.saveActionHandler(animator.TheActionHandler);
+                break;
+            case "keypress":
+                this.Data.writeInt32LE(112);
+                this.Data.writeInt32LE(animator.KeyPressType);
+                this.Data.writeInt32LE(animator.KeyCode);
+                this.Data.writeBoolean(animator.IfCameraOnlyDoIfActive);
+                this.Data.writeInt32LE();
+                this.saveActionHandler(animator.TheActionHandler);
+                break;
+            case "gameai":
+                this.Data.writeInt32LE(113);
+                this.Data.writeInt32LE(animator.AIType);
+                this.Data.writeFloat32LE(animator.MovementSpeed);
+                this.Data.writeFloat32LE(animator.ActivationRadius);
+                this.Data.writeBoolean(animator.CanFly);
+                this.Data.writeInt32LE(animator.Health);
+                this.saveString(animator.Tags);
+                this.saveString(animator.AttacksAIWithTags);
+                this.Data.writeBoolean(animator.PatrolRadius);
+                this.Data.writeInt32LE(animator.RotationSpeedMs);
+                this.write3DVectF(animator.AdditionalRotationForLooking);
+                this.saveString(animator.StandAnimation);
+                this.saveString(animator.WalkAnimation);
+                this.saveString(animator.DieAnimation);
+                this.saveString(animator.AttackAnimation);
+                if (animator.AIType == 3) this.Data.writeInt32LE(animator.PathIdToFollow);
+                flag = 0;
+                pos = this.startFlag();
+                {
+                    if (animator.PatrolWaitTimeMs) {
+                        animator.PatrolWaitTimeMs = 1E4;
+                        if(animator.MovementSpeed != 0) animator.PatrolWaitTimeMs = animator.PatrolRadius / (animator.MovementSpeed / 1E3);
+                        this.Data.writeInt32LE(animator.PatrolWaitTimeMs);
+                    }
+                    else {
+                        flag += 1;
+                        this.Data.writeInt32LE();
+                    }
+                }
+                this.endFlag(pos, flag);
+                this.saveActionHandler(animator.ActionHandlerOnAttack);
+                this.saveActionHandler(animator.ActionHandlerOnActivate);
+                this.saveActionHandler(animator.ActionHandlerOnHit);
+                this.saveActionHandler(animator.ActionHandlerOnDie);
+                break;
+            case "3rdpersoncamera":
+                this.Data.writeInt32LE(114);
+                this.Data.writeInt32LE(animator.SceneNodeIDToFollow);
+                this.write3DVectF(animator.AdditionalRotationForLooking);
+                this.Data.writeInt32LE(animator.FollowMode);
+                this.Data.writeFloat32LE(animator.FollowSmoothingSpeed);
+                this.Data.writeFloat32LE(animator.TargetHeight);
+                flag = 0;
+                pos = this.startFlag();
+                {
+                    if (animator.CollidesWithWorld) {
+                        flag += 1;
+                    }
+                }
+                this.endFlag(pos, flag);
+                break;
+            case "keyboardcontrolled":
+                this.Data.writeInt32LE(115);
+                this.Data.writeInt32LE();
+                this.Data.writeFloat32LE(animator.RunSpeed);
+                this.Data.writeFloat32LE(animator.MoveSpeed);
+                this.Data.writeFloat32LE(animator.RotateSpeed);
+                this.Data.writeFloat32LE(animator.JumpSpeed);
+                this.write3DVectF(animator.AdditionalRotationForLooking);
+                this.saveString(animator.StandAnimation);
+                this.saveString(animator.WalkAnimation);
+                this.saveString(animator.JumpAnimation);
+                this.saveString(animator.RunAnimation);
+                flag = 0;
+                pos = this.startFlag();
+                {
+                    if (animator.DisableWithoutActiveCamera) {
+                        flag += 1;
+                    }
+                    if (animator.UseAcceleration) {
+                        flag += 2;
+                        this.Data.writeFloat32LE(animator.AccelerationSpeed);
+                        this.Data.writeFloat32LE(animator.DecelerationSpeed);
+                    }
+                    if (animator.PauseAfterJump) {
+                        flag += 4;
+                    }
+                }
+                this.endFlag(pos, flag);
+                break;
             case "onfirstframe":
                 this.Data.writeInt32LE(116);
                 this.Data.writeBoolean(animator.AlsoOnReload);
@@ -402,48 +785,48 @@ export class FlaceSaver {
 
         pos = this.startTag(26);
         {
-            this.saveString("CL3D");
-            this.Data.writeInt32LE(this.rgbToInt(65, 65, 65));
+            this.saveString(scene.Name);
+            this.Data.writeInt32LE(scene.BackgroundColor || this.rgbToInt(65, 65, 65));
         }
         this.endTag(pos);
 
         pos = this.startTag(1007);
         {
-            this.write3DVectF(new CL3D.Vect3d());
-            this.write3DVectF(new CL3D.Vect3d());
+            this.write3DVectF(scene.DefaultCameraPos);
+            this.write3DVectF(scene.DefaultCameraTarget);
         }
         this.endTag(pos);
 
         pos = this.startTag(1008);
         {
-            this.Data.writeFloat32LE(10.0);
+            this.Data.writeFloat32LE(scene.Gravity);
         }
         this.endTag(pos);
 
         pos = this.startTag(1009);
         {
-            this.Data.writeBoolean(false);
-            this.Data.writeFloat32LE(0.007);
-            this.Data.writeInt32LE(this.rgbToInt(200,200,200));
+            this.Data.writeBoolean(scene.FogEnabled);
+            this.Data.writeFloat32LE(scene.FogDensity);
+            this.Data.writeInt32LE(scene.FogColor);
         }
         this.endTag(pos);
 
         pos = this.startTag(1010);
         {
             this.Data.writeBoolean(false);
-            this.Data.writeFloat32LE(1.0);
-            this.Data.writeFloat32LE(2.0);
+            this.Data.writeFloat32LE(scene.WindSpeed);
+            this.Data.writeFloat32LE(scene.WindStrength);
         }
         this.endTag(pos);
 
         pos = this.startTag(1011);
         {
-            this.Data.writeBoolean(false);
-            this.Data.writeFloat32LE(0.5);
-            this.Data.writeFloat32LE(0.2);
-            this.Data.writeFloat32LE(0.001);
-            this.Data.writeFloat32LE(0.005);
-            this.Data.writeFloat32LE(0.5);
+            this.Data.writeBoolean(scene.ShadowMappingEnabled);
+            this.Data.writeFloat32LE(scene.ShadowMapBias1);
+            this.Data.writeFloat32LE(scene.ShadowMapBias2);
+            this.Data.writeFloat32LE(scene.ShadowMapBackFaceBias);
+            this.Data.writeFloat32LE(scene.ShadowMapOpacity);
+            this.Data.writeFloat32LE(scene.ShadowMapCameraViewDetailFactor);
         }
         this.endTag(pos);
 
@@ -451,13 +834,13 @@ export class FlaceSaver {
         {
             for(let index = 0; index < 6; ++index)
                 this.Data.writeBoolean(false);
-            this.Data.writeInt32LE(2);
-            this.Data.writeFloat32LE(0.7);
-            this.Data.writeInt32LE(2);
-            this.Data.writeInt32LE(this.rgbToInt(255, 0, 0));
-            this.Data.writeFloat32LE(0.8);
-            this.Data.writeFloat32LE(0.4);
-            this.Data.writeFloat32LE(0.55);
+            this.Data.writeInt32LE(scene.PE_bloomBlurIterations);
+            this.Data.writeFloat32LE(scene.PE_bloomTreshold);
+            this.Data.writeInt32LE(scene.PE_blurIterations);
+            this.Data.writeInt32LE(scene.PE_colorizeColor);
+            this.Data.writeFloat32LE(scene.PE_vignetteIntensity);
+            this.Data.writeFloat32LE(scene.PE_vignetteRadiusA);
+            this.Data.writeFloat32LE(scene.PE_vignetteRadiusB);
         }
         this.endTag(pos);
     }
@@ -505,14 +888,13 @@ export class FlaceSaver {
             this.endTag(pos);
 
             if (node.Animators.length > 0) {
-                pos = this.startTag(25);
-                {
-                    for (let index = 0; index < node.Animators.length; ++index) {
+                for (let index = 0; index < node.Animators.length; ++index) {
+                    pos = this.startTag(25);
+                    {
                         this.saveAnimator(node.Animators[index]);
                     }
+                    this.endTag(pos);
                 }
-                this.endTag(pos);
-
             }
 
             this.saveSceneNode(scene, node, depth + 1);
@@ -587,13 +969,13 @@ export class FlaceSaver {
                     this.endTag(pos);
 
                     if (currentNode.Animators.length > 0) {
-                        pos = this.startTag(25);
-                        {
-                            for (let index = 0; index < currentNode.Animators.length; ++index) {
+                        for (let index = 0; index < currentNode.Animators.length; ++index) {
+                            pos = this.startTag(25);
+                            {
                                 this.saveAnimator(currentNode.Animators[index]);
                             }
+                            this.endTag(pos);
                         }
-                        this.endTag(pos);
                     }
 
                     if (currentNode.MeshBuffer) {
@@ -602,16 +984,17 @@ export class FlaceSaver {
                             this.saveMaterial(currentNode.MeshBuffer.Mat);
                         }
                         this.endTag(pos);
+                        this.Data.write(new Uint8Array(18)); // unknown data definition
                     }
-
-                    if (currentNode.OwnedMesh && currentNode.OwnedMesh.MeshBuffers.length > 0) {
-                        pos = this.startTag(11);
-                        {
-                            for (let index = 0; index < currentNode.OwnedMesh.MeshBuffers.length; ++index) {
+                    else if (currentNode.OwnedMesh && currentNode.OwnedMesh.MeshBuffers.length > 0) {
+                        for (let index = 0; index < currentNode.OwnedMesh.MeshBuffers.length; ++index) {
+                            pos = this.startTag(11);
+                            {
                                 this.saveMaterial(currentNode.OwnedMesh.MeshBuffers[index].Mat);
                             }
+                            this.endTag(pos);
+                            this.Data.write(new Uint8Array(18)); // unknown data definition
                         }
-                        this.endTag(pos);
                     }
 
                     if (currentNode.Children.length > 0) {
