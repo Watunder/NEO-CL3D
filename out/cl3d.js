@@ -10,48 +10,48 @@ const DebugPostEffects = false;
 const UseShadowCascade = true;
 const Extensions = {
 	draw: () => { },
-	setWorld: () => { },
-	readAnimator: (loader, type, rootSceneNode, sceneManager) => { },
+	setWorld: (world) => { },
+	readAnimator: (loader, type, rootSceneNode, sceneManager) => { return null },
 };
 
 /** 
  * @const 
- * @private
+ * @public
  * The value PI
  */
 const PI = 3.14159265359;
 
 /** 
  * @const 
- * @private
+ * @public
  * reciprocal PI value
  */
 const RECIPROCAL_PI = 1.0 / 3.14159265359;
 
 /** 
  * @const 
- * @private
+ * @public
  * Half of PI
  */
 const HALF_PI = 3.14159265359 / 2.0;
 
 /** 
  * @const 
- * @private
+ * @public
  * Hih precision PI value
  */
 const PI64 = 3.1415926535897932384626433832795028841971693993751;
 
 /** 
  * @const 
- * @private
+ * @public
  * Value to convert degrees to grad. Use {@link degToRad} to do this.
  */
 const DEGTORAD = 3.14159265359 / 180.0;
 
 /** 
  * @const 
- * @private
+ * @public
  */
 const RADTODEG = 180.0 / 3.14159265359;
 
@@ -229,7 +229,7 @@ const convertIntColor = function (c) {
 };
 
 /**
- * @private
+ * @public
  */
 const getInterpolatedColor = function (clr1, clr2, f) {
 	var invf = 1.0 - f;
@@ -242,7 +242,7 @@ const getInterpolatedColor = function (clr1, clr2, f) {
 };
 
 /**
- * @private
+ * @public
  */
 const sgn = function (a) {
 	if (a > 0.0)
@@ -320,15 +320,15 @@ class ColorF {
 /**
  * A simple class for receiving the current time in milliseconds. Used by the animators for example.
  * @constructor
- * @private
+ * @public
  */
 class CLTimer {
 	constructor() {
 	}
 	/**
-		 * Returns the current time in milliseconds.
-		 * @public
-		 */
+	 * Returns the current time in milliseconds.
+	 * @public
+	 */
 	static getTime() {
 		//var d = new Date();
 		//return d.getTime();
@@ -390,7 +390,7 @@ class Vect3d {
 	/**
 	 * Creates a copy of this vector and returns it
 	 * @public
-	 * @type {CL3D.Vect3d}
+	 * @returns {CL3D.Vect3d}
 	 */
 	clone() {
 		return new Vect3d(this.X, this.Y, this.Z);
@@ -444,7 +444,7 @@ class Vect3d {
 		this.Z += other.Z;
 	}
 	/**
-	 * @private
+	 * @public
 	 */
 	addToThisReturnMe(other) {
 		this.X += other.X;
@@ -505,7 +505,7 @@ class Vect3d {
 		this.Z = other.Z;
 	}
 	/**
-	 * Returns true if this vector equals another vector. Doesn't use the comparison operator but the {@link CL3D.equals} function.
+	 * Returns true if this vector equals another vector. Doesn't use the comparison operator but the {@link equals} function.
 	 * @public
 	 * @param other {CL3D.Vect3d} other vector
 	 */
@@ -515,14 +515,14 @@ class Vect3d {
 			equals(this.Z, other.Z);
 	}
 	/**
-	 * Returns true if this vector equals zero. Doesn't use the comparison operator but the {@link CL3D.iszero} function.
+	 * Returns true if this vector equals zero. Doesn't use the comparison operator but the {@link iszero} function.
 	 * @public
 	 */
 	equalsZero() {
 		return iszero(this.X) && iszero(this.Y) && iszero(this.Z);
 	}
 	/**
-	 * Returns true if this vector equals x, y, and z given as argument. Doesn't use the comparison operator but the {@link CL3D.equals} function.
+	 * Returns true if this vector equals x, y, and z given as argument. Doesn't use the comparison operator but the {@link equals} function.
 	 * @public
 	 */
 	equalsByNumbers(x, y, z) {
@@ -593,7 +593,7 @@ class Vect3d {
 		this.Z *= v;
 	}
 	/**
-	 * @private
+	 * @public
 	 */
 	multiplyThisWithScalReturnMe(v) {
 		this.X *= v;
@@ -780,7 +780,7 @@ class Vect2d {
 	}
 	/**
 	 * Sets all 2 coordinates to new values
-	 * @private
+	 * @public
 	 */
 	set(x, y) {
 		this.X = x;
@@ -789,7 +789,7 @@ class Vect2d {
 	/**
 	 * Creates a copy of this vector and returns it
 	 * @public
-	 * @type Vect2d
+	 * @returns {Vect2d}
 	 */
 	clone() {
 		return new Vect2d(this.X, this.Y);
@@ -891,7 +891,7 @@ class Box3d {
 		return this.intersectsWithLineImpl(middle, vect, len * 0.5);
 	}
 	/**
-	 * @private
+	 * @public
 	 */
 	intersectsWithLineImpl(linemiddle, linevect, halflength) {
 		let e = this.getExtent().multiplyWithScal(0.5);
@@ -1066,7 +1066,7 @@ class Matrix4 {
 			isone(this.m15));
 	}
 	/**
-	 * Returns if this matrix equals another matrix, uses {@link CL3D.equals} as comparison operator.
+	 * Returns if this matrix equals another matrix, uses {@link equals} as comparison operator.
 	 * @public
 	 */
 	equals(mat) {
@@ -1775,35 +1775,35 @@ class Vertex3D {
 	/** 
 	 * 3D Position of the vertex
 	 * @public
-	 * @type Vertex3d
+	 * @type {CL3D.Vect3d}
 	 */
 	Pos = null;
 
 	/** 
 	 * Normal of the vertex
 	 * @public
-	 * @type Vertex3d
+	 * @type {CL3D.Vect3d}
 	 */
 	Normal = null;
 
 	/** 
 	 * Color of the vertex
 	 * @public
-	 * @type int
+	 * @type {Number}
 	 */
 	Color = 0;
 
 	/** 
 	 * Texture coordinate 1 of the vertex
 	 * @public
-	 * @type Vertex3d
+	 * @type {CL3D.Vect2d}
 	 */
 	TCoords = null;
 
 	/** 
 	 * Texture coordinate 2 of the vertex
 	 * @public
-	 * @type Vertex3d
+	 * @type {CL3D.Vect2d}
 	 */
 	TCoords2 = null;
 
@@ -1829,7 +1829,7 @@ const cloneVertex3D = function (c) {
 };
 
 /**
- * @private
+ * @public
  */
 const createVertex = function (x, y, z, nx, ny, nz, clr, s, t) {
 	let vtx = new Vertex3D(true);
@@ -1848,7 +1848,7 @@ const createVertex = function (x, y, z, nx, ny, nz, clr, s, t) {
 };
 
 /**
- * @private
+ * @public
  */
 const createSimpleVertex = function (x, y, z, s, t) {
 	let vtx = new Vertex3D(true);
@@ -1866,8 +1866,8 @@ const createSimpleVertex = function (x, y, z, s, t) {
 
 /**
  * Class which holds the geometry of an object.
- * A Mesh is nothing more than a collection of some {@link CL3D.MeshBuffer}s. 
- * A mesh is usually used in a {@link CL3D.MeshSceneNode} in order to be rendered.
+ * A Mesh is nothing more than a collection of some {@link MeshBuffer}s. 
+ * A mesh is usually used in a {@link MeshSceneNode} in order to be rendered.
  * @constructor
  * @public
  * @class Class which holds the geometry of an object
@@ -2018,7 +2018,7 @@ class MeshBuffer {
 	}
 	/**
 	 * Clears the native render array and frees up memory
-	 * @private
+	 * @public
 	 */
 	freeNativeArray() {
 		let obj = this.RendererNativeArray;
@@ -2127,7 +2127,7 @@ class MeshBuffer {
 // ------------------------------------------------------------------------------------------------
 
 /**
- * @private
+ * @public
  */
 class MeshCache {
 	constructor() {
@@ -2135,7 +2135,7 @@ class MeshCache {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	getMeshFromName(name) {
 		for (var i = 0; i < this.Meshes.length; ++i) {
@@ -2148,7 +2148,7 @@ class MeshCache {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	addMesh(t) {
 		if (t != null) {
@@ -2165,7 +2165,7 @@ class MeshCache {
 // ------------------------------------------------------------------------------------------------
 
 /**
- * @private
+ * @public
  */
 class SkinnedMeshJoint {
 	constructor() {
@@ -2200,7 +2200,7 @@ class SkinnedMeshJoint {
 // ------------------------------------------------------------------------------------------------
 
 /**
- * @private
+ * @public
  */
 class SkinnedMeshWeight {
 	constructor() {
@@ -2218,7 +2218,7 @@ class SkinnedMeshWeight {
 // ------------------------------------------------------------------------------------------------
 
 /**
- * @private
+ * @public
  */
 class SkinnedMeshScaleKey {
 	constructor() {
@@ -2232,7 +2232,7 @@ class SkinnedMeshScaleKey {
 // ------------------------------------------------------------------------------------------------
 
 /**
- * @private
+ * @public
  */
 class SkinnedMeshPositionKey {	
 	constructor() {
@@ -2245,7 +2245,7 @@ class SkinnedMeshPositionKey {
 // ------------------------------------------------------------------------------------------------
 
 /**
- * @private
+ * @public
  */
 class SkinnedMeshRotationKey {	
 	constructor() {
@@ -2258,7 +2258,7 @@ class SkinnedMeshRotationKey {
 // ------------------------------------------------------------------------------------------------
 
 /**
- * @private
+ * @public
  */
 class NamedAnimationRange {
 	Name = '';
@@ -2278,7 +2278,7 @@ class NamedAnimationRange {
 // ------------------------------------------------------------------------------------------------
 
 /**
- * @private
+ * @public
  */
 class SkinnedMesh {
 	constructor() {
@@ -2310,28 +2310,28 @@ class SkinnedMesh {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	AddMeshBuffer(buf) {
 		this.LocalBuffers.push(buf);
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	getFrameCount() {
 		return Math.floor(this.AnimationFrames);
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	getBoundingBox() {
 		return this.BoundingBox;
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	finalize() {
 		this.LastAnimatedFrame = -1;
@@ -2416,7 +2416,7 @@ class SkinnedMesh {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	checkForAnimation() {
 		this.HasAnimation = false;
@@ -2488,7 +2488,7 @@ class SkinnedMesh {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	CalculateGlobalMatrices(joint, parentJoint) {
 		if (joint == null && parentJoint != null)
@@ -2532,7 +2532,7 @@ class SkinnedMesh {
 	 * Animates this mesh's joints based on frame input
 	 * blend: {0-old position, 1-New position}
 	 * returns if animation has changed
-	 * @private
+	 * @public
 	 */
 	animateMesh(frame, blend) {
 		if (!this.HasAnimation ||
@@ -2596,7 +2596,7 @@ class SkinnedMesh {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	getFrameData(frame, joint,
 		position, positionHint,
@@ -2800,7 +2800,7 @@ class SkinnedMesh {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	buildAll_LocalAnimatedMatrices() {
 		for (var i = 0; i < this.AllJoints.length; ++i) {
@@ -2873,7 +2873,7 @@ class SkinnedMesh {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	updateBoundingBox() {
 		this.BoundingBox.MinEdge.set(0, 0, 0);
@@ -2907,7 +2907,7 @@ class SkinnedMesh {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	buildAll_GlobalAnimatedMatrices(joint, parentJoint) {
 		if (joint == null) {
@@ -2933,7 +2933,7 @@ class SkinnedMesh {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	skinMesh(animateNormals) {
 		if (!this.HasAnimation)
@@ -2971,7 +2971,7 @@ class SkinnedMesh {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	skinJoint(joint, parentJoint, animateNormals) {
 		if (joint.Weights.length) {
@@ -3023,7 +3023,7 @@ class SkinnedMesh {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	getNamedAnimationRangeByName(thename) {
 		if (!thename)
@@ -3042,14 +3042,14 @@ class SkinnedMesh {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	addNamedAnimationRange(n) {
 		this.NamedAnimationRanges.push(n);
 	}
 
 	/**
-	 * @private
+	 * @public
 	 * Used to see by the loader if this model already has been loaded before
 	 */
 	containsData(buf) {
@@ -3327,7 +3327,7 @@ class Texture {
 	/**
 	 * returns the image of the texture
 	 * @public
-	 * @type {Image}
+	 * @returns {Image}
 	 */
 	getImage() {
 		return this.Image;
@@ -3335,7 +3335,7 @@ class Texture {
 	/**
 	 * returns the webGL texture object of the texture, only available if the texture has been loaded already.
 	 * @public
-	 * @type {CL3D.Texture}
+	 * @returns {CL3D.Texture}
 	 */
 	getWebGLTexture() {
 		return this.Texture;
@@ -3343,7 +3343,7 @@ class Texture {
 	/**
 	 * returns the width of this texture, or null if not loaded yet
 	 * @public
-	 * @type {int}
+	 * @returns {Number}
 	 */
 	getWidth() {
 		if (this.Image)
@@ -3357,7 +3357,7 @@ class Texture {
 	/**
 	 * returns the height of this texture, or null if not loaded yet
 	 * @public
-	 * @type {int}
+	 * @returns {Number}
 	 */
 	getHeight() {
 		if (this.Image)
@@ -3371,7 +3371,7 @@ class Texture {
 	/**
 	 * returns the URL of this texture
 	 * @public
-	 * @type {String}
+	 * @returns {String}
 	 */
 	getURL() {
 		return this.Name;
@@ -3379,7 +3379,7 @@ class Texture {
 	/**
 	 * returns if the texture has been sucessfully loaded
 	 * @public
-	 * @type {Boolean}
+	 * @returns {Boolean}
 	 */
 	isLoaded() {
 		return this.Loaded;
@@ -3413,6 +3413,12 @@ else {
     };
 }
 
+/**
+ * 
+ * @param {string|Buffer} src 
+ * @param {any} options 
+ * @returns {Promise<Image>}
+ */
 const loadImage = (src, options) => {
     return loadImageImpl(src, options);
 };
@@ -3481,7 +3487,7 @@ class TextureManager {
 		return this.Textures.length;
 	}
 	/**
-	 * @private
+	 * @public
 	 */
 	onTextureLoaded(t) {
 		//console.log("http loaded texture: " + t.Name);
@@ -3507,7 +3513,7 @@ class TextureManager {
 		return ret;
 	}
 	/**
-	 * @private
+	 * @public
 	 */
 	getTextureFromName(name) {
 		for (let i = 0; i < this.Textures.length; ++i) {
@@ -3519,7 +3525,7 @@ class TextureManager {
 		return null;
 	}
 	/**
-	 * @private
+	 * @public
 	 */
 	addTexture(t) {
 		if (t != null) {
@@ -3532,7 +3538,7 @@ class TextureManager {
 	}
 	/**
 	 * use renderer.deleteTexture instead, this is just for removing it from the list of registered textures
-	 * @private
+	 * @public
 	 */
 	removeTexture(tex) {
 		for (let i = 0; i < this.Textures.length; ++i) {
@@ -3554,7 +3560,7 @@ const gTextureManager = new TextureManager();
 
 /**
  * @constructor
- * @private
+ * @public
  */
 class SoundManager {
 	constructor() {
@@ -3564,7 +3570,7 @@ class SoundManager {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	getSoundFromName(name) {
 		for (var i = 0; i < this.Sounds.length; ++i) {
@@ -3577,7 +3583,7 @@ class SoundManager {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	addSound(t) {
 		if (t != null) {
@@ -3589,7 +3595,7 @@ class SoundManager {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 * name is the url
 	 */
 	getSoundFromSoundName(name, createIfNotFound) {
@@ -3611,7 +3617,7 @@ class SoundManager {
 	}
 	
 	/**
-	 * @private
+	 * @public
 	 * s can either be the URL or the SoundSource object
 	 */
 	play2D(s, looped, volume) {
@@ -3674,7 +3680,7 @@ class SoundManager {
 				if (!pl.hasStopped) {
 					try { this.currentTime = 0; }
 					catch (err) { }
-					this.play();
+					this.play2D();
 					//CL3D.Debug.print('foobar');
 				}
 			};
@@ -3688,7 +3694,7 @@ class SoundManager {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	stop(playingSnd) {
 		if (!playingSnd)
@@ -3700,14 +3706,14 @@ class SoundManager {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	getGlobalVolume() {
 		return this.GlobalVolume;
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	setGlobalVolume(v) {
 		this.GlobalVolume = v;
@@ -3725,7 +3731,7 @@ class SoundManager {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	setVolume(playingSnd, v) {
 		if (!playingSnd)
@@ -3738,7 +3744,7 @@ class SoundManager {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	stopAll() {
 		for (var i = 0; i < this.PlayingSounds.length; ++i) {
@@ -3751,7 +3757,7 @@ class SoundManager {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	clearFinishedPlayingSounds() {
 		for (var i = 0; i < this.PlayingSounds.length;)
@@ -3763,7 +3769,7 @@ class SoundManager {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	stopSpecificPlayingSound(name) {
 		for (var i = 0; i < this.PlayingSounds.length; ++i) {
@@ -3787,7 +3793,7 @@ const gSoundManager = new SoundManager();
 
 /**
  * @constructor
- * @private
+ * @public
  */
 class SoundSource {
 	constructor(name) {
@@ -3821,7 +3827,7 @@ class SoundSource {
 
 /**
  * @constructor
- * @private
+ * @public
  */
 class PlayingSound {
 	constructor(source) {
@@ -3892,7 +3898,7 @@ class Line3d {
     /**
      * Returns the length of the line
      * @public
-     * @returns {CL3D.Vect3d} center
+     * @returns {Number} center
      */
     getLength() {
         return this.getVector().getLength();
@@ -3956,7 +3962,7 @@ class Plane3d {
 	 * @public
 	 */
 	clone() {
-		var pl = new Plane3d(false);
+		var pl = new Plane3d();
 		pl.Normal = this.Normal.clone();
 		pl.D = this.D;
 		return pl;
@@ -4183,7 +4189,7 @@ class Triangle3d {
 	 * @returns Triangle3d
 	 */
 	getPlane() {
-		var p = new Plane3d(false);
+		var p = new Plane3d();
 		p.setPlaneFrom3Points(this.pointA, this.pointB, this.pointC);
 		return p;
 	}
@@ -4229,7 +4235,7 @@ class Triangle3d {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	isOnSameSide(p1, p2, a, b) {
 		var bminusa = b.substract(a);
@@ -4397,7 +4403,7 @@ class Quaternion {
 
 	/**
 	 * Multiplication operator, multiplies with a float (scalar).
-	 * @private
+	 * @public
 	 */
 	multiplyThisWith(s) {
 		this.X = this.X * s;
@@ -4482,7 +4488,7 @@ class Quaternion {
 
 	/**
 	 * Creates a matrix from this quaternion
-	 * @private
+	 * @public
 	 */
 	getMatrix_transposed(dest) {
 		var X = this.X;
@@ -4536,7 +4542,9 @@ class Quaternion {
 
 	/**
 	 * Sets the quaternion from euler coordinates
-	 * @param {CL3D.Vect3d} dest 3d vector to be filled with the euler coordinates
+	 * @param {Number} x 
+	 * @param {Number} y 
+	 * @param {Number} z 
 	 * @public
 	 */
 	setFromEuler(x, y, z) {
@@ -4577,7 +4585,7 @@ class Quaternion {
 
 	/**
 	 * Creates a matrix from this quaternion
-	 * @private
+	 * @public
 	 */
 	toString() {
 		return "(x: " + this.X + " y:" + this.Y + " z:" + this.Z + " w:" + this.W + ")";
@@ -4591,7 +4599,7 @@ class Quaternion {
 /**
  * A view frustrum defining the area of view
  * @constructor
- * @private
+ * @public
  * @class A view frustrum defining the area of view
  */
 class ViewFrustrum {
@@ -4599,49 +4607,49 @@ class ViewFrustrum {
 
 	/**
 	 * Far plane of the frustum. That is the plane farest away from the eye.
-	 * @private
+	 * @public
 	 * @static
 	 */
 	static VF_FAR_PLANE = 0;
 	
 	/**
 	 * Near plane of the frustum. That is the plane nearest to the eye.
-	 * @private
+	 * @public
 	 * @static
 	 */
 	static VF_NEAR_PLANE = 1;
 	
 	/**
 	 * Left plane of the frustum.
-	 * @private
+	 * @public
 	 * @static
 	 */
 	static VF_LEFT_PLANE = 2;
 	
 	/**
 	 * Right plane of the frustum.
-	 * @private
+	 * @public
 	 * @static
 	 */
 	static VF_RIGHT_PLANE = 3;
 	
 	/**
 	 * Bottom plane of the frustum.
-	 * @private
+	 * @public
 	 * @static
 	 */
 	static VF_BOTTOM_PLANE = 4;
 	
 	/**
 	 * Top plane of the frustum.
-	 * @private
+	 * @public
 	 * @static
 	 */
 	static VF_TOP_PLANE = 5;
 	
 	/**
 	 * Amount of planes enclosing the view frustum. Should be 6.
-	 * @private
+	 * @public
 	 * @static
 	 */
 	static VF_PLANE_COUNT = 6;
@@ -4652,7 +4660,7 @@ class ViewFrustrum {
 			this.planes.push(new Plane3d());
 	}
 	/**
-	 * @private
+	 * @public
 	 */
 	setFrom(mat) {
 		// left clipping plane
@@ -4709,7 +4717,7 @@ class ViewFrustrum {
 		}
 	}
 	/**
-	 * @private
+	 * @public
 	 */
 	getFarLeftUp() {
 		var p = new Vect3d();
@@ -4720,7 +4728,7 @@ class ViewFrustrum {
 		return p;
 	}
 	/**
-	 * @private
+	 * @public
 	 */
 	getFarRightUp() {
 		var p = new Vect3d();
@@ -4731,7 +4739,7 @@ class ViewFrustrum {
 		return p;
 	}
 	/**
-	 * @private
+	 * @public
 	 */
 	getFarRightDown() {
 		var p = new Vect3d();
@@ -4742,7 +4750,7 @@ class ViewFrustrum {
 		return p;
 	}
 	/**
-	 * @private
+	 * @public
 	 */
 	getFarLeftDown() {
 		var p = new Vect3d();
@@ -4753,7 +4761,7 @@ class ViewFrustrum {
 		return p;
 	}
 	/**
-	 * @private
+	 * @public
 	 */
 	getBoundingBox(campos) {
 		var b = new Box3d();
@@ -4767,7 +4775,7 @@ class ViewFrustrum {
 		return b;
 	}
 	/**
-	 * @private
+	 * @public
 	 */
 	isBoxInside(box) {
 		var edges = box.getEdges();
@@ -4809,6 +4817,7 @@ class ViewFrustrum {
  */
 class TriangleSelector {
 	constructor() {
+		this.Node = null;
 	}
 
 	/**
@@ -4841,7 +4850,7 @@ class TriangleSelector {
 	 * @param {Boolean} bIgnoreBackFaces if set to true, this will ignore back faced polygons, making the query twice as fast
 	 * @param {CL3D.Triangle3d} outTriangle if set to a triangle, this will contain the 3d triangle with which the line collided
 	 * @param {Boolean} ignoreInvisibleItems set to true to ignore invisible scene nodes for collision test
-	 * @returns {CL3D.Vect3d}  a 3d position as {@link CL3D.Vect3d} if a collision was found or null if no collision was found
+	 * @returns {CL3D.Vect3d}  a 3d position as {@link Vect3d} if a collision was found or null if no collision was found
 	 */
 	getCollisionPointWithLine(start, end, bIgnoreBackFaces, outTriangle, ignoreInvisibleItems) {
 		if (!start || !end)
@@ -4950,18 +4959,18 @@ class TriangleSelector {
 
 /**
  * Implementation of TriangleSelector for meshes, useful for collision detection.<br/>
- * Note use {@link CL3D.OctTreeTriangleSelector} instead of this one if your mesh is huge, otherwise collision detection might be slow.
- * Every {@link CL3D.SceneNode} may have a triangle selector, available with SceneNode::Selector. This is used for doing collision detection: 
+ * Note use {@link OctTreeTriangleSelector} instead of this one if your mesh is huge, otherwise collision detection might be slow.
+ * Every {@link SceneNode} may have a triangle selector, available with SceneNode::Selector. This is used for doing collision detection: 
  * For example if you know that a collision may have happened in the area between (1,1,1) and (10,10,10), you can get all triangles of the scene
  * node in this area with the TriangleSelector easily and check every triangle if it collided.<br/>
  * @class Interface to return triangles with specific properties, useful for collision detection.
  * @public
  * @constructor
  * @extends CL3D.TriangleSelector
- * @param {CL3D.Mesh} Mesh the {@link CL3D.Mesh} representing the geometry
+ * @param {CL3D.Mesh} Mesh the {@link Mesh} representing the geometry
  * @param {Number} materialToIgnore (optional) material type to ignore for collision. Can be set to null.
  * @param {Number} materialToIgnore2 (optional) material type to ignore for collision. Can be set to null.
- * @param {CL3D.SceneNode} scenenode the {@link CL3D.SceneNode} representing the position of the geometry
+ * @param {CL3D.SceneNode} scenenode the {@link SceneNode} representing the position of the geometry
  */
 class MeshTriangleSelector extends TriangleSelector {
 	constructor(mesh, scenenode, materialToIgnore, materialToIgnore2) {
@@ -5088,14 +5097,14 @@ class MeshTriangleSelector extends TriangleSelector {
 
 /**
  * Implementation of TriangleSelector based on a simple, static bounding box, useful for collision detection.<br/>
- * Every {@link CL3D.SceneNode} may have a triangle selector, available with SceneNode::Selector. This is used for doing collision detection: 
+ * Every {@link SceneNode} may have a triangle selector, available with SceneNode::Selector. This is used for doing collision detection: 
  * For example if you know that a collision may have happened in the area between (1,1,1) and (10,10,10), you can get all triangles of the scene
  * node in this area with the TriangleSelector easily and check every triangle if it collided.<br/>
  * @class Interface to return triangles with specific properties, useful for collision detection.
  * @public
  * @constructor
  * @extends CL3D.MeshTriangleSelector
- * @param Box {@link CL3D.Box3d} representing the simpliefied collision object of the node
+ * @param Box {@link Box3d} representing the simpliefied collision object of the node
  */
 class BoundingBoxTriangleSelector extends MeshTriangleSelector {
 	constructor(box, scenenode) {
@@ -5152,7 +5161,7 @@ class BoundingBoxTriangleSelector extends MeshTriangleSelector {
  * Interface for making multiple triangle selectors work as one big selector. 
  * This is nothing more than a collection of one or more triangle selectors providing together the interface of one triangle selector.
  * In this way, collision tests can be done with different triangle soups in one pass.
- * See {@link CL3D.MeshTriangleSelector} for an implementation of a triangle selector for meshes.<br/>
+ * See {@link MeshTriangleSelector} for an implementation of a triangle selector for meshes.<br/>
  * @class Interface for making multiple triangle selectors work as one big selector. 
  * @public
  * @extends CL3D.TriangleSelector
@@ -5210,7 +5219,7 @@ class MetaTriangleSelector extends TriangleSelector{
 	/**
 	 * Adds a triangle selector to the collection of triangle selectors.
 	 * @public
-	 * @param {CL3D.TriangleSelector} t a {@link CL3D.TriangleSelector} to add
+	 * @param {CL3D.TriangleSelector} t a {@link TriangleSelector} to add
 	 */
 	addSelector(t) {
 		this.Selectors.push(t);
@@ -5219,7 +5228,7 @@ class MetaTriangleSelector extends TriangleSelector{
 	/**
 	 * Removes a triangle selector from the collection of triangle selectors.
 	 * @public
-	 * @param {CL3D.TriangleSelector} t a {@link CL3D.TriangleSelector} to remove
+	 * @param {CL3D.TriangleSelector} t a {@link TriangleSelector} to remove
 	 */
 	removeSelector(t) {
 		for (var i = 0; i < this.Selectors.length;) {
@@ -5251,7 +5260,7 @@ class MetaTriangleSelector extends TriangleSelector{
 	 * @param {Boolean} bIgnoreBackFaces if set to true, this will ignore back faced polygons, making the query twice as fast
 	 * @param {CL3D.Triangle3d} outTriangle if set to a triangle, this will contain the 3d triangle with which the line collided
 	 * @param {Boolean} ignoreInvisibleItems set to true to ignore invisible scene nodes for collision test
-	 * @returns {CL3D.Vect3d} a 3d position as {@link CL3D.Vect3d} if a collision was found or null if no collision was found
+	 * @returns {CL3D.Vect3d} a 3d position as {@link Vect3d} if a collision was found or null if no collision was found
 	 */
 	getCollisionPointWithLine(start, end, bIgnoreBackFaces, outTriangle, ignoreInvisibleItems) {
 		// we would not need to re-implement this function here, because it would also work from the base class, since it calls getAllTriangles().
@@ -5293,7 +5302,7 @@ class MetaTriangleSelector extends TriangleSelector{
 // ------------------------------------------------------------------------------------------------------
 
 /**
- * @private
+ * @public
  */
 class SOctTreeNode {
 	constructor() {
@@ -5305,15 +5314,15 @@ class SOctTreeNode {
 /**
  * Implementation of TriangleSelector for huge meshes, useful for collision detection.
  * The internal structure of this mesh is an occtree, speeding up queries using an axis aligne box ({@link getTrianglesInBox}).
- * Every {@link CL3D.SceneNode} may have a triangle selector, available with SceneNode::Selector. This is used for doing collision detection: 
+ * Every {@link SceneNode} may have a triangle selector, available with SceneNode::Selector. This is used for doing collision detection: 
  * For example if you know that a collision may have happened in the area between (1,1,1) and (10,10,10), you can get all triangles of the scene
  * node in this area with the TriangleSelector easily and check every triangle if it collided.<br/>
  * @class OctTree implementation of a triangle selector, useful for collision detection.
  * @public
  * @constructor
  * @extends CL3D.TriangleSelector
- * @param {CL3D.Mesh} Mesh the {@link CL3D.Mesh} representing the geometry
- * @param {CL3D.SceneNode} scenenode the {@link CL3D.SceneNode} representing the position of the geometry
+ * @param {CL3D.Mesh} Mesh the {@link Mesh} representing the geometry
+ * @param {CL3D.SceneNode} scenenode the {@link SceneNode} representing the position of the geometry
  * @param {Number} minimalPolysPerNode (optional) minmal polygons per oct tree node. Default is 64.
  * @param materialToIgnore {Number} (optional) material type to ignore for collision. Can be set to null.
  * @param materialToIgnore2 {Number} (optional) material type to ignore for collision. Can be set to null.
@@ -5370,7 +5379,7 @@ class OctTreeTriangleSelector extends TriangleSelector {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	constructTree(node) {
 		++this.DebugNodeCount;
@@ -5470,7 +5479,7 @@ class OctTreeTriangleSelector extends TriangleSelector {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	getTrianglesFromOctTree(node, outArray, box, transform) {
 		if (!node.Box.intersectsWithBox(box))
@@ -5526,7 +5535,7 @@ class OctTreeTriangleSelector extends TriangleSelector {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	createOcTreeNodeClone(toclone) {
 		var clone = new SOctTreeNode();
@@ -5633,6 +5642,13 @@ else {
     };
 }
 
+/**
+ * @param {Number} width 
+ * @param {Number} height 
+ * @param {WebGLContextAttributes} options 
+ * @param {HTMLCanvasElement} canvas 
+ * @returns {WebGLRenderingContext|WebGL2RenderingContext|import('3d-core-raub').TCore3D}
+ */
 const createContext = (width, height, options, canvas) => {
     return createContextImpl(width, height, options, canvas);
 };
@@ -5652,6 +5668,11 @@ else {
     };
 }
 
+/**
+ * @param {Number=} width 
+ * @param {Number=} height 
+ * @returns {HTMLCanvasElement}
+ */
 const createCanvas = (width, height) => {
     return createCanvasImpl(width, height);
 };
@@ -6848,8 +6869,13 @@ class Renderer {
 	 */
 	constructor(textureManager) {
 		this.TheTextureManager = textureManager;
-
+		/**
+		 * @type {HTMLCanvasElement}
+		 */
 		this.canvas = null;
+		/**
+		 * @type {WebGLRenderingContext|WebGL2RenderingContext}
+		 */
 		this.gl = null;
 		this.width = 0;
 		this.height = 0;
@@ -6923,7 +6949,7 @@ class Renderer {
 		return this.width;
 	}
 	/**
-	 * @private
+	 * @public
 	 */
 	getAndResetTextureWasLoadedFlag() {
 		let b = this.textureWasLoadedFlag;
@@ -6945,7 +6971,7 @@ class Renderer {
 		return this.height;
 	}
 	/**
-	 * @private
+	 * @public
 	 */
 	registerFrame() {
 		// TODO: fps counter here
@@ -7140,7 +7166,7 @@ class Renderer {
 	}
 	/**
 	 * Creates a mesh buffer native render array
-	 * @private
+	 * @public
 	 */
 	updateRendererNativeArray(buf) {
 		if (buf.Vertices.length == 0 || buf.Indices.length == 0)
@@ -7182,7 +7208,7 @@ class Renderer {
 			// this is used for particle systems. The indices only update when size of the array changes
 			if (buf.RendererNativeArray.indexCount < buf.Indices.length) {
 				let indexCount = buf.Indices.length;
-				let indexArray = new WebGLUnsignedShortArray(indexCount);
+				let indexArray = new Uint16Array(indexCount);
 
 				for (let j = 0; j < indexCount; j += 3) {
 					indexArray[j + 0] = buf.Indices[j + 0];
@@ -7203,7 +7229,7 @@ class Renderer {
 	}
 	/**
 	 * Creates a mesh buffer native render array
-	 * @private
+	 * @public
 	 */
 	updatePositionsInRendererNativeArray(buf) {
 		if (buf.RendererNativeArray != null) {
@@ -7226,7 +7252,7 @@ class Renderer {
 	}
 	/**
 	 * Creates a mesh buffer native render array
-	 * @private
+	 * @public
 	 */
 	createRendererNativeArray(buf) {
 		if (buf.RendererNativeArray == null) {
@@ -7234,18 +7260,18 @@ class Renderer {
 			let obj = new Object();
 			let len = buf.Vertices.length;
 
-			let positionsArray = new WebGLFloatArray(len * 3);
-			let normalsArray = new WebGLFloatArray(len * 3);
-			let tcoordsArray = new WebGLFloatArray(len * 2);
-			let tcoordsArray2 = new WebGLFloatArray(len * 2);
-			let colorArray = new WebGLFloatArray(len * 4);
+			let positionsArray = new Float32Array(len * 3);
+			let normalsArray = new Float32Array(len * 3);
+			let tcoordsArray = new Float32Array(len * 2);
+			let tcoordsArray2 = new Float32Array(len * 2);
+			let colorArray = new Float32Array(len * 4);
 
 			let tangentsArray = null;
 			let binormalsArray = null;
 			if (buf.Tangents)
-				tangentsArray = new WebGLFloatArray(len * 3);
+				tangentsArray = new Float32Array(len * 3);
 			if (buf.Binormals)
-				binormalsArray = new WebGLFloatArray(len * 3);
+				binormalsArray = new Float32Array(len * 3);
 
 			for (let i = 0; i < len; ++i) {
 				let v = buf.Vertices[i];
@@ -7287,7 +7313,7 @@ class Renderer {
 			}
 
 			let indexCount = buf.Indices.length;
-			let indexArray = new WebGLUnsignedShortArray(indexCount);
+			let indexArray = new Uint16Array(indexCount);
 
 			for (let j = 0; j < indexCount; j += 3) {
 				indexArray[j + 0] = buf.Indices[j + 0];
@@ -7349,7 +7375,7 @@ class Renderer {
 		}
 	}
 	/**
-	 * @private
+	 * @public
 	 */
 	drawWebGlStaticGeometry(b, indexCountToUse) {
 		//console.log("drawElementsBegin with " + b.indexCount + " indices " + b.positionBuffer + " " + b.texcoordsBuffer + " " + b.normalBuffer);
@@ -7476,7 +7502,7 @@ class Renderer {
 		}
 	}
 	/**
-	 * @private
+	 * @public
 	 */
 	setShadowMapDataIntoConstants(program) {
 		let gl = this.gl;
@@ -7540,16 +7566,16 @@ class Renderer {
 		}
 	}
 	/**
-	 * @private
+	 * @public
 	 */
 	setDynamicLightsIntoConstants(program, useWorldSpacePositionsForLights, useOldNormalMappingAttenuationCalculation) {
 		// we use two contants per light, where we pack Position, Color and Attenuation into, like this:
 		// (px, py, pz, att) and (cr, cg, cb, 1)
 		let buf1 = new ArrayBuffer(4 * 4 * Float32Array.BYTES_PER_ELEMENT);
-		let positionArray = new WebGLFloatArray(buf1);
+		let positionArray = new Float32Array(buf1);
 
 		let buf2 = new ArrayBuffer(5 * 4 * Float32Array.BYTES_PER_ELEMENT);
-		let colorArray = new WebGLFloatArray(buf2);
+		let colorArray = new Float32Array(buf2);
 
 		// calculate matrix to transform light position into object space (unless useWorldSpacePositionsForLights is true)
 		let mat = new Matrix4(true);
@@ -7627,7 +7653,7 @@ class Renderer {
 			mat.rotateVect(dir);
 			dir.normalize();
 
-			this.gl.uniform3f(program.locDirectionalLight, dir.X, dir.Y, dir.Z, 1.0);
+			this.gl.uniform3f(program.locDirectionalLight, dir.X, dir.Y, dir.Z);
 
 			if (dirlight)
 				this.gl.uniform4f(program.locDirectionalLightColor, dirlight.Color.R, dirlight.Color.G, dirlight.Color.B, 1.0);
@@ -7637,7 +7663,7 @@ class Renderer {
 		}
 	}
 	/**
-	 * @private
+	 * @public
 	 * Draws a 3d line with the current material
 	 */
 	draw3DLine(vect3dFrom, vect3dTo) {
@@ -7681,7 +7707,7 @@ class Renderer {
 		height *= yFact;
 
 		// positions
-		let positionsArray = new WebGLFloatArray(4 * 3);
+		let positionsArray = new Float32Array(4 * 3);
 
 		positionsArray[0] = x;
 		positionsArray[1] = y;
@@ -7701,7 +7727,7 @@ class Renderer {
 
 		// indices
 		let indexCount = 6;
-		let indexArray = new WebGLUnsignedShortArray(indexCount);
+		let indexArray = new Uint16Array(indexCount);
 		indexArray[0] = 0;
 		indexArray[1] = 2;
 		indexArray[2] = 1;
@@ -7794,7 +7820,7 @@ class Renderer {
 		height *= yFact;
 
 		// positions
-		let positionsArray = new WebGLFloatArray(4 * 3);
+		let positionsArray = new Float32Array(4 * 3);
 
 		positionsArray[0] = x;
 		positionsArray[1] = y;
@@ -7813,7 +7839,7 @@ class Renderer {
 		positionsArray[11] = 0;
 
 		// texture coordinates
-		let tcoordsArray = new WebGLFloatArray(4 * 2);
+		let tcoordsArray = new Float32Array(4 * 2);
 
 		tcoordsArray[0] = 0;
 		tcoordsArray[1] = 0;
@@ -7829,7 +7855,7 @@ class Renderer {
 
 		// indices
 		let indexCount = 6;
-		let indexArray = new WebGLUnsignedShortArray(indexCount);
+		let indexArray = new Uint16Array(indexCount);
 		indexArray[0] = 0;
 		indexArray[1] = 2;
 		indexArray[2] = 1;
@@ -7915,7 +7941,7 @@ class Renderer {
 		}
 	}
 	/**
-	 * @private
+	 * @public
 	 * internal drawing function for drawing 2d overlay fonts
 	 */
 	draw2DFontImage(x, y, width, height, tex, color) {
@@ -7946,7 +7972,7 @@ class Renderer {
 	 * Starts the drawing process by clearing the whole scene. Is called by {@link CopperLicht.draw3dScene}(),
 	 * so it shouldn't be necessary to call this yourself.
 	 * @public
-	 * @param clearColor {Number} Color for the background. See {@link CL3D.createColor}.
+	 * @param clearColor {Number} Color for the background. See {@link createColor}.
 	 */
 	beginScene(clearColor) {
 		if (this.gl == null)
@@ -7987,11 +8013,7 @@ class Renderer {
 		if (this.gl == null)
 			return;
 
-		let gl = this.gl;
-
-		//gl.flush();
-		if (gl.swap)
-			gl.swap();
+		this.gl;
 
 		//console.log("drawEnd");
 	}
@@ -8022,7 +8044,7 @@ class Renderer {
 		this.DirectionalLight = l;
 	}
 	/**
-	 * @private
+	 * @public
 	 */
 	ensuresizeok(width, height) {
 		if (this.gl == null)
@@ -8049,7 +8071,7 @@ class Renderer {
 		//console.log("adjusted size: " + this.width + " " + this.height);
 	}
 	/**
-	 * @private
+	 * @public
 	 */
 	init(width, height, options, canvas) {
 		this.width = width;
@@ -8088,73 +8110,12 @@ class Renderer {
 		return true;
 	}
 	/**
-	 * @private
+	 * @public
 	 */
 	removeCompatibilityProblems() {
-		// WebKit and Chrome:
-		// 20. Aug 2010: WebGLFloatArray has been renamed to Float32Array and
-		// WebGLUnsignedShortArray to Uint16Array
-		if (typeof WebGLFloatArray == 'undefined' &&
-			typeof Float32Array != 'undefined') {
-			try {
-				globalThis.WebGLFloatArray = Float32Array;
-				globalThis.WebGLUnsignedShortArray = Uint16Array;
-			}
-			catch (e) {
-				console.log("Error: Float32 array types for webgl not found.");
-			}
-		}
-
-		/*
-		if ( typeof WebGLIntArray == 'undefined' &&
-			 typeof Int32Array != 'undefined' )
-		{
-			try
-			{
-				WebGLIntArray = Int32Array;
-			}
-			catch (e)
-			{
-				console.log("Error: Int32 array types for webgl not found.");
-			}
-		}
-		*/
-		// Firefox:
-		// The WebGL*Array where named Canvas*Array in the past.
-		// However, this will only affect old nightly builds. The current nightly does already
-		// support the new names. (13 Dec 2009).
-		if (typeof WebGLFloatArray == 'undefined' &&
-			typeof CanvasFloatArray != 'undefined') {
-			try {
-				WebGLFloatArray = CanvasFloatArray;
-				WebGLUnsignedShortArray = CanvasUnsignedShortArray;
-
-				// others, not used by copperlicht
-				//WebGLArrayBuffer = CanvasArrayBuffer;
-				//WebGLByteArray = CanvasByteArray;
-				//WebGLUnsignedByteArray = CanvasUnsignedByteArray;
-				//WebGLShortArray = CanvasShortArray;
-				//WebGLIntArray = CanvasIntArray;
-				//WebGLUnsignedIntArray = CanvasUnsignedIntArray;
-			}
-			catch (e) {
-				console.log("Error: canvas array types for webgl not found.");
-			}
-		}
-
-		let gl = this.gl;
-
-		// Google Chrome compatibility code
-		// Since a JavaScript function may have multiple return types, functions
-		// 'getProgrami' and 'getShaderi' where renamed. However, Chrome does still
-		// use the old names.  (30 Nov 2009)
-		if (!gl['getProgramParameter'])
-			gl['getProgramParameter'] = gl['getProgrami'];
-		if (!gl['getShaderParameter'])
-			gl['getShaderParameter'] = gl['getShaderi'];
 	}
 	/**
-	 * @private
+	 * @public
 	 */
 	loadShader(shaderType, shaderSource) {
 		let gl = this.gl;
@@ -8177,7 +8138,7 @@ class Renderer {
 		return shader;
 	}
 	/**
-	 * @private
+	 * @public
 	 */
 	createShaderProgram(vertexShaderSource, fragmentShaderSource, useBinormalsAndTangents) {
 		// create shader
@@ -8331,7 +8292,7 @@ class Renderer {
 	 * Returns the webgl shader program from a material type. This is useful when you are using {@link createMaterialType} to create your
 	 * own shaders and need to set material constants using for example uniform1i.
 	 * @public
-	 * @param mattype {int} The material type, like for example {@link Material.EMT_SOLID}, or your own material type returned by {@link createMaterialType}.
+	 * @param {Number} mattype The material type, like for example {@link Material.EMT_SOLID}, or your own material type returned by {@link createMaterialType}.
 	 * @returns {program} Returns the WebGL shader program or null if not found.
 	 */
 	getGLProgramFromMaterialType(mattype) {
@@ -8344,7 +8305,7 @@ class Renderer {
 		return program;
 	}
 	/**
-	 * @private
+	 * @public
 	 */
 	createMaterialTypeInternal(vsshader, fsshader, blendenabled, blendsfactor, blenddfactor, useBinormalsAndTangents) {
 		if (useBinormalsAndTangents == null)
@@ -8389,7 +8350,7 @@ class Renderer {
 		return program;
 	}
 	/**
-	 * @private
+	 * @public
 	 */
 	initWebGL() {
 		let gl = this.gl;
@@ -8644,13 +8605,13 @@ class Renderer {
 			m.copyTo(this.World);
 	}
 	/**
-	 * @private
+	 * @public
 	 */
 	getMatrixAsWebGLFloatArray(mat) {
-		return new WebGLFloatArray(mat.asArray());
+		return new Float32Array(mat.asArray());
 	}
 	/**
-	 * @private
+	 * @public
 	 */
 	findTexture(name) {
 		return this.TheTextureManager.getTextureFromName(name);
@@ -8746,6 +8707,7 @@ class Renderer {
 
 		else if (createFloatingPointTexture) {
 			if (this.UsesWebGL2)
+				// @ts-ignore
 				gl.texStorage2D(gl.TEXTURE_2D, 1, gl.RGBA32F, sx, sy);
 
 			else
@@ -8815,7 +8777,7 @@ class Renderer {
 	/**
 	 * Sets the current render target
 	 * @public
-	 * @param {@link Texture} texture Texture or null, which will become the new render target
+	 * @param {CL3D.Texture?} texture Texture or null, which will become the new render target
 	 * @param clearBackBuffer To clear the buffer or not
 	 * @param clearZBuffer To clear the zbuffer or not
 	 * @param bgcolor Background color to set if clearBackBuffer is true
@@ -8891,7 +8853,7 @@ class Renderer {
 	 * Replaces the content of a placeholder texture with the content of a new texture.
 	 * The new texture shouldn't be used anymore after this.
 	 * Useful for creating placeholder textures for videos, for example.
-	 * @private
+	 * @public
 	 */
 	replacePlaceholderTextureWithNewTextureContent(placeholderTexture, newtexture) {
 		placeholderTexture.Texture = newtexture.Texture;
@@ -8901,9 +8863,9 @@ class Renderer {
 		placeholderTexture.OriginalHeight = newtexture.OriginalHeight;
 	}
 	/**
-	 * Fills an existing {@link CL3D.Texture} with the content of a from a 2d canvas
+	 * Fills an existing {@link Texture} with the content of a from a 2d canvas
 	 * @public
-	 * @param {Canvas} canvas a 2d canvas to be converted into a texture
+	 * @param {HTMLCanvasElement} canvas a 2d canvas to be converted into a texture
 	 * @param {boolean} nonscaling optional parameter, if set to true, and the texture don't have a power-of-two size, the texture will not be scaled up, but copied without scaling.
 	 *        This is useful for font or 2D textures, for example, to make them less blurry.
 	 */
@@ -8954,9 +8916,9 @@ class Renderer {
 		gl.bindTexture(gl.TEXTURE_2D, null);
 	}
 	/**
-	 * Creates a {@link CL3D.Texture} from a 2d canvas
+	 * Creates a {@link Texture} from a 2d canvas
 	 * @public
-	 * @param {Canvas} canvas a 2d canvas to be converted into a texture
+	 * @param {HTMLCanvasElement} canvas a 2d canvas to be converted into a texture
 	 * @param {boolean} nonscaling optional parameter, if set to true, and the texture don't have a power-of-two size, the texture will not be scaled up, but copied without scaling.
 	 *        This is useful for font or 2D textures, for example, to make them less blurry.
 	 */
@@ -8969,10 +8931,12 @@ class Renderer {
 		let origwidth = canvas.width;
 		let origheight = canvas.height;
 
-		if (canvas.videoWidth)
-			origwidth = canvas.videoWidth;
-		if (canvas.videoHeight)
-			origheight = canvas.videoHeight;
+		if (globalThis.HTMLVideoElement && canvas instanceof HTMLVideoElement) {
+			if (canvas.videoWidth)
+				origwidth = canvas.videoWidth;
+			if (canvas.videoHeight)
+				origheight = canvas.videoHeight;
+		}
 
 		let scaledUpWidth = origwidth;
 		let scaledUpHeight = origheight;
@@ -9021,13 +8985,15 @@ class Renderer {
 		return t;
 	}
 	/**
-	 * Creates a {@link CL3D.Texture} from pixels
+	 * Creates a {@link Texture} from pixels
 	 * @public
 	 * @param {ArrayBufferView} pixels source data for the texture
 	 * @param {Number} width the width of the texture
 	 * @param {Number} height the height of the texture
 	 */
 	createTextureFromPixels(pixels, width, height) {
+		let gl = this.gl;
+
 		let texture = gl.createTexture();
 		gl.bindTexture(gl.TEXTURE_2D, texture);
 
@@ -9052,13 +9018,13 @@ class Renderer {
 		return t;
 	}
 	/**
-	 * @private
+	 * @public
 	 */
 	isPowerOfTwo(x) {
 		return (x & (x - 1)) == 0;
 	}
 	/**
-	 * @private
+	 * @public
 	 */
 	nextHighestPowerOfTwo(x) {
 		--x;
@@ -9068,7 +9034,7 @@ class Renderer {
 		return x + 1;
 	}
 	/**
-	 * @private
+	 * @public
 	 * domobj is an image or a canvas element
 	 */
 	fillTextureFromDOMObject(wgltex, domobj) {
@@ -9095,21 +9061,12 @@ class Renderer {
 				this.domainTextureLoadErrorPrinted = true;
 				return;
 			}
-
 			//console.log(browserVersion + "Could not texImage2D texture: " + e);
-			try {
-				// old version
-				gl.texImage2D(gl.TEXTURE_2D, 0, domobj);
-			}
-			catch (e2) {
-				// something is pretty wrong here
-				//console.log("Could not texImage2D texture (2nd try):" + e2);
-			}
 		}
 
 	}
 	/**
-	 * @private
+	 * @public
 	 */
 	finalizeLoadedImageTexture(t) {
 		let gl = this.gl;
@@ -9156,7 +9113,7 @@ class Renderer {
 		t.Texture = texture;
 	}
 	/**
-	 * @private
+	 * @public
 	 */
 	getStaticBillboardMeshBuffer() {
 		if (this.StaticBillboardMeshBuffer == null)
@@ -9165,7 +9122,7 @@ class Renderer {
 		return this.StaticBillboardMeshBuffer;
 	}
 	/**
-	 * @private
+	 * @public
 	 */
 	createStaticBillboardMeshBuffer() {
 		if (this.StaticBillboardMeshBuffer != null)
@@ -9255,17 +9212,19 @@ class Renderer {
 
 /**
  * @constructor
- * @private
+ * @public
  */
 class Action
 {
     constructor()
     {
-
+        this.Type = '';
     }
     
     /**
-     * @private
+     * @public
+     * @param {CL3D.SceneNode} node 
+     * @param {CL3D.Scene=} mgr 
      */
     execute(node, mgr)
     {
@@ -9273,7 +9232,9 @@ class Action
     }
 
     /**
-     * @private
+     * @public
+     * @param {Number} oldNodeId 
+     * @param {Number} newNodeId 
      */
     createClone(oldNodeId, newNodeId)
     {
@@ -9288,27 +9249,35 @@ class Action
 
 /**
  * @constructor
- * @private
+ * @public
  * @class
  */
 class ActionHandler {
+    /**
+     * @param {CL3D.Scene} scene 
+     */
     constructor(scene) {
 
+        /**
+         * @type {CL3D.Action[]}
+         */
         this.Actions = new Array();
         this.SMGr = scene;
     }
 
     /**
-     * @private
+     * @public
+     * @param {CL3D.SceneNode} node 
      */
-    execute(node, mgr, isCache) {
+    execute(node) {
         for (var i = 0; i < this.Actions.length; ++i) {
-            this.Actions[i].execute(node, this.SMGr, isCache);
+            this.Actions[i].execute(node, this.SMGr);
         }
     }
 
     /**
-     * @private
+     * @public
+     * @param {CL3D.Action} a 
      */
     addAction(a) {
         if (a == null)
@@ -9318,7 +9287,8 @@ class ActionHandler {
     }
 
     /**
-     * @private
+     * @public
+     * @param {String} type 
      */
     findAction(type) {
         for (var i = 0; i < this.Actions.length; ++i) {
@@ -9329,8 +9299,11 @@ class ActionHandler {
 
         return null;
     }
+    
     /**
-     * @private
+     * @public
+     * @param {Number} oldNodeId 
+     * @param {Number} newNodeId 
      */
     createClone(oldNodeId, newNodeId) {
         var c = new ActionHandler(this.SMGr);
@@ -9351,11 +9324,24 @@ class ActionHandler {
 
 
 /**
- * @private
+ * @public
  * @constructor
  * @class
  */
 class ActionCloneSceneNode extends Action {
+    /**
+     * @type {Number}
+     */
+    SceneNodeToClone;
+    /**
+     * @type {boolean}
+     */
+    CloneCurrentSceneNode;
+    /**
+     * @type {CL3D.ActionHandler}
+     */
+    TheActionHandler;
+
     constructor() {
         super();
 
@@ -9363,7 +9349,8 @@ class ActionCloneSceneNode extends Action {
     }
 
     /**
-     * @private
+     * @param {Number} oldNodeId
+     * @param {Number} newNodeId
      */
     createClone(oldNodeId, newNodeId) {
         var a = new ActionCloneSceneNode();
@@ -9377,7 +9364,8 @@ class ActionCloneSceneNode extends Action {
     }
 
     /**
-     * @private
+     * @param {CL3D.SceneNode} currentNode
+     * @param {CL3D.Scene} sceneManager
      */
     execute(currentNode, sceneManager) {
         if (!currentNode || !sceneManager)
@@ -9435,20 +9423,34 @@ class ActionCloneSceneNode extends Action {
 
 
 /**
- * @private
+ * @public
  * @constructor
  * @class
  */
 class ActionDeleteSceneNode extends Action {
+    /**
+     * @type {Number}
+     */
+    SceneNodeToDelete;
+    /**
+     * @type {boolean}
+     */
+    DeleteCurrentSceneNode;
+    /**
+     * @type {Number}
+     */
+    TimeAfterDelete;
+    
     constructor() {
         super();
 
         this.Type = 'DeleteSceneNode';
     }
 
-    /**
-     * @private
-     */
+	/**
+	 * @param {Number} oldNodeId 
+	 * @param {Number} newNodeId 
+	 */
     createClone(oldNodeId, newNodeId) {
         var a = new ActionDeleteSceneNode();
         a.SceneNodeToDelete = this.SceneNodeToDelete;
@@ -9461,9 +9463,10 @@ class ActionDeleteSceneNode extends Action {
         return a;
     }
 
-    /**
-     * @private
-     */
+	/**
+	 * @param {CL3D.SceneNode} currentNode 
+	 * @param {CL3D.Scene} sceneManager 
+	 */
     execute(currentNode, sceneManager) {
         if (!currentNode || !sceneManager)
             return;
@@ -9486,11 +9489,28 @@ class ActionDeleteSceneNode extends Action {
 
 
 /**
- * @private
+ * @public
  * @constructor
  * @class
  */
 class ActionSetSceneNodeAnimation extends Action {
+	/**
+	 * @type {Number}
+	 */
+	SceneNodeToChangeAnim;
+	/**
+	 * @type {boolean}
+	 */
+	ChangeCurrentSceneNode;
+	/**
+	 * @type {boolean}
+	 */
+	Loop;
+	/**
+	 * @type {String}
+	 */
+	AnimName;
+
 	constructor() {
         super();
 
@@ -9498,7 +9518,8 @@ class ActionSetSceneNodeAnimation extends Action {
 	}
     
 	/**
-	 * @private
+	 * @param {Number} oldNodeId
+	 * @param {Number} newNodeId
 	 */
 	createClone(oldNodeId, newNodeId) {
 		var a = new ActionSetSceneNodeAnimation();
@@ -9514,7 +9535,8 @@ class ActionSetSceneNodeAnimation extends Action {
 	}
 
 	/**
-	 * @private
+	 * @param {CL3D.SceneNode} currentNode
+	 * @param {CL3D.Scene} sceneManager
 	 */
 	execute(currentNode, sceneManager) {
 		if (!currentNode || !sceneManager)
@@ -9530,10 +9552,9 @@ class ActionSetSceneNodeAnimation extends Action {
 		if (nodeToHandle) {
 			// set animation
 			var animatedMesh = nodeToHandle;
-			if (animatedMesh.getType() != 'animatedmesh')
-				return;
-
-			animatedMesh.setAnimationByEditorName(this.AnimName, this.Loop);
+			if (animatedMesh instanceof AnimatedMeshSceneNode && animatedMesh.getType() == 'animatedmesh') {
+				animatedMesh.setAnimationByEditorName(this.AnimName, this.Loop);
+			}
 		}
 	}
 }
@@ -9544,11 +9565,32 @@ class ActionSetSceneNodeAnimation extends Action {
 
 
 /**
- * @private
+ * @public
  * @constructor
  * @class
  */
 class ActionChangeSceneNodeTexture extends Action {
+	/**
+	 * @type {Number}
+	 */
+	TextureChangeType;
+	/**
+	 * @type {Number}
+	 */
+	SceneNodeToChange;
+	/**
+	 * @type {boolean}
+	 */
+	ChangeCurrentSceneNode;
+	/**
+	 * @type {CL3D.Texture}
+	 */
+	TheTexture;
+	/**
+	 * @type {Number}
+	 */
+	IndexToChange;
+	
 	constructor() {
         super();
 
@@ -9556,7 +9598,8 @@ class ActionChangeSceneNodeTexture extends Action {
 	}
 
 	/**
-	 * @private
+	 * @param {Number} oldNodeId 
+	 * @param {Number} newNodeId 
 	 */
 	createClone(oldNodeId, newNodeId) {
 		var a = new ActionChangeSceneNodeTexture();
@@ -9573,7 +9616,8 @@ class ActionChangeSceneNodeTexture extends Action {
 	}
     
 	/**
-	 * @private
+	 * @param {CL3D.SceneNode} currentNode 
+	 * @param {CL3D.Scene} sceneManager 
 	 */
 	execute(currentNode, sceneManager) {
 		if (!currentNode || !sceneManager)
@@ -9587,7 +9631,7 @@ class ActionChangeSceneNodeTexture extends Action {
 			nodeToHandle = sceneManager.getSceneNodeFromId(this.SceneNodeToChange);
 
 		if (nodeToHandle) {
-			if (nodeToHandle.getType() == '2doverlay') {
+			if (nodeToHandle instanceof Overlay2DSceneNode && nodeToHandle.getType() == '2doverlay') {
 				nodeToHandle.setShowImage(this.TheTexture);
 			}
 
@@ -9619,11 +9663,28 @@ class ActionChangeSceneNodeTexture extends Action {
 
 
 /**
- * @private
+ * @public
  * @constructor
  * @class
  */
 class ActionChangeSceneNodeScale extends Action {
+	/**
+	 * @type {Number}
+	 */
+	ScaleChangeType;
+	/**
+	 * @type {Number}
+	 */
+	SceneNodeToChangeScale;
+	/**
+	 * @type {boolean}
+	 */
+	ChangeCurrentSceneNode;
+	/**
+	 * @type {CL3D.Vect3d}
+	 */
+	Vector;
+	
 	constructor() {
         super();
 
@@ -9631,7 +9692,8 @@ class ActionChangeSceneNodeScale extends Action {
 	}
 
 	/**
-	 * @private
+	 * @param {Number} oldNodeId 
+	 * @param {Number} newNodeId 
 	 */
 	createClone(oldNodeId, newNodeId) {
 		var a = new ActionChangeSceneNodeScale();
@@ -9647,7 +9709,8 @@ class ActionChangeSceneNodeScale extends Action {
 	}
     
 	/**
-	 * @private
+	 * @param {CL3D.SceneNode} currentNode 
+	 * @param {CL3D.Scene} sceneManager 
 	 */
 	execute(currentNode, sceneManager) {
 		if (!currentNode || !sceneManager)
@@ -9679,11 +9742,37 @@ class ActionChangeSceneNodeScale extends Action {
 
 
 /**
- * @private
+ * @public
  * @constructor
  * @class
  */
 class ActionChangeSceneNodeRotation extends Action {
+	/**
+	 * @type {Number}
+	 */
+	RotationChangeType;
+	/**
+	 * @type {Number}
+	 */
+	SceneNodeToChangeRotation;
+	/**
+	 * @type {boolean}
+	 */
+	ChangeCurrentSceneNode;
+	/**
+	 * @type {CL3D.Vect3d}
+	 */
+	Vector;
+	/**
+	 * @type {boolean}
+	 */
+	RotateAnimated;
+	/**
+	 * @type {Number}
+	 */
+	TimeNeededForRotationMs;
+	
+
 	constructor() {
         super();
 
@@ -9691,7 +9780,8 @@ class ActionChangeSceneNodeRotation extends Action {
 	}
 
 	/**
-	 * @private
+	 * @param {Number} oldNodeId 
+	 * @param {Number} newNodeId 
 	 */
 	createClone(oldNodeId, newNodeId) {
 		var a = new ActionChangeSceneNodeRotation();
@@ -9708,7 +9798,8 @@ class ActionChangeSceneNodeRotation extends Action {
 	}
     
 	/**
-	 * @private
+	 * @param {CL3D.SceneNode} currentNode 
+	 * @param {CL3D.Scene} sceneManager 
 	 */
 	execute(currentNode, sceneManager) {
 		if (!currentNode || !sceneManager)
@@ -9757,21 +9848,52 @@ class ActionChangeSceneNodeRotation extends Action {
 
 
 /**
- * @private
+ * @public
  * @constructor
  * @class
  */
 class ActionChangeSceneNodePosition extends Action {
+	/**
+	 * @type {Number}
+	 */
+	PositionChangeType;
+	/**
+	 * @type {Number}
+	 */
+	SceneNodeToChangePosition;
+	/**
+	 * @type {boolean}
+	 */
+	ChangeCurrentSceneNode;
+	/**
+	 * @type {CL3D.Vect3d}
+	 */
+	Vector;
+	/**
+	 * @type {CL3D.Vect3d}
+	 */
+	Area3DEnd;
+	/**
+	 * @type {boolean}
+	 */
+	RelativeToCurrentSceneNode;
+	/**
+	 * @type {Number}
+	 */
+	SceneNodeRelativeTo;
+
+
 	constructor() {
-        super();
+		super();
 
 		this.UseAnimatedMovement = false;
-		this.TimeNeededForMovementMs = false;
+		this.TimeNeededForMovementMs = 0;
 		this.Type = 'ChangeSceneNodePosition';
 	}
 
 	/**
-	 * @private
+	 * @param {Number} oldNodeId 
+	 * @param {Number} newNodeId 
 	 */
 	createClone(oldNodeId, newNodeId) {
 		var a = new ActionChangeSceneNodePosition();
@@ -9792,9 +9914,10 @@ class ActionChangeSceneNodePosition extends Action {
 
 		return a;
 	}
-    
+
 	/**
-	 * @private
+	 * @param {CL3D.SceneNode} currentNode 
+	 * @param {CL3D.Scene} sceneManager 
 	 */
 	execute(currentNode, sceneManager) {
 		if (!currentNode || !sceneManager)
@@ -9838,7 +9961,7 @@ class ActionChangeSceneNodePosition extends Action {
 						var moveVect = new Vect3d(1, 0, 0);
 						matr.rotateVect(moveVect);
 
-						if (nodeToHandle.getType() == 'camera')
+						if (nodeToHandle instanceof CameraSceneNode && nodeToHandle.getType() == 'camera')
 							moveVect = nodeToHandle.Target.substract(nodeToHandle.Pos);
 
 						moveVect.setLength(len);
@@ -9893,7 +10016,7 @@ class ActionChangeSceneNodePosition extends Action {
 
 
 /**
- * @private
+ * @public
  * @constructor
  * @class
  */
@@ -9908,7 +10031,8 @@ class ActionMakeSceneNodeInvisible extends Action {
 	}
 
 	/**
-	 * @private
+	 * @param {Number} oldNodeId 
+	 * @param {Number} newNodeId 
 	 */
 	createClone(oldNodeId, newNodeId) {
 		var a = new ActionMakeSceneNodeInvisible();
@@ -9923,7 +10047,8 @@ class ActionMakeSceneNodeInvisible extends Action {
 	}
     
 	/**
-	 * @private
+	 * @param {CL3D.SceneNode} currentNode 
+	 * @param {CL3D.Scene} sceneManager 
 	 */
 	execute(currentNode, sceneManager) {
 		if (!currentNode || !sceneManager)
@@ -9960,11 +10085,36 @@ class ActionMakeSceneNodeInvisible extends Action {
 
 
 /**
- * @private
+ * @public
  * @constructor
  * @class
  */
 class ActionIfVariable extends Action {
+	/**
+	 * @type {String}
+	 */
+	VariableName;
+	/**
+	 * @type {Number}
+	 */
+	ComparisonType;
+	/**
+	 * @type {Number}
+	 */
+	ValueType;
+	/**
+	 * @type {String}
+	 */
+	Value;
+	/**
+	 * @type {CL3D.ActionHandler}
+	 */
+	TheActionHandler;
+	/**
+	 * @type {CL3D.ActionHandler}
+	 */
+	TheElseActionHandler;
+
 	constructor() {
         super();
 
@@ -9978,7 +10128,8 @@ class ActionIfVariable extends Action {
 	}
 
 	/**
-	 * @private
+	 * @param {Number} oldNodeId 
+	 * @param {Number} newNodeId 
 	 */
 	createClone(oldNodeId, newNodeId) {
 		var a = new ActionIfVariable();
@@ -9992,7 +10143,8 @@ class ActionIfVariable extends Action {
 	}
 
 	/**
-	 * @private
+	 * @param {CL3D.SceneNode} currentNode 
+	 * @param {CL3D.Scene} sceneManager 
 	 */
 	execute(currentNode, sceneManager) {
 		if (!currentNode || !sceneManager)
@@ -10067,17 +10219,29 @@ class ActionIfVariable extends Action {
 
 
 /**
- * @private
+ * @public
  * @constructor
  * @class
  */
-class ActionStoreLoadVariable extends Action{
+class ActionStoreLoadVariable extends Action {
+    /**
+     * @type {boolean}
+     */
+    Load;
+    /**
+     * @type {String}
+     */
+    VariableName;
+
     constructor() {
+        super();
+
         this.Type = 'StoreLoadVariable';
     }
 
     /**
-     * @private
+     * @param {Number} oldNodeId
+     * @param {Number} newNodeId
      */
     createClone(oldNodeId, newNodeId) {
         var a = new ActionStoreLoadVariable();
@@ -10086,13 +10250,21 @@ class ActionStoreLoadVariable extends Action{
         return a;
     }
 
+    /**
+     * @param {String} cookieName
+     * @param {String} value
+     * @param {Number} expdays
+     */
     setCookie(cookieName, value, expdays) {
         var expdate = new Date();
         expdate.setDate(expdate.getDate() + expdays);
-        var cvalue = escape(value) + ("; expires=" + expdate.toUTCString());
+        var cvalue = encodeURIComponent(value) + ("; expires=" + expdate.toUTCString());
         document.cookie = cookieName + "=" + cvalue;
     }
 
+    /**
+     * @param {String} cookieName
+     */
     getCookie(cookieName) {
         var ARRcookies = document.cookie.split(";");
         for (var i = 0; i < ARRcookies.length; ++i) {
@@ -10110,7 +10282,8 @@ class ActionStoreLoadVariable extends Action{
     }
 
     /**
-     * @private
+     * @param {CL3D.SceneNode} currentNode
+     * @param {CL3D.Scene} sceneManager
      */
     execute(currentNode, sceneManager) {
         if (this.VariableName == null || this.VariableName == "")
@@ -10143,11 +10316,28 @@ class ActionStoreLoadVariable extends Action{
 
 
 /**
- * @private
+ * @public
  * @constructor
  * @class
  */
 class ActionSetOrChangeAVariable extends Action {
+	/**
+	 * @type {String}
+	 */
+	VariableName;
+	/**
+	 * @type {Number}
+	 */
+	Operation;
+	/**
+	 * @type {Number}
+	 */
+	ValueType;
+	/**
+	 * @type {String}
+	 */
+	Value;
+
 	constructor() {
         super();
 
@@ -10160,7 +10350,8 @@ class ActionSetOrChangeAVariable extends Action {
 	}
 
 	/**
-	 * @private
+	 * @param {Number} oldNodeId
+	 * @param {Number} newNodeId
 	 */
 	createClone(oldNodeId, newNodeId) {
 		var a = new ActionSetOrChangeAVariable();
@@ -10171,8 +10362,9 @@ class ActionSetOrChangeAVariable extends Action {
 		return a;
 	}
     
-	/**
-	 * @private
+	/** 
+	 * @param {CL3D.SceneNode} currentNode
+	 * @param {CL3D.Scene} sceneManager
 	 */
 	execute(currentNode, sceneManager) {
 		if (!currentNode || !sceneManager)
@@ -10239,11 +10431,47 @@ class ActionSetOrChangeAVariable extends Action {
 
 
 /**
- * @private
+ * @public
  * @constructor
  * @class
  */
 class ActionPlayMovie extends Action {
+    /**
+     * @type {boolean}
+     */
+    PlayLooped;
+    /**
+     * @type {Number}
+     */
+    Command;
+    /**
+     * @type {String}
+     */
+    VideoFileName;
+    /**
+     * @type {Number}
+     */
+    SceneNodeToPlayAt;
+    /**
+     * @type {boolean}
+     */
+    PlayAtCurrentSceneNode;
+    /**
+     * @type {Number}
+     */
+    MaterialIndex;
+    /**
+     * @type {CL3D.ActionHandler}
+     */
+    ActionHandlerFinished;
+    /**
+     * @type {CL3D.ActionHandler}
+     */
+    ActionHandlerFailed;
+
+    /**
+     * @param {CL3D.CopperLicht} [engine]
+     */
     constructor(engine) {
         super();
 
@@ -10251,9 +10479,10 @@ class ActionPlayMovie extends Action {
         this.Engine = engine;
     }
 
-    /**
-     * @private
-     */
+	/**
+	 * @param {Number} oldNodeId 
+	 * @param {Number} newNodeId 
+	 */
     createClone(oldNodeId, newNodeId) {
         var a = new ActionPlayMovie();
         a.PlayLooped = this.PlayLooped;
@@ -10271,9 +10500,10 @@ class ActionPlayMovie extends Action {
         return a;
     }
 
-    /**
-     * @private
-     */
+	/**
+	 * @param {CL3D.SceneNode} currentNode 
+	 * @param {CL3D.Scene} sceneManager 
+	 */
     execute(currentNode, sceneManager) {
         if (!currentNode || !sceneManager)
             return;
@@ -10296,7 +10526,7 @@ class ActionPlayMovie extends Action {
 
                         // set texture
                         if (nodeToHandle) {
-                            if (nodeToHandle.getType() == '2doverlay')
+                            if (nodeToHandle instanceof Overlay2DSceneNode && nodeToHandle.getType() == '2doverlay')
                                 nodeToHandle.setShowImage(stream.texture);
                             else {
                                 var mat = nodeToHandle.getMaterial(this.MaterialIndex);
@@ -10325,11 +10555,48 @@ class ActionPlayMovie extends Action {
 
 
 /**
- * @private
+ * @public
  * @constructor
  * @class
  */
 class ActionPlaySound extends Action {
+	/**
+	 * @type {Number}
+	 */
+	SceneNodeToPlayAt;
+	/**
+	 * @type {boolean}
+	 */
+	PlayAtCurrentSceneNode;
+	/**
+	 * @type {CL3D.Vect3d}
+	 */
+	Position3D;
+	/**
+	 * @type {Number}
+	 */
+	MinDistance;
+	/**
+	 * @type {Number}
+	 */
+	MaxDistance;
+	/**
+	 * @type {boolean}
+	 */
+	PlayLooped;
+	/**
+	 * @type {Number}
+	 */
+	Volume;
+	/**
+	 * @type {boolean}
+	 */
+	PlayAs2D;
+	/**
+	 * @type {null}
+	 */
+	TheSound;
+
 	constructor() {
 		super();
 
@@ -10337,7 +10604,8 @@ class ActionPlaySound extends Action {
 	}
 
 	/**
-	 * @private
+	 * @param {Number} oldNodeId
+	 * @param {Number} newNodeId
 	 */
 	createClone(oldNodeId, newNodeId) {
 		var a = new ActionPlaySound();
@@ -10358,7 +10626,8 @@ class ActionPlaySound extends Action {
 	}
 
 	/**
-	 * @private
+	 * @param {CL3D.SceneNode} currentNode
+	 * @param {CL3D.Scene} sceneManager
 	 */
 	execute(currentNode, sceneManager) {
 		if (sceneManager == null || this.TheSound == null)
@@ -10377,11 +10646,20 @@ class ActionPlaySound extends Action {
 
 
 /**
- * @private
+ * @public
  * @constructor
  * @class
  */
 class ActionStopSound extends Action {
+    /**
+     * @type {Number}
+     */
+    SoundChangeType;
+    /**
+     * @type {any}
+     */
+    SoundFileName;
+
     constructor() {
         super();
 
@@ -10389,7 +10667,8 @@ class ActionStopSound extends Action {
     }
     
     /**
-     * @private
+     * @param {Number} oldNodeId
+     * @param {Number} newNodeId
      */
     createClone(oldNodeId, newNodeId) {
         var a = new ActionStopSound();
@@ -10399,7 +10678,8 @@ class ActionStopSound extends Action {
     }
 
     /**
-     * @private
+     * @param {CL3D.SceneNode} currentNode
+     * @param {CL3D.Scene} sceneManager
      */
     execute(currentNode, sceneManager) {
         gSoundManager.stopAll();
@@ -10412,11 +10692,16 @@ class ActionStopSound extends Action {
 
 
 /**
- * @private
+ * @public
  * @constructor
  * @class
  */
 class ActionStopSpecificSound extends Action {
+    /**
+     * @type {{ Name: any; }}
+     */
+    TheSound;
+
     constructor() {
         super();
 
@@ -10424,7 +10709,8 @@ class ActionStopSpecificSound extends Action {
     }
 
     /**
-     * @private
+     * @param {Number} oldNodeId
+     * @param {Number} newNodeId
      */
     createClone(oldNodeId, newNodeId) {
         var a = new ActionStopSpecificSound();
@@ -10434,7 +10720,8 @@ class ActionStopSpecificSound extends Action {
     }
 
     /**
-     * @private
+     * @param {CL3D.SceneNode} currentNode
+     * @param {CL3D.Scene} sceneManager
      */
     execute(currentNode, sceneManager) {
         if (sceneManager == null || this.TheSound == null)
@@ -10450,7 +10737,7 @@ class ActionStopSpecificSound extends Action {
 
 
 /**
- * @private
+ * @public
  * @constructor
  * @class
  */
@@ -10458,26 +10745,32 @@ class ActionRestartBehaviors extends Action {
 	constructor() {
         super();
 
+		/**
+		 * @type {Number}
+		 */
 		this.SceneNodeToRestart = null;
 		this.ChangeCurrentSceneNode = false;
 		this.Type = 'RestartBehaviors';
 	}
 
 	/**
-	 * @private
+	 * @param {Number} oldNodeId
+	 * @param {Number} newNodeId
+	 * @param {boolean} bChangeCurrentSceneNode
 	 */
-	createClone(oldNodeId, newNodeId) {
+	createClone(oldNodeId, newNodeId, bChangeCurrentSceneNode = false) {
 		var a = new ActionRestartBehaviors();
 		a.SceneNodeToRestart = this.SceneNodeToRestart;
 		a.ChangeCurrentSceneNode = this.ChangeCurrentSceneNode;
 
-		if (a.ChangeCurrentSceneNode == oldNodeId)
-			a.ChangeCurrentSceneNode = newNodeId;
+		if (a.ChangeCurrentSceneNode != bChangeCurrentSceneNode)
+			a.ChangeCurrentSceneNode = bChangeCurrentSceneNode;
 		return a;
 	}
 
 	/**
-	 * @private
+	 * @param {CL3D.SceneNode} currentNode
+	 * @param {CL3D.Scene} sceneManager
 	 */
 	execute(currentNode, sceneManager) {
 		if (!currentNode || !sceneManager)
@@ -10501,11 +10794,19 @@ class ActionRestartBehaviors extends Action {
 }
 
 /**
- * @private
+ * @public
  * @constructor
  * @class
  */
 class ActionRestartScene extends Action {
+    /**
+     * @type {String}
+     */
+    SceneName;
+
+    /**
+     * @param {CL3D.CopperLicht} [engine]
+     */
     constructor(engine) {
         super();
 
@@ -10514,7 +10815,8 @@ class ActionRestartScene extends Action {
     }
 
     /**
-     * @private
+     * @param {Number} oldNodeId
+     * @param {Number} newNodeId
      */
     createClone(oldNodeId, newNodeId) {
         var a = new ActionRestartScene();
@@ -10523,7 +10825,8 @@ class ActionRestartScene extends Action {
     }
 
     /**
-     * @private
+     * @param {CL3D.SceneNode} currentNode
+     * @param {CL3D.Scene} sceneManager
      */
     execute(currentNode, sceneManager) {
         if (this.Engine)
@@ -10537,11 +10840,19 @@ class ActionRestartScene extends Action {
 
 
 /**
- * @private
+ * @public
  * @constructor
  * @class
  */
 class ActionSwitchToScene extends Action {
+	/**
+	 * @type {String}
+	 */
+	SceneName;
+
+	/**
+	 * @param {CL3D.CopperLicht} [engine]
+	 */
 	constructor(engine) {
         super();
 
@@ -10550,7 +10861,8 @@ class ActionSwitchToScene extends Action {
 	}
 
 	/**
-	 * @private
+	 * @param {Number} oldNodeId
+	 * @param {Number} newNodeId
 	 */
 	createClone(oldNodeId, newNodeId) {
 		var a = new ActionSwitchToScene();
@@ -10559,7 +10871,8 @@ class ActionSwitchToScene extends Action {
 	}
     
 	/**
-	 * @private
+	 * @param {CL3D.SceneNode} currentNode
+	 * @param {CL3D.Scene} sceneManager
 	 */
 	execute(currentNode, sceneManager) {
 		if (this.Engine)
@@ -10592,11 +10905,20 @@ const openWebpage = (url) => {
 
 
 /**
- * @private
+ * @public
  * @constructor
  * @class
  */
-class ActionOpenWebpage extends Action{
+class ActionOpenWebpage extends Action {
+	/**
+	 * @type {String}
+	 */
+	Webpage;
+	/**
+	 * @type {String}
+	 */
+	Target;
+	
 	constructor() {
         super();
 
@@ -10604,7 +10926,8 @@ class ActionOpenWebpage extends Action{
 	}
 
 	/**
-	 * @private
+	 * @param {Number} oldNodeId 
+	 * @param {Number} newNodeId 
 	 */
 	createClone(oldNodeId, newNodeId) {
 		var a = new ActionOpenWebpage();
@@ -10614,7 +10937,8 @@ class ActionOpenWebpage extends Action{
 	}
 
 	/**
-	 * @private
+	 * @param {CL3D.SceneNode} currentNode 
+	 * @param {CL3D.Scene} sceneManager 
 	 */
 	execute(currentNode, sceneManager) {
 		//console.log("opening" + this.Webpage + " with:" + this.Target);
@@ -10633,11 +10957,16 @@ class ActionOpenWebpage extends Action{
 let gCurrentJScriptNode = null;
 
 /**
- * @private
+ * @public
  * @constructor
  * @class
  */
 class ActionExecuteJavaScript extends Action {
+	/**
+	 * @type {String}
+	 */
+	JScript;
+
 	constructor() {
         super();
 
@@ -10645,7 +10974,8 @@ class ActionExecuteJavaScript extends Action {
 	}
 
 	/**
-	 * @private
+	 * @param {Number} oldNodeId 
+	 * @param {Number} newNodeId 
 	 */
 	createClone(oldNodeId, newNodeId) {
 		var a = new ActionExecuteJavaScript();
@@ -10654,7 +10984,8 @@ class ActionExecuteJavaScript extends Action {
 	}
 
 	/**
-	 * @private
+	 * @param {CL3D.SceneNode} currentNode 
+	 * @param {CL3D.Scene} sceneManager 
 	 */
 	execute(currentNode, sceneManager) {
 		gCurrentJScriptNode = currentNode;
@@ -10671,21 +11002,47 @@ class ActionExecuteJavaScript extends Action {
 
 
 /**
- * @private
+ * @public
  * @constructor
  * @class
  */
 class ActionSetCameraTarget extends Action {
+	/**
+	 * @type {Number}
+	 */
+	PositionChangeType;
+	/**
+	 * @type {Number}
+	 */
+	SceneNodeToChangePosition;
+	/**
+	 * @type {Number}
+	 */
+	SceneNodeRelativeTo;
+	/**
+	 * @type {boolean}
+	 */
+	ChangeCurrentSceneNode;
+	/**
+	 * @type {boolean}
+	 */
+	RelativeToCurrentSceneNode;
+	/**
+	 * @type {CL3D.Vect3d}
+	 */
+	Vector;
+
 	constructor() {
-        super();
+		super();
 
 		this.UseAnimatedMovement = false;
 		this.TimeNeededForMovementMs = 0;
 		this.Type = 'SetCameraTarget';
 	}
 
-	/**
-	 * @private
+	/** 
+	 * @param {Number} oldNodeId
+	 * @param {Number} newNodeId
 	 */
 	createClone(oldNodeId, newNodeId) {
 		var a = new ActionSetCameraTarget();
@@ -10699,9 +11056,10 @@ class ActionSetCameraTarget extends Action {
 		a.TimeNeededForMovementMs = this.TimeNeededForMovementMs;
 		return a;
 	}
-    
+
 	/**
-	 * @private
+	 * @param {CL3D.SceneNode} currentNode
+	 * @param {CL3D.Scene} sceneManager
 	 */
 	execute(currentNode, sceneManager) {
 		if (!currentNode || !sceneManager)
@@ -10715,54 +11073,53 @@ class ActionSetCameraTarget extends Action {
 			nodeToHandle = sceneManager.getSceneNodeFromId(this.SceneNodeToChangePosition);
 
 		var cam = nodeToHandle;
-		if (cam.getType() != 'camera')
-			return;
+		if (cam instanceof CameraSceneNode && cam.getType() == 'camera') {
+			var finalpos = cam.getTarget().clone();
 
-		var finalpos = cam.getTarget().clone();
+			switch (this.PositionChangeType) {
+				case 0: //EIT_ABSOLUTE_POSITION:
+					finalpos = this.Vector.clone();
+					break;
+				case 1: //EIT_RELATIVE_POSITION:
+					finalpos = nodeToHandle.Pos.add(this.Vector);
+					break;
+				case 2: //EIT_RELATIVE_TO_SCENE_NODE:
+					{
+						var nodeRelativeTo = null;
+						if (this.RelativeToCurrentSceneNode)
+							nodeRelativeTo = currentNode;
 
-		switch (this.PositionChangeType) {
-			case 0: //EIT_ABSOLUTE_POSITION:
-				finalpos = this.Vector.clone();
-				break;
-			case 1: //EIT_RELATIVE_POSITION:
-				finalpos = nodeToHandle.Pos.add(this.Vector);
-				break;
-			case 2: //EIT_RELATIVE_TO_SCENE_NODE:
-				{
-					var nodeRelativeTo = null;
-					if (this.RelativeToCurrentSceneNode)
-						nodeRelativeTo = currentNode;
+						else if (this.SceneNodeRelativeTo != -1)
+							nodeRelativeTo = sceneManager.getSceneNodeFromId(this.SceneNodeRelativeTo);
 
-					else if (this.SceneNodeRelativeTo != -1)
-						nodeRelativeTo = sceneManager.getSceneNodeFromId(this.SceneNodeRelativeTo);
-
-					if (nodeRelativeTo)
-						finalpos = nodeRelativeTo.Pos.add(this.Vector);
-				}
-				break;
-		}
-
-		if (finalpos != null) {
-			if (this.UseAnimatedMovement && this.TimeNeededForMovementMs > 0) {
-				// move animated to target
-				var anim = new AnimatorFlyStraight();
-				anim.Start = cam.getTarget().clone();
-				anim.End = finalpos;
-				anim.TimeForWay = this.TimeNeededForMovementMs;
-				anim.DeleteMeAfterEndReached = true;
-				anim.AnimateCameraTargetInsteadOfPosition = true;
-				anim.recalculateImidiateValues();
-
-				nodeToHandle.addAnimator(anim);
+						if (nodeRelativeTo)
+							finalpos = nodeRelativeTo.Pos.add(this.Vector);
+					}
+					break;
 			}
 
-			else {
-				// set target directly
-				cam.setTarget(finalpos);
+			if (finalpos != null) {
+				if (this.UseAnimatedMovement && this.TimeNeededForMovementMs > 0) {
+					// move animated to target
+					var anim = new AnimatorFlyStraight();
+					anim.Start = cam.getTarget().clone();
+					anim.End = finalpos;
+					anim.TimeForWay = this.TimeNeededForMovementMs;
+					anim.DeleteMeAfterEndReached = true;
+					anim.AnimateCameraTargetInsteadOfPosition = true;
+					anim.recalculateImidiateValues();
 
-				var animfps = cam.getAnimatorOfType('camerafps');
-				if (animfps != null)
-					animfps.lookAt(finalpos);
+					nodeToHandle.addAnimator(anim);
+				}
+
+				else {
+					// set target directly
+					cam.setTarget(finalpos);
+
+					var animfps = cam.getAnimatorOfType('camerafps');
+					if (animfps != null && animfps instanceof AnimatorCameraFPS)
+						animfps.lookAt(finalpos);
+				}
 			}
 		}
 	}
@@ -10774,11 +11131,19 @@ class ActionSetCameraTarget extends Action {
 
 
 /**
- * @private
+ * @public
  * @constructor
  * @class
  */
 class ActionSetActiveCamera extends Action {
+	/**
+	 * @type {Number}
+	 */
+	CameraToSetActive;
+
+	/**
+	 * @param {CL3D.CopperLicht} [engine]
+	 */
 	constructor(engine) {
         super();
 
@@ -10787,7 +11152,9 @@ class ActionSetActiveCamera extends Action {
 	}
 
 	/**
-	 * @private
+	 * 
+	 * @param {Number} oldNodeId
+	 * @param {Number} newNodeId
 	 */
 	createClone(oldNodeId, newNodeId) {
 		var a = new ActionSetActiveCamera();
@@ -10800,7 +11167,9 @@ class ActionSetActiveCamera extends Action {
 	}
     
 	/**
-	 * @private
+	 * 
+	 * @param {CL3D.SceneNode} currentNode
+	 * @param {CL3D.Scene} sceneManager
 	 */
 	execute(currentNode, sceneManager) {
 		if (!currentNode || !sceneManager)
@@ -10827,7 +11196,7 @@ class ActionSetActiveCamera extends Action {
 
 
 /**
- * @private
+ * @public
  * @constructor
  * @class
  */
@@ -10842,7 +11211,8 @@ class ActionSetOverlayText extends Action {
 	}
 
 	/**
-	 * @private
+	 * @param {Number} oldNodeId
+	 * @param {Number} newNodeId
 	 */
 	createClone(oldNodeId, newNodeId) {
 		var a = new ActionSetOverlayText();
@@ -10857,7 +11227,8 @@ class ActionSetOverlayText extends Action {
 	}
     
 	/**
-	 * @private
+	 * @param {CL3D.SceneNode} currentNode
+	 * @param {CL3D.Scene} sceneManager
 	 */
 	execute(currentNode, sceneManager) {
 		if (!currentNode || !sceneManager)
@@ -10870,7 +11241,7 @@ class ActionSetOverlayText extends Action {
 		else if (this.SceneNodeToChange != -1)
 			nodeToHandle = sceneManager.getSceneNodeFromId(this.SceneNodeToChange);
 
-		if (nodeToHandle && nodeToHandle.setText) {
+		if (nodeToHandle && nodeToHandle instanceof Overlay2DSceneNode) {
 			var posVar = this.Text.indexOf('$');
 			if (posVar != -1) {
 				// text probably contains variables. Find and replace them with their values
@@ -10921,13 +11292,13 @@ class ActionSetOverlayText extends Action {
 
 
 /**
- * @private
+ * @public
  * @constructor
  * @class
  */
 class ActionShoot extends Action {
 	constructor() {
-        super();
+		super();
 
 		this.ShootType = 0;
 		this.Damage = 0;
@@ -10943,7 +11314,8 @@ class ActionShoot extends Action {
 	}
 
 	/**
-	 * @private
+	 * @param {Number} oldNodeId
+	 * @param {Number} newNodeId
 	 */
 	createClone(oldNodeId, newNodeId) {
 		var a = new ActionShoot();
@@ -10967,7 +11339,8 @@ class ActionShoot extends Action {
 	}
 
 	/**
-	 * @private
+	 * @param {CL3D.SceneNode} currentNode
+	 * @param {CL3D.Scene} sceneManager
 	 */
 	execute(currentNode, sceneManager) {
 		if (!currentNode || !sceneManager)
@@ -11034,7 +11407,7 @@ class ActionShoot extends Action {
 			shooterNode = currentNode;
 
 			var shootingAI = currentNode.getAnimatorOfType('gameai');
-			if (shootingAI && shootingAI.isCurrentlyShooting()) {
+			if (shootingAI && shootingAI instanceof AnimatorGameAI && shootingAI.isCurrentlyShooting()) {
 				ray = shootingAI.getCurrentlyShootingLine();
 				rayFound = true;
 			}
@@ -11134,7 +11507,11 @@ class ActionShoot extends Action {
 	}
 
 	/**
-	 * @private
+	 * 
+	 * @param {CL3D.Line3d} ray
+	 * @param {string | any[]} ainodes
+	 * @param {Number} maxLen
+	 * @param {any} sceneManager
 	 */
 	shortenRayToClosestCollisionPointWithWorld(ray, ainodes, maxLen, sceneManager) {
 		if (ainodes.length != 0) {
@@ -11158,7 +11535,12 @@ class ActionShoot extends Action {
 	}
 
 	/**
-	 * @private
+	 * 
+	 * @param {CL3D.Line3d} ray
+	 * @param {string | any[]} ainodes
+	 * @param {Number} maxLen
+	 * @param {any} toIgnore
+	 * @param {any} sceneManager
 	 */
 	shortenRayToClosestCollisionPointWithAIAnimator(ray, ainodes, maxLen, toIgnore, sceneManager) {
 		var bestDistance = maxLen;
@@ -11173,8 +11555,7 @@ class ActionShoot extends Action {
 			if (enemyAI && !enemyAI.isAlive()) // don't test collision against dead items
 				continue;
 
-			var collisionDistance = new Object();
-			collisionDistance.N = 0;
+			var collisionDistance = { N: 0 };
 			if (AnimatorOnClick.prototype.static_getCollisionDistanceWithNode(sceneManager, ainodes[i], ray, false,
 				false, null, collisionDistance)) {
 				if (collisionDistance.N < bestDistance) {
@@ -11194,7 +11575,7 @@ class ActionShoot extends Action {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 * @constructor
 	 * @class
 	 */
@@ -11236,7 +11617,7 @@ class Animator {
 	 * Animates the scene node it is attached to and returns true if scene node was modified.
 	 * @public
 	 * @param {CL3D.SceneNode} n The Scene node which needs to be animated this frame.
-	 * @param {Integer} timeMs The time in milliseconds since the start of the scene.
+	 * @param {Number} timeMs The time in milliseconds since the start of the scene.
 	 */
 	animateNode(n, timeMs) {
 		return false;
@@ -11244,28 +11625,32 @@ class Animator {
 
 	/**
 	 * Event handler called by the engine so the animator can react to mouse and key input
-	 * @public
+	 * 
+	 * @param {any} event
 	 */
 	onMouseDown(event) {
 	}
 	
 	/**
 	 * Event handler called by the engine so the animator can react to mouse and key input
-	 * @public
+	 * 
+	 * @param {any} delta
 	 */
 	onMouseWheel(delta) {
 	}
 
 	/**
 	 * Event handler called by the engine so the animator can react to mouse and key input
-	 * @public
+	 * 
+	 * @param {any} event
 	 */
 	onMouseUp(event) {
 	}
 
 	/**
 	 * Event handler called by the engine so the animator can react to mouse and key input
-	 * @public
+	 * 
+	 * @param {any} event
 	 */
 	onMouseMove(event) {
 	}
@@ -11273,7 +11658,8 @@ class Animator {
 	/**
 	 * Event handler called by the engine so the animator can react to mouse and key input.
 	 * Returns false if the event has not been processed.
-	 * @public
+	 * 
+	 * @param {any} event
 	 */
 	onKeyDown(event) {
 		return false;
@@ -11282,7 +11668,8 @@ class Animator {
 	/**
 	 * Event handler called by the engine so the animator can react to mouse and key input
 	 * Returns false if the event has not been processed.
-	 * @public
+	 * 
+	 * @param {any} event
 	 */
 	onKeyUp(event) {
 		return false;
@@ -11290,13 +11677,14 @@ class Animator {
 
 	/**
 	 * Resets the animator, if supported
-	 * @private
+	 * 
+	 * @param {undefined} [event]
 	 */
 	reset(event) {
 	}
 
 	/**
-	 * @private
+	 * @param {String} type
 	 */
 	findActionByType(type) {
 		return null;
@@ -11304,9 +11692,12 @@ class Animator {
 
 	/**
 	 * Creates an exact, deep copy of this animator
-	 * @public
+	 * @param {CL3D.SceneNode} node
+	 * @param {CL3D.Scene} newManager
+	 * @param {Number} oldNodeId
+	 * @param {Number} newNodeId
 	 */
-	createClone(node, scene, oldNodeId, newNodeId) {
+	createClone(node, newManager, oldNodeId, newNodeId) {
 		return null;
 	}
 }
@@ -11327,12 +11718,14 @@ class Animator {
  * @public
  * @extends CL3D.Animator
  * @class  Scene node animator which invokes a callback function when the scene node has been clicked.
- * @param scene {CL3D.Scene} The scene of the animator.
- * @param engine {CL3D.CopperLicht} an instance of the 3d engine
- * @param functionToCall {function} a function which should be called when the scene node has been clicked
- * @param register {Boolean} (optional) set to true to prevent registering at the scene using registerSceneNodeAnimatorForEvents
  */
 class AnimatorOnClick extends Animator {
+	/**
+ 	 * @param {CL3D.Scene} scene The scene of the animator.
+ 	 * @param {CL3D.CopperLicht} engine an instance of the 3d engine
+ 	 * @param {Function=} functionToCall a function which should be called when the scene node has been clicked
+ 	 * @param {Boolean=} donotregister (optional) set to true to prevent registering at the scene using registerSceneNodeAnimatorForEvents
+	 */
 	constructor(scene, engine, functionToCall, donotregister) {
 		super();
 
@@ -11363,7 +11756,10 @@ class AnimatorOnClick extends Animator {
 	}
 
 	/**
-	 * @private
+	 * @param {CL3D.SceneNode} node
+	 * @param {CL3D.Scene} newManager
+	 * @param {Number} oldNodeId
+	 * @param {Number} newNodeId
 	 */
 	createClone(node, newManager, oldNodeId, newNodeId) {
 		var a = new AnimatorOnClick(this.SMGr, this.engine);
@@ -11378,7 +11774,7 @@ class AnimatorOnClick extends Animator {
 	 * Animates the scene node it is attached to and returns true if scene node was modified.
 	 * @public
 	 * @param {CL3D.SceneNode} n The Scene node which needs to be animated this frame.
-	 * @param {Integer} timeMs The time in milliseconds since the start of the scene.
+	 * @param {Number} timeMs The time in milliseconds since the start of the scene.
 	 */
 	animateNode(n, timeMs) {
 		this.TheObject = n;
@@ -11388,7 +11784,7 @@ class AnimatorOnClick extends Animator {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	onMouseDown(event) {
 		var n = this.TheObject;
@@ -11437,7 +11833,7 @@ class AnimatorOnClick extends Animator {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	onMouseUp(event) {
 		var n = this.TheObject;
@@ -11485,7 +11881,7 @@ class AnimatorOnClick extends Animator {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	invokeAction(node) {
 		if (this.TheActionHandler)
@@ -11493,7 +11889,7 @@ class AnimatorOnClick extends Animator {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	isOverNode(node, positionX, positionY) {
 		if (node == null)
@@ -11529,7 +11925,7 @@ class AnimatorOnClick extends Animator {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	static_getDistanceToNearestCollisionPointWithWorld(smgr, begin, end, world, ignoreInvisibleItems) {
 		var maxdist = 999999999999.0;
@@ -11546,14 +11942,14 @@ class AnimatorOnClick extends Animator {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	getDistanceToNearestCollisionPointWithWorld(begin, end) {
 		return this.static_getDistanceToNearestCollisionPointWithWorld(this.SMGr, begin, end, this.World, true);
 	}
 	
 	/**
-	 * @private
+	 * @public
 	 * returns true if collides (and no wall between), false if not
 	 */
 	static_getCollisionDistanceWithNode(smgr, node, ray, bBoundingBoxTestOnly, collidesWithWorld,
@@ -11671,7 +12067,7 @@ class AnimatorOnClick extends Animator {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	findActionByType(type) {
 		if (this.TheActionHandler)
@@ -11689,14 +12085,16 @@ class AnimatorOnClick extends Animator {
  * Scene node animator which invokes an action when the mouse enters or leaves a 3d scene node. 
  * Private, only used to implement the coppercube editor animator.
  * @constructor
- * @private
+ * @public
  * @extends CL3D.AnimatorOnClick
  * @class  Scene node animator which invokes a callback function when the scene node has been clicked.
- * @param scene {CL3D.Scene} The scene of the animator.
- * @param engine {CL3D.CopperLicht} an instance of the 3d engine
- * @param functionToCall {function} a function which should be called when the scene node has been clicked
  */
 class AnimatorOnMove extends AnimatorOnClick {
+	/**
+ 	 * @param {CL3D.Scene} scene The scene of the animator.
+ 	 * @param {CL3D.CopperLicht} engine an instance of the 3d engine
+ 	 * @param {Function=} functionToCall a function which should be called when the scene node has been clicked
+	 */
 	constructor(scene, engine, functionToCall) {
 		super(null, null, null, true);
 		
@@ -11707,7 +12105,7 @@ class AnimatorOnMove extends AnimatorOnClick {
 		this.ActionHandlerOnEnter = null;
 		this.ActionHandlerOnLeave = null;
 		this.TimeLastChecked = 0;
-		this.bLastTimeWasInside = 0;
+		this.bLastTimeWasInside = false;
 	}
 
 	/**
@@ -11720,7 +12118,10 @@ class AnimatorOnMove extends AnimatorOnClick {
 	}
 
 	/**
-	 * @private
+	 * @param {CL3D.SceneNode} node
+	 * @param {CL3D.Scene} newManager
+	 * @param {Number} oldNodeId
+	 * @param {Number} newNodeId
 	 */
 	createClone(node, newManager, oldNodeId, newNodeId) {
 		var a = new AnimatorOnMove(this.SMGr, this.engine);
@@ -11736,8 +12137,8 @@ class AnimatorOnMove extends AnimatorOnClick {
 	/**
 	 * Animates the scene node it is attached to and returns true if scene node was modified.
 	 * @public
-	 * @param {CL3D.SceneNode} n The Scene node which needs to be animated this frame.
-	 * @param {Integer} timeMs The time in milliseconds since the start of the scene.
+	 * @param {CL3D.SceneNode} node The Scene node which needs to be animated this frame.
+	 * @param {Number} timeMs The time in milliseconds since the start of the scene.
 	 */
 	animateNode(node, timeMs) {
 		var firstCheck = (this.TimeLastChecked == 0);
@@ -11775,7 +12176,7 @@ class AnimatorOnMove extends AnimatorOnClick {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	findActionByType(type) {
 		var ret = null;
@@ -11812,13 +12213,15 @@ class AnimatorOnMove extends AnimatorOnClick {
  * @public
  * @extends CL3D.Animator
  * @class  Scene node animator which invokes a callback function when the scene node gets near another scene node.
- * @param scene {CL3D.Scene} the current scene
- * @param radius {Number} the proximity radius to use
- * @param idOfSceneNode {Number} The unique id (see {@link CL3D.SceneNode.id} of the scene node which will trigger this
- * @param functionToCall {function} a function which should be called when the scene node has been clicked. The function will be given two parameters: The node this is attached to and the node colliding.
- * @param triggerOnLeave {Boolean} set to false to let this trigger when the radius is entered, to true if when the radius is left
  */
 class AnimatorOnProximity extends Animator {
+	/**
+	 * @param {CL3D.Scene} scene the current scene
+	 * @param {Number=} radius the proximity radius to use
+	 * @param {Number=} idOfSceneNode The unique id (see {@link SceneNode.id} of the scene node which will trigger this
+	 * @param {Function=} functionToCall a function which should be called when the scene node has been clicked. The function will be given two parameters: The node this is attached to and the node colliding.
+	 * @param {Boolean=} triggerOnLeave set to false to let this trigger when the radius is entered, to true if when the radius is left
+	 */
 	constructor(scene, radius, idOfSceneNode, functionToCall, triggerOnLeave) {
 		super();
 
@@ -11857,7 +12260,10 @@ class AnimatorOnProximity extends Animator {
 		return 'oncollide';
 	}
 	/**
-	 * @private
+	 * @param {CL3D.SceneNode} node
+	 * @param {CL3D.Scene} newManager
+	 * @param {Number} oldNodeId
+	 * @param {Number} newNodeId
 	 */
 	createClone(node, newManager, oldNodeId, newNodeId) {
 		var a = new AnimatorOnProximity(this.sceneManager);
@@ -11872,7 +12278,7 @@ class AnimatorOnProximity extends Animator {
 	 * Animates the scene node it is attached to and returns true if scene node was modified.
 	 * @public
 	 * @param {CL3D.SceneNode} n The Scene node which needs to be animated this frame.
-	 * @param {Integer} timeMs The time in milliseconds since the start of the scene.
+	 * @param {Number} timeMs The time in milliseconds since the start of the scene.
 	 */
 	animateNode(n, timeMs) {
 		if (n == null || this.sceneManager == null)
@@ -11935,7 +12341,7 @@ class AnimatorOnProximity extends Animator {
 		return actionInvoked;
 	}
 	/**
-	 * @private
+	 * @public
 	 */
 	invokeAction(node, n) {
 		if (this.FunctionToCall)
@@ -11945,7 +12351,7 @@ class AnimatorOnProximity extends Animator {
 			this.TheActionHandler.execute(node);
 	}
 	/**
-	 * @private
+	 * @public
 	 */
 	findActionByType(type) {
 		if (this.TheActionHandler)
@@ -11984,17 +12390,19 @@ class AnimatorOnProximity extends Animator {
  * @constructor
  * @public
  * @extends CL3D.Animator
- * @class Scene node animator making {@link CL3D.SceneNode}s move using autoamtic collision detection and response
- * @param {CL3D.Vect3d} radius 3d vector describing the radius of the scene node as ellipsoid.	
- * @param {CL3D.Vect3d} translation Set translation of the collision ellipsoid. By default, the ellipsoid for collision 
- * detection is created around the center of the scene node, which means that the ellipsoid surrounds it completely. 
- * If this is not what you want, you may specify a translation for the ellipsoid.
- * @param {CL3D.TriangleSelector} world Representing the world, the collision geometry, represented by a {@link TriangleSelector}.
- * @param {Number} slidingspeed (optional) A very small value, set to 0.0005 for example. This affects how the ellipsoid is moved 
- * when colliding with a wall. Affects movement smoothness and friction. If set to a too big value, this will also may cause the 
- * ellipsoid to be stuck.
+ * @class Scene node animator making {@link SceneNode}s move using autoamtic collision detection and response
  */
 class AnimatorCollisionResponse extends Animator {
+	/**
+	 * @param {CL3D.Vect3d=} radius 3d vector describing the radius of the scene node as ellipsoid.	
+	 * @param {CL3D.Vect3d=} translation Set translation of the collision ellipsoid. By default, the ellipsoid for collision 
+	 * detection is created around the center of the scene node, which means that the ellipsoid surrounds it completely. 
+	 * If this is not what you want, you may specify a translation for the ellipsoid.
+	 * @param {CL3D.TriangleSelector=} world Representing the world, the collision geometry, represented by a {@link TriangleSelector}.
+	 * @param {Number=} slidingspeed (optional) A very small value, set to 0.0005 for example. This affects how the ellipsoid is moved 
+	 * when colliding with a wall. Affects movement smoothness and friction. If set to a too big value, this will also may cause the 
+	 * ellipsoid to be stuck.
+	 */
 	constructor(radius, translation, world, slidingspeed) {
 		super();
 
@@ -12032,7 +12440,10 @@ class AnimatorCollisionResponse extends Animator {
 	}
 
 	/**
-	 * @private
+	 * @param {CL3D.SceneNode} node
+	 * @param {CL3D.Scene} newManager
+	 * @param {Number} oldNodeId
+	 * @param {Number} newNodeId
 	 */
 	createClone(node, newManager, oldNodeId, newNodeId) {
 		var a = new AnimatorCollisionResponse();
@@ -12084,7 +12495,7 @@ class AnimatorCollisionResponse extends Animator {
 	 * Animates the scene node it is attached to and returns true if scene node was modified.
 	 * @public
 	 * @param {CL3D.SceneNode} n The Scene node which needs to be animated this frame.
-	 * @param {Integer} timeMs The time in milliseconds since the start of the scene.
+	 * @param {Number} timeMs The time in milliseconds since the start of the scene.
 	 */
 	animateNode(n, timeMs) {
 		var difftime = (timeMs - this.LastAnimationTime);
@@ -12142,7 +12553,7 @@ class AnimatorCollisionResponse extends Animator {
 
 			//this.SlidingSpeed = force.getLength() * 0.0001;
 			var cam = null;
-			if (n && n.getType() == 'camera')
+			if (n && n instanceof CameraSceneNode && n.getType() == 'camera')
 				cam = n;
 
 			var camvect;
@@ -12150,8 +12561,7 @@ class AnimatorCollisionResponse extends Animator {
 				camvect = cam.Target.substract(cam.Pos);
 
 			var triangle = new Triangle3d();
-			var objFalling = new Object(); // used for passing the object falling value by reference
-			objFalling.N = 0;
+			var objFalling = { N: 0 }; // used for passing the object falling value by reference
 
 			this.World.setNodeToIgnore(n);
 
@@ -12242,7 +12652,7 @@ class AnimatorCollisionResponse extends Animator {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	getCollisionResultPosition(selector, //:TriangleSelector,
 		position, //:Vect3d, 
@@ -12256,7 +12666,7 @@ class AnimatorCollisionResponse extends Animator {
 			return position;
 
 		// now collide ellipsoid with world
-		var colData = new Object(); //var colData:CollisionData = new CollisionData();
+		var colData = {}; //var colData:CollisionData = new CollisionData();
 		colData.R3Position = position.clone();
 		colData.R3Velocity = velocity.clone();
 		colData.eRadius = radius.clone();
@@ -12314,7 +12724,7 @@ class AnimatorCollisionResponse extends Animator {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	collideWithWorld(recursionDepth, //:int,
 		colData, //:CollisionData, 
@@ -12400,7 +12810,7 @@ class AnimatorCollisionResponse extends Animator {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	testTriangleIntersection(colData, triangle) {
 		var trianglePlane = triangle.getPlane();
@@ -12490,8 +12900,7 @@ class AnimatorCollisionResponse extends Animator {
 			var a = 0; //:Number;
 			var b = 0; //:Number;
 			var c = 0; //:Number;
-			var newTObj = new Object();
-			newTObj.N = 0;
+			var newTObj = { N: 0 };
 
 			// for each edge or vertex a quadratic equation has to be solved:
 			// a*t^2 + b*t + c = 0. We calculate a,b, and c for each test.
@@ -12630,7 +13039,7 @@ class AnimatorCollisionResponse extends Animator {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	getLowestRoot(a, b, c, maxR, outRoot) {
 		// check if solution exists
@@ -12668,9 +13077,9 @@ class AnimatorCollisionResponse extends Animator {
 
 		return false;
 	}
-	
+
 	/**
-	 * @private
+	 * @public
 	 */
 	jump(jumpspeed) {
 		if (this.JumpForce == 0)
@@ -12683,13 +13092,12 @@ class AnimatorCollisionResponse extends Animator {
 
 
 /**
- * Scene node animator making {@link CL3D.SceneNode}s move along a path.
- * Uses {@link CL3D.PathSceneNode} to define the path.
+ * Scene node animator making {@link SceneNode}s move along a path.
+ * Uses {@link PathSceneNode} to define the path.
  * @constructor
  * @public
  * @extends CL3D.Animator
- * @class  Scene node animator making {@link CL3D.SceneNode}s move along a path, uses {@link CL3D.PathSceneNode} to define the path.
- * @param scene The scene the animator is in
+ * @class  Scene node animator making {@link SceneNode}s move along a path, uses {@link PathSceneNode} to define the path.
  */
 class AnimatorFollowPath extends Animator {
 	/** 
@@ -12713,6 +13121,14 @@ class AnimatorFollowPath extends Animator {
 	 */
 	static EFPFEM_SWITCH_TO_CAMERA = 2;
 
+	/**
+	 * @type {CL3D.ActionHandler}
+	 */
+	TheActionHandler;
+
+	/**
+	 * @param {CL3D.Scene} scene The scene the animator is in
+	 */
 	constructor(scene) {
 		super();
 
@@ -12752,10 +13168,13 @@ class AnimatorFollowPath extends Animator {
 	}
 
 	/**
-	 * @private
+	 * @param {CL3D.SceneNode} node
+	 * @param {CL3D.Scene} newManager
+	 * @param {Number} oldNodeId
+	 * @param {Number} newNodeId
 	 */
 	createClone(node, newManager, oldNodeId, newNodeId) {
-		var a = new AnimatorFollowPath();
+		var a = new AnimatorFollowPath(newManager);
 		a.TimeNeeded = this.TimeNeeded;
 		a.LookIntoMovementDirection = this.LookIntoMovementDirection;
 		a.OnlyMoveWhenCameraActive = this.OnlyMoveWhenCameraActive;
@@ -12772,7 +13191,7 @@ class AnimatorFollowPath extends Animator {
 	 * Sets the options for animating the node along the path
 	 * @public
 	 * @param endmode {Number} Mode specifying what should happen when the end of the path has been reached.
-	 * Can be {@link CL3D.AnimatorFollowPath.EFPFEM_START_AGAIN} or {@link CL3D.AnimatorFollowPath.EFPFEM_STOP}
+	 * Can be {@link AnimatorFollowPath.EFPFEM_START_AGAIN} or {@link AnimatorFollowPath.EFPFEM_STOP}
 	 * @param timeNeeded {Number} Time in milliseconds needed for following the whole path, for example 10000 for 10 seconds.
 	 * @param lookIntoMovementDirection {Boolean} true if the node should look into the movement direction or false
 	 * if not.
@@ -12788,7 +13207,7 @@ class AnimatorFollowPath extends Animator {
 	 * Animates the scene node it is attached to and returns true if scene node was modified.
 	 * @public
 	 * @param {CL3D.SceneNode} n The Scene node which needs to be animated this frame.
-	 * @param {Integer} timeMs The time in milliseconds since the start of the scene.
+	 * @param {Number} timeMs The time in milliseconds since the start of the scene.
 	 */
 	animateNode(n, timeMs) {
 		if (n == null || !this.Manager || !this.TimeNeeded)
@@ -12891,7 +13310,7 @@ class AnimatorFollowPath extends Animator {
 				var lookvector = nextPos.substract(pos);
 				lookvector.setLength(100.0);
 
-				if (this.IsCamera) {
+				if (n instanceof CameraSceneNode) {
 					cam = n;
 					var newTarget = pos.add(lookvector);
 					changed = changed || !newTarget.equals(cam.Target);
@@ -12930,7 +13349,7 @@ class AnimatorFollowPath extends Animator {
 	}
 
 	/**
-	* @private
+	* @public
 	*/
 	setNode(n) {
 		this.LastObject = n;
@@ -12939,7 +13358,7 @@ class AnimatorFollowPath extends Animator {
 	}
 
 	/**
-	* @private
+	* @public
 	*/
 	linkWithPath() {
 		if (this.PathNodeToFollow)
@@ -12955,7 +13374,7 @@ class AnimatorFollowPath extends Animator {
 			return;
 
 		var node = this.Manager.getSceneNodeFromName(this.PathToFollow);
-		if (node && node.getType() == 'path') {
+		if (node && node instanceof PathSceneNode && node.getType() == 'path') {
 			this.setPathToFollow(node);
 		}
 	}
@@ -12970,7 +13389,7 @@ class AnimatorFollowPath extends Animator {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	switchToNextCamera() {
 		if (!this.Manager)
@@ -12980,7 +13399,7 @@ class AnimatorFollowPath extends Animator {
 			return;
 
 		var node = this.Manager.getSceneNodeFromName(this.CameraToSwitchTo);
-		if (node && node.getType() == 'camera') {
+		if (node && node instanceof CameraSceneNode && node.getType() == 'camera') {
 			var renderer = this.Manager.getLastUsedRenderer();
 			if (renderer)
 				node.setAutoAspectIfNoFixedSet(renderer.getWidth(), renderer.getHeight());
@@ -12989,7 +13408,7 @@ class AnimatorFollowPath extends Animator {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	findActionByType(type) {
 		if (this.TheActionHandler)
@@ -13004,19 +13423,21 @@ class AnimatorFollowPath extends Animator {
 
 
 /**
- * Scene node animator making {@link CL3D.SceneNode}s move along straight line between two points.
+ * Scene node animator making {@link SceneNode}s move along straight line between two points.
  * @constructor
  * @public
  * @extends CL3D.Animator
- * @class Scene node animator making {@link CL3D.SceneNode}s move along straight line between two points.
- * @param {CL3D.Vect3d} start Start 3d position of the line
- * @param {CL3D.Vect3d} end End 3d position of the line
- * @param {Number} timeForWay Time for moving along the whole line in milliseconds. For example 2000 for 2 seconds.
- * @param {Boolean} loop set to true for looping along the line, false for stopping movement when the end has been reached.
- * @param {Boolean} deleteMeAfterEndReached set to true if the animator should delete itself after the end has been reached.
- * @param {Boolean} animateCameraTargetInsteadOfPosition if the animated node is a camera, set to true to animate the camera target instead of the position of the camera.
+ * @class Scene node animator making {@link SceneNode}s move along straight line between two points.
  */
 class AnimatorFlyStraight extends Animator {
+	/**
+ 	 * @param {CL3D.Vect3d=} start Start 3d position of the line
+ 	 * @param {CL3D.Vect3d=} end End 3d position of the line
+ 	 * @param {Number=} timeforway Time for moving along the whole line in milliseconds. For example 2000 for 2 seconds.
+ 	 * @param {Boolean=} loop set to true for looping along the line, false for stopping movement when the end has been reached.
+ 	 * @param {Boolean=} deleteMeAfterEndReached set to true if the animator should delete itself after the end has been reached.
+ 	 * @param {Boolean=} animateCameraTargetInsteadOfPosition if the animated node is a camera, set to true to animate the camera target instead of the position of the camera.
+	 */
 	constructor(start, end, timeforway, loop, deleteMeAfterEndReached, animateCameraTargetInsteadOfPosition) {
 		super();
 
@@ -13032,7 +13453,10 @@ class AnimatorFlyStraight extends Animator {
 		this.ShootCollisionNodeToIgnore = null;
 		this.ShootCollisionDamage = 0;
 		this.DeleteSceneNodeAfterEndReached = false;
-		this.ActionToExecuteOnEnd = false;
+		/**
+		 * @type {CL3D.Action}
+		 */
+		this.ActionToExecuteOnEnd = null;
 		this.ExecuteActionOnEndOnlyIfTimeSmallerThen = 0;
 
 		if (start)
@@ -13062,7 +13486,7 @@ class AnimatorFlyStraight extends Animator {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	createClone(node, newManager, oldNodeId, newNodeId) {
 		var a = new AnimatorFlyStraight();
@@ -13084,7 +13508,7 @@ class AnimatorFlyStraight extends Animator {
 	 * Animates the scene node it is attached to and returns true if scene node was modified.
 	 * @public
 	 * @param {CL3D.SceneNode} n The Scene node which needs to be animated this frame.
-	 * @param {Integer} timeMs The time in milliseconds since the start of the scene.
+	 * @param {Number} timeMs The time in milliseconds since the start of the scene.
 	 */
 	animateNode(n, timeMs) {
 		var t = (timeMs - this.StartTime);
@@ -13103,11 +13527,11 @@ class AnimatorFlyStraight extends Animator {
 			}
 
 			if (this.AnimateCameraTargetInsteadOfPosition) {
-				if (n.getType() == 'camera') {
+				if (n instanceof CameraSceneNode && n.getType() == 'camera') {
 					n.setTarget(pos);
 
 					var animfps = n.getAnimatorOfType('camerafps');
-					if (animfps != null)
+					if (animfps != null && animfps instanceof AnimatorCameraFPS)
 						animfps.lookAt(pos);
 				}
 			}
@@ -13150,7 +13574,7 @@ class AnimatorFlyStraight extends Animator {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	doShootCollisionTest(bulletNode) {
 		if (!bulletNode)
@@ -13184,7 +13608,7 @@ class AnimatorFlyStraight extends Animator {
 	}
 	
 	/**
-	 * @private
+	 * @public
 	 */
 	recalculateImidiateValues() {
 		this.Vector = this.End.substract(this.Start);
@@ -13199,17 +13623,20 @@ class AnimatorFlyStraight extends Animator {
 
 
 /**
- * Scene node animator making {@link CL3D.SceneNode}s move in a circle
+ * Scene node animator making {@link SceneNode}s move in a circle
  * @constructor
  * @public
  * @extends CL3D.Animator
- * @class Scene node animator making {@link CL3D.SceneNode}s move in a circle
- * @param {CL3D.Vect3d} center 3d position of the center of the circle
- * @param {Number} radius radius of the circle
- * @param {CL3D.Vect3d} direction direction of the circle. For example (0,1,0) for up.
- * @param {Number} speed movement speed, for example 0.01
+ * @class Scene node animator making {@link SceneNode}s move in a circle
  */
 class AnimatorFlyCircle extends Animator {
+	/**
+	 * 
+	 * @param {CL3D.Vect3d=} center 3d position of the center of the circle
+	 * @param {Number=} radius radius of the circle
+	 * @param {CL3D.Vect3d=} direction direction of the circle. For example (0,1,0) for up.
+	 * @param {Number=} speed movement speed, for example 0.01
+	 */
 	constructor(center, radius, direction, speed) {
 		super();
 
@@ -13243,7 +13670,10 @@ class AnimatorFlyCircle extends Animator {
 	}
 
 	/**
-	 * @private
+	 * @param {CL3D.SceneNode} node
+	 * @param {CL3D.Scene} newManager
+	 * @param {Number} oldNodeId
+	 * @param {Number} newNodeId
 	 */
 	createClone(node, newManager, oldNodeId, newNodeId) {
 		var a = new AnimatorFlyCircle();
@@ -13260,7 +13690,7 @@ class AnimatorFlyCircle extends Animator {
 	 * Animates the scene node it is attached to and returns true if scene node was modified.
 	 * @public
 	 * @param {CL3D.SceneNode} n The Scene node which needs to be animated this frame.
-	 * @param {Integer} timeMs The time in milliseconds since the start of the scene.
+	 * @param {Number} timeMs The time in milliseconds since the start of the scene.
 	 */
 	animateNode(n, timeMs) {
 		var diff = (timeMs - this.StartTime);
@@ -13307,11 +13737,13 @@ class AnimatorFlyCircle extends Animator {
  * @public
  * @extends CL3D.Animator
  * @class  Scene node animator changing the texture of {@link SceneNode}s so that they appear animated.
- * @param {Array} textures array of {@link Texture}s to set
- * @param {Number} timeperframe time to switch to the next texture in the texture array, in milliseconds. For example 500 for half a second per  frame.
- * @param {Boolean} donotloop if set to true, the animation will only be played once
  */
 class AnimatorAnimateTexture extends Animator {
+	/**
+	 * @param {CL3D.Texture[]=} textures array of {@link Texture}s to set
+	 * @param {Number=} timeperframe time to switch to the next texture in the texture array, in milliseconds. For example 500 for half a second per  frame.
+	 * @param {Boolean=} donotloop if set to true, the animation will only be played once
+	 */
 	constructor(textures, timeperframe, donotloop) {
 		super();
 
@@ -13343,7 +13775,10 @@ class AnimatorAnimateTexture extends Animator {
 	}
 
 	/**
-	 * @private
+	 * @param {CL3D.SceneNode} node
+	 * @param {CL3D.Scene} newManager
+	 * @param {Number} oldNodeId
+	 * @param {Number} newNodeId
 	 */
 	createClone(node, newManager, oldNodeId, newNodeId) {
 		var a = new AnimatorAnimateTexture();
@@ -13359,7 +13794,7 @@ class AnimatorAnimateTexture extends Animator {
 	 * Animates the scene node it is attached to and returns true if scene node was modified.
 	 * @public
 	 * @param {CL3D.SceneNode} n The Scene node which needs to be animated this frame.
-	 * @param {Integer} timeMs The time in milliseconds since the start of the scene.
+	 * @param {Number} timeMs The time in milliseconds since the start of the scene.
 	 */
 	animateNode(n, timeMs) {
 		if (n == null || this.Textures == null)
@@ -13417,7 +13852,7 @@ class AnimatorAnimateTexture extends Animator {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	reset() {
 		this.MyStartTime = CLTimer.getTime();
@@ -13429,14 +13864,17 @@ class AnimatorAnimateTexture extends Animator {
 
 
 /**
- * Scene node animator making {@link CL3D.SceneNode}s rotate
+ * Scene node animator making {@link SceneNode}s rotate
  * @constructor
  * @public
  * @extends CL3D.Animator
- * @class  Scene node animator making {@link CL3D.SceneNode}s rotate
- * @param speed {CL3D.Vect3d} vector defining the RotationSpeed in each direction
+ * @class  Scene node animator making {@link SceneNode}s rotate
  */
 class AnimatorRotation extends Animator {
+	/**
+	 * 
+	 * @param {CL3D.Vect3d=} speed vector defining the RotationSpeed in each direction
+	 */
 	constructor(speed) {
 		super();
 
@@ -13461,10 +13899,13 @@ class AnimatorRotation extends Animator {
 	}
 
 	/**
-	 * @private
+	 * @param {CL3D.SceneNode} node
+	 * @param {CL3D.Scene} newManager
+	 * @param {Number} oldNodeId
+	 * @param {Number} newNodeId
 	 */
 	createClone(node, newManager, oldNodeId, newNodeId) {
-		var a = new AnimatorRotation(this.SMGr, this.engine);
+		var a = new AnimatorRotation();
 		a.Rotation = this.Rotation.clone();
 		a.StartTime = this.StartTime;
 		return a;
@@ -13527,7 +13968,7 @@ class AnimatorRotation extends Animator {
 
 	/**
 	 * Makes the animator rotate the scene node to a specific target and then stop there
-	 * @private
+	 * @public
 	 */
 	setRotateToTargetAndStop(targetRot, beginRot, timeForMovement) {
 		this.RotateToTargetAndStop = true;
@@ -13543,14 +13984,12 @@ class AnimatorRotation extends Animator {
 
 /**
  * Special scene node animator making cameras user controlled model viewrs around a pivot point on a fixed radius.
- * This scene node animator can be attached to a {@link CL3D.CameraSceneNode} to make it act like a user controlled model viewer.
+ * This scene node animator can be attached to a {@link CameraSceneNode} to make it act like a user controlled model viewer.
  * Simply set the target of the camera to the pivot point and attach this animator to make it work.
  * @constructor
  * @public
  * @extends CL3D.Animator
  * @class Special scene node animator for model viewer cameras. 
- * @param {CL3D.CameraSceneNode} cam an instance of a {@link CL3D.CameraSceneNode} this animator will be attached to. Can be null if the camera is not yet known.
- * @param {CL3D.CopperLicht} engine An instance of the {@link CL3D.CopperLicht} 3d engine, for receiving the mouse and keyboard input.
  */
 class AnimatorCameraModelViewer extends Animator {
 	/**
@@ -13577,6 +14016,10 @@ class AnimatorCameraModelViewer extends Animator {
 	 */
 	NoVerticalMovement = false;
 
+	/**
+ 	 * @param {CL3D.CameraSceneNode} cam an instance of a {@link CameraSceneNode} this animator will be attached to. Can be null if the camera is not yet known.
+ 	 * @param {CL3D.CopperLicht} engine An instance of the {@link CopperLicht} 3d engine, for receiving the mouse and keyboard input.
+	 */
 	constructor(cam, engine) {
 		super();
 
@@ -13620,7 +14063,7 @@ class AnimatorCameraModelViewer extends Animator {
 	 * Animates the scene node it is attached to and returns true if scene node was modified.
 	 * @public
 	 * @param {CL3D.SceneNode} n The Scene node which needs to be animated this frame.
-	 * @param {Integer} timeMs The time in milliseconds since the start of the scene.
+	 * @param {Number} timeMs The time in milliseconds since the start of the scene.
 	 */
 	animateNode(n, timeMs) {
 		if (this.Camera == null)
@@ -13770,7 +14213,7 @@ class AnimatorCameraModelViewer extends Animator {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	onMouseWheel(delta) {
 		this.TargetZoomValue += delta * this.ZoomSpeed;
@@ -13789,15 +14232,13 @@ class AnimatorCameraModelViewer extends Animator {
 
 /**
  * Special scene node animator for first person shooter cameras.
- * This scene node animator can be attached to a {@link CL3D.CameraSceneNode} to make it act like a first person shooter.
+ * This scene node animator can be attached to a {@link CameraSceneNode} to make it act like a first person shooter.
  * By pressing the cursor keys or WASD, the camera will move and by having the mouse button pressed while moving, the camera
  * will look around.
  * @constructor
  * @public
  * @extends CL3D.Animator
  * @class Special scene node animator for first person shooter cameras.
- * @param {CL3D.CameraSceneNode} cam an instance of a {@link CL3D.CameraSceneNode} this animator will be attached to. Can be null if the camera is not yet known.
- * @param {CL3D.CopperLicht} engine An instance of the {@link CopperLicht} 3d engine, for receiving the mouse and keyboard input.
  */
 class AnimatorCameraFPS extends Animator {
 	/**
@@ -13857,6 +14298,10 @@ class AnimatorCameraFPS extends Animator {
 	 */
 	MayZoom = true;
 
+	/**
+	 * @param {CL3D.CameraSceneNode} cam an instance of a {@link CameraSceneNode} this animator will be attached to. Can be null if the camera is not yet known.
+ 	 * @param {CL3D.CopperLicht} engine An instance of the {@link CopperLicht} 3d engine, for receiving the mouse and keyboard input.
+	 */
 	constructor(cam, engine) {
 		super();
 
@@ -13914,7 +14359,7 @@ class AnimatorCameraFPS extends Animator {
 	/**
 	 * Sets if the animator may move the camera
 	 * @public
-	 * @type Boolean
+	 * @param {Boolean} b
 	 * @default true
 	 */
 	setMayMove(b) {
@@ -13924,7 +14369,7 @@ class AnimatorCameraFPS extends Animator {
 	/**
 	 * Sets if the camera look direction is moved by the cursor when the mouse is down or not
 	 * @public
-	 * @type Boolean
+	 * @param {Boolean} b
 	 * @default true
 	 */
 	setLookByMouseDown(b) {
@@ -13954,7 +14399,7 @@ class AnimatorCameraFPS extends Animator {
 	 * Animates the scene node it is attached to and returns true if scene node was modified.
 	 * @public
 	 * @param {CL3D.SceneNode} n The Scene node which needs to be animated this frame.
-	 * @param {Integer} timeMs The time in milliseconds since the start of the scene.
+	 * @param {Number} timeMs The time in milliseconds since the start of the scene.
 	 */
 	animateNode(n, timeMs) {
 		if (this.Camera == null)
@@ -14215,7 +14660,7 @@ class AnimatorCameraFPS extends Animator {
 			if (this.jumpKeyDown) {
 				if (this.LastTimeJumpKeyWasUp) {
 					var a = n.getAnimatorOfType('collisionresponse');
-					if (a && !a.isFalling()) {
+					if (a && a instanceof AnimatorCollisionResponse && !a.isFalling()) {
 						this.LastTimeJumpKeyWasUp = false;
 						a.jump(this.JumpSpeed);
 					}
@@ -14233,7 +14678,7 @@ class AnimatorCameraFPS extends Animator {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	onMouseDown(event) {
 		//super.onMouseDown(event);
@@ -14244,7 +14689,7 @@ class AnimatorCameraFPS extends Animator {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	onMouseWheel(delta) {
 		/*this.targetZoomValue += delta * this.zoomSpeed;
@@ -14257,7 +14702,7 @@ class AnimatorCameraFPS extends Animator {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	onMouseUp(event) {
 		//super.onMouseUp(event);
@@ -14265,7 +14710,7 @@ class AnimatorCameraFPS extends Animator {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	onMouseMove(event) {
 		//super.onMouseMove(event);
@@ -14273,7 +14718,7 @@ class AnimatorCameraFPS extends Animator {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	setKeyBool(down, code) {
 		if (code)
@@ -14320,21 +14765,21 @@ class AnimatorCameraFPS extends Animator {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	onKeyDown(event) {
 		return this.setKeyBool(true, event.key);
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	onKeyUp(event) {
 		return this.setKeyBool(false, event.key);
 	}
 
 	/**
-	 * @private
+	 * @public
 	 * for adding force to look up or down
 	 */
 	getAdditionalXLookDiff() {
@@ -14342,7 +14787,7 @@ class AnimatorCameraFPS extends Animator {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 * for adding force to look up or down
 	 */
 	getAdditionalYLookDiff() {
@@ -14350,7 +14795,7 @@ class AnimatorCameraFPS extends Animator {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 * for adding force to look left or right
 	 */
 	getAdditionalZoomDiff() {
@@ -14365,7 +14810,7 @@ class AnimatorCameraFPS extends Animator {
 
 
 /**
- * @private
+ * @public
  * Array containing instances of CL3D.CopperCubeVariable. A container for holding coppercube variables, which
  * can also be set and changed using the Actions in the editor.
  */
@@ -14391,9 +14836,9 @@ class CopperCubeVariable {
     /**
      * Static function, returns the instance of an existing CopperCube variable or creates one if not existing.
      * @public
-     * @param n {String} Name of the variable
-     * @param createIfNotExisting {Boolean} if the variable is not found, it will be created if this is set to true.
-     * @param scene {CL3D.Scene} The current scene. This parameter is optional, this can be 0. It is used for getting runtime variables such as #player1.health
+     * @param {String} n Name of the variable
+     * @param {Boolean} createIfNotExisting if the variable is not found, it will be created if this is set to true.
+     * @param {CL3D.Scene} scene The current scene. This parameter is optional, this can be 0. It is used for getting runtime variables such as #player1.health
      * @returns {CL3D.CopperCubeVariable} Returns instance of the variable or null if not found
      */
     static getVariable(n, createIfNotExisting, scene) {
@@ -14427,7 +14872,7 @@ class CopperCubeVariable {
     }
         
     /**
-     * @private
+     * @public
      * Creates a coppercube variable of the type "#player.health" with the correct expected content
      */
     static createTemporaryVariableIfPossible(varname, scene) {
@@ -14481,7 +14926,7 @@ class CopperCubeVariable {
     }
         
     /**
-     * @private
+     * @public
      * Saves the content of a coppercube variable of the type "#player.health" back into the correct scene node
      */
     static saveContentOfPotentialTemporaryVariableIntoSource(thevar, scene) {
@@ -14547,7 +14992,7 @@ class CopperCubeVariable {
     }
         
     /**
-     * @private
+     * @public
      * Parses the variable name of the type "#player.health" and returns attribute name and scene node in the scene
      */
     static getSceneNodeAndAttributeNameFromTemporaryVariableName(varname, scene) {
@@ -14581,7 +15026,7 @@ class CopperCubeVariable {
         }
 
         // return
-        var retobj = new Object(); // used for passing scene node and attribute name back if available
+        var retobj = {}; // used for passing scene node and attribute name back if available
         retobj.node = node;
         retobj.attrname = attrname;
         return retobj;
@@ -14629,7 +15074,7 @@ class CopperCubeVariable {
     }
         
     /**
-     * @private
+     * @public
      */
     setAsCopy(copyFrom) {
         if (copyFrom == null)
@@ -14668,7 +15113,7 @@ class CopperCubeVariable {
     getValueAsInt() {
         switch (this.ActiveValueType) {
             case 0: // string
-                return Math.floor(this.StringValue);
+                return Math.floor(Number(this.StringValue));
             case 1: // int
                 return this.IntValue;
             case 2: // float
@@ -14734,7 +15179,7 @@ class CopperCubeVariable {
 /**
  * @constructor
  * @class
- * @private
+ * @public
  * @extends CL3D.Animator
  */
 class AnimatorKeyboardControlled extends Animator {
@@ -14789,14 +15234,17 @@ class AnimatorKeyboardControlled extends Animator {
     /**
      * Returns the type of the animator.
      * For the AnimatorTimer, this will return 'keyboardcontrolled'.
-     * @private
+     * @public
      */
     getType() {
         return 'keyboardcontrolled';
     }
 
     /**
-     * @private
+	 * @param {CL3D.SceneNode} node
+	 * @param {CL3D.Scene} newManager
+	 * @param {Number} oldNodeId
+	 * @param {Number} newNodeId
      */
     createClone(node, newManager, oldNodeId, newNodeId) {
         var a = new AnimatorKeyboardControlled(this.SMGr, this.Engine);
@@ -14819,7 +15267,7 @@ class AnimatorKeyboardControlled extends Animator {
     }
 
     /**
-     * @private
+     * @public
      */
     setKeyBool(down, code) {
         if (code)
@@ -14866,7 +15314,7 @@ class AnimatorKeyboardControlled extends Animator {
     }
 
     /**
-     * @private
+     * @public
      */
     onKeyDown(event) {
         this.ShiftIsDown = (event.shiftKey == 1);
@@ -14874,7 +15322,7 @@ class AnimatorKeyboardControlled extends Animator {
     }
 
     /**
-     * @private
+     * @public
      */
     onKeyUp(event) {
         this.ShiftIsDown = (event.shiftKey == 1);
@@ -14883,9 +15331,9 @@ class AnimatorKeyboardControlled extends Animator {
 
     /**
      * Animates the scene node it is attached to and returns true if scene node was modified.
-     * @private
-     * @param {CL3D.SceneNode} n The Scene node which needs to be animated this frame.
-     * @param {Integer} timeMs The time in milliseconds since the start of the scene.
+     * @public
+     * @param {CL3D.SceneNode} node The Scene node which needs to be animated this frame.
+     * @param {Number} timeMs The time in milliseconds since the start of the scene.
      */
     animateNode(node, timeMs) {
         var timeDiff = timeMs - this.lastAnimTime;
@@ -15007,7 +15455,7 @@ class AnimatorKeyboardControlled extends Animator {
             var bFalling = false;
 
             var a = node.getAnimatorOfType('collisionresponse');
-            if (a)
+            if (a && a instanceof AnimatorCollisionResponse)
                 bFalling = a.isFalling();
 
             if (!bFalling && (this.hasAnimationType(node, 1) || this.hasAnimationType(node, 3) || this.hasAnimationType(node, 2)))
@@ -15019,7 +15467,7 @@ class AnimatorKeyboardControlled extends Animator {
         // and if it's not falling, we tell it to jump.
         if (this.jumpKeyDown) {
             var b = node.getAnimatorOfType('collisionresponse');
-            if (b && !b.isFalling()) {
+            if (b && b instanceof AnimatorCollisionResponse && !b.isFalling()) {
                 var minJumpTime = 0;
                 if (this.SMGr && this.SMGr.Gravity != 0)
                     minJumpTime = Math.floor((this.JumpSpeed * (1.0 / this.SMGr.Gravity)) * 2000);
@@ -15040,7 +15488,7 @@ class AnimatorKeyboardControlled extends Animator {
     }
 
     /**
-     * @private
+     * @public
      */
     getAnimationNameFromType(n) {
         switch (n) {
@@ -15054,14 +15502,14 @@ class AnimatorKeyboardControlled extends Animator {
     }
 
     /**
-     * @private
+     * @public
      */
     hasAnimationType(node, animationType) {
         return this.setAnimation(node, animationType, false, true);
     }
 
     /**
-     * @private
+     * @public
      */
     setAnimation(node, animationType, breverse, testIfIsSetOnly) {
         if (!node || node.getType() != 'animatedmesh')
@@ -15123,7 +15571,7 @@ class AnimatorKeyboardControlled extends Animator {
 * @constructor
 * @extends CL3D.Animator
 * @class  Scene node animator which animated a mobile input 2d node
-* @private
+* @public
 */
 class AnimatorMobileInput extends Animator {
     constructor(engine, scene, obj) {
@@ -15149,14 +15597,14 @@ class AnimatorMobileInput extends Animator {
     /**
      * Returns the type of the animator.
      * For the AnimatorOnClick, this will return 'mobileinput'.
-     * @private
+     * @public
      */
     getType() {
         return 'mobileinput';
     }
 
     /**
-     * @private
+     * @public
      */
     animateNode(n, timeMs) {
         var ret = false;
@@ -15199,7 +15647,7 @@ class AnimatorMobileInput extends Animator {
     }
 
     /**
-     * @private
+     * @public
      */
     postKey(down, key) {
         if (this.KeyDown[key] == down)
@@ -15207,8 +15655,7 @@ class AnimatorMobileInput extends Animator {
 
         this.KeyDown[key] = down;
 
-        var e = new Object();
-        e.keyCode = key;
+        var e = { keyCode: key};
 
         if (down)
             this.engine.handleKeyDown(e);
@@ -15218,21 +15665,21 @@ class AnimatorMobileInput extends Animator {
     }
 
     /**
-     * @private
+     * @public
      */
     onMouseUp(event) {
         this.MouseDown = false;
     }
 
     /**
-     * @private
+     * @public
      */
     onMouseDown(event) {
         this.MouseDown = true;
     }
     
     /**
-     * @private
+     * @public
      */
     onMouseMove(event) {
         if (this.MouseDown && this.Obj.MouseOverButton &&
@@ -15261,10 +15708,19 @@ class AnimatorMobileInput extends Animator {
 /**
  * @constructor
  * @class
- * @private
+ * @public
  * @extends CL3D.Animator
  */
 class AnimatorOnKeyPress extends Animator{
+    /**
+     * @type {number}
+     */
+    KeyPressType;
+    /**
+     * @type {number}
+     */
+    KeyCode;
+
     constructor(scene, engine) {
         super();
 
@@ -15284,14 +15740,17 @@ class AnimatorOnKeyPress extends Animator{
     /**
      * Returns the type of the animator.
      * For the AnimatorOnKeyPress, this will return 'keypress'.
-     * @private
+     * @public
      */
     getType() {
         return 'keypress';
     }
     
     /**
-     * @private
+	 * @param {CL3D.SceneNode} node
+	 * @param {CL3D.Scene} newManager
+	 * @param {Number} oldNodeId
+	 * @param {Number} newNodeId
      */
     createClone(node, newManager, oldNodeId, newNodeId) {
         var a = new AnimatorOnKeyPress(this.SMGr, this.Engine);
@@ -15304,9 +15763,9 @@ class AnimatorOnKeyPress extends Animator{
     
     /**
      * Animates the scene node it is attached to and returns true if scene node was modified.
-     * @private
+     * @public
      * @param {CL3D.SceneNode} n The Scene node which needs to be animated this frame.
-     * @param {Integer} timeMs The time in milliseconds since the start of the scene.
+     * @param {Number} timeMs The time in milliseconds since the start of the scene.
      */
     animateNode(n, timeMs) {
         this.Object = n;
@@ -15316,7 +15775,7 @@ class AnimatorOnKeyPress extends Animator{
     }
     
     /**
-     * @private
+     * @public
      */
     onKeyDown(evt) {
         if (this.KeyPressType == 0 && evt.keyCode == this.KeyCode) {
@@ -15328,7 +15787,7 @@ class AnimatorOnKeyPress extends Animator{
     }
     
     /**
-     * @private
+     * @public
      */
     onKeyUp(evt) {
         if (this.KeyPressType == 1 && evt.keyCode == this.KeyCode) {
@@ -15340,7 +15799,7 @@ class AnimatorOnKeyPress extends Animator{
     }
     
     /**
-     * @private
+     * @public
      */
     onMouseUp(evt) {
         if (this.KeyPressType == 1) {
@@ -15353,7 +15812,7 @@ class AnimatorOnKeyPress extends Animator{
     }
     
     /**
-     * @private
+     * @public
      */
     onMouseDown(evt) {
         if (this.KeyPressType == 0) {
@@ -15366,7 +15825,7 @@ class AnimatorOnKeyPress extends Animator{
     }
     
     /**
-     * @private
+     * @public
      */
     findActionByType(type) {
         if (this.TheActionHandler)
@@ -15376,7 +15835,7 @@ class AnimatorOnKeyPress extends Animator{
     }
     
     /**
-     * @private
+     * @public
      */
     directlyRunKeypressEvent(type) {
         if (this.Object &&
@@ -15412,15 +15871,14 @@ class AnimatorOnKeyPress extends Animator{
 /**
  * @constructor
  * @class
- * @private
+ * @public
  * @extends CL3D.Animator
  */
 class Animator3rdPersonCamera extends Animator {
-    constructor(scene) {
+    constructor() {
         super();
 
         this.lastAnimTime = 0;
-        this.SMGr = scene;
 
         this.SceneNodeIDToFollow = -1;
         this.FollowSmoothingSpeed = 15;
@@ -15428,7 +15886,7 @@ class Animator3rdPersonCamera extends Animator {
         this.FollowMode = 0;
         this.TargetHeight = 0;
         this.CollidesWithWorld = false;
-        this.World = 0;
+        this.World = null;
 
         // runtime variables
         this.LastAnimationTime = 0.0;
@@ -15443,17 +15901,20 @@ class Animator3rdPersonCamera extends Animator {
     /**
      * Returns the type of the animator.
      * For the AnimatorTimer, this will return '3rdpersoncamera'.
-     * @private
+     * @public
      */
     getType() {
         return '3rdpersoncamera';
     }
 
     /**
-     * @private
+	 * @param {CL3D.SceneNode} node
+	 * @param {CL3D.Scene} newManager
+	 * @param {Number} oldNodeId
+	 * @param {Number} newNodeId
      */
     createClone(node, newManager, oldNodeId, newNodeId) {
-        var a = new Animator3rdPersonCamera(this.SMGr);
+        var a = new Animator3rdPersonCamera();
         a.SceneNodeIDToFollow = this.SceneNodeIDToFollow;
         a.FollowSmoothingSpeed = this.FollowSmoothingSpeed;
         a.AdditionalRotationForLooking = this.AdditionalRotationForLooking.clone();
@@ -15467,9 +15928,9 @@ class Animator3rdPersonCamera extends Animator {
 
     /**
      * Animates the scene node it is attached to and returns true if scene node was modified.
-     * @private
-     * @param {CL3D.SceneNode} n The Scene node which needs to be animated this frame.
-     * @param {Integer} timeMs The time in milliseconds since the start of the scene.
+     * @public
+     * @param {CL3D.CameraSceneNode} node The Scene node which needs to be animated this frame.
+     * @param {Number} timeMs The time in milliseconds since the start of the scene.
      */
     animateNode(node, timeMs) {
         var timeDiff = timeMs - this.lastAnimTime;
@@ -15630,7 +16091,7 @@ class Animator3rdPersonCamera extends Animator {
     }
 
     /**
-     * @private
+     * @public
      */
     linkWithNode(smgr) {
         if (this.TriedToLinkWithNode)
@@ -15660,7 +16121,7 @@ class Animator3rdPersonCamera extends Animator {
 /**
  * @constructor
  * @class
- * @private
+ * @public
  * @extends CL3D.Animator
  */
 class AnimatorGameAI extends Animator {
@@ -15711,7 +16172,7 @@ class AnimatorGameAI extends Animator {
         this.CurrentCommandStartTime = 0;
         this.CurrentCommandTicksDone = 0;
         this.CurrentCommandExpectedTickCount = 0;
-        this.BeginPositionWhenStartingCurrentCommand = 0;
+        this.BeginPositionWhenStartingCurrentCommand = null;
         this.HandleCurrentCommandTargetNode = null;
         this.AttackCommandExecuted = false;
         this.Activated = false;
@@ -15733,14 +16194,14 @@ class AnimatorGameAI extends Animator {
     /**
      * Returns the type of the animator.
      * For the AnimatorGameAI, this will return 'gameai'.
-     * @private
+     * @public
      */
     getType() {
         return 'gameai';
     }
 
     /**
-     * @private
+     * @public
      */
     createClone(node, newManager, oldNodeId, newNodeId) {
         var a = new AnimatorGameAI(this.TheSceneManager);
@@ -15771,9 +16232,9 @@ class AnimatorGameAI extends Animator {
 
     /**
      * Animates the scene node it is attached to and returns true if scene node was modified.
-     * @private
-     * @param {CL3D.SceneNode} n The Scene node which needs to be animated this frame.
-     * @param {Integer} timeMs The time in milliseconds since the start of the scene.
+     * @public
+     * @param {CL3D.SceneNode} node The Scene node which needs to be animated this frame.
+     * @param {Number} timeMs The time in milliseconds since the start of the scene.
      */
     animateNode(node, timeMs) {
         if (node == null || this.TheSceneManager == null)
@@ -15971,7 +16432,7 @@ class AnimatorGameAI extends Animator {
 
     /**
      * returns if rotation changed, returns true/false
-     * @private
+     * @public
      */
     animateRotation(node, timeSinceStartRotation,
         lookvector, rotationSpeedMs) {
@@ -16021,7 +16482,7 @@ class AnimatorGameAI extends Animator {
     }
 
     /**
-     * @private
+     * @public
      */
     moveToTarget(node, target, currentPos, now) {
         this.CurrentCommand = 1; //EMT_REACH_POSITION;
@@ -16034,7 +16495,7 @@ class AnimatorGameAI extends Animator {
     }
 
     /**
-     * @private
+     * @public
      */
     attackTarget(node, targetnode, target, currentPos, now) {
         this.CurrentCommand = 2; //EMT_ATTACK_ITEM;
@@ -16054,7 +16515,7 @@ class AnimatorGameAI extends Animator {
     }
 
     /**
-     * @private
+     * @public
      */
     aiCommandCancel(node) {
         this.CurrentCommand = 0; //EMT_DO_NOTHING;
@@ -16062,7 +16523,7 @@ class AnimatorGameAI extends Animator {
     }
 
     /**
-     * @private
+     * @public
      */
     die(node, currentPos, now) {
         this.CurrentCommand = 3; //EMT_DIE_AND_STOP;
@@ -16075,7 +16536,7 @@ class AnimatorGameAI extends Animator {
     }
 
     /**
-     * @private
+     * @public
      */
     isNodeVisibleFromNode(node1, node2) {
         if (!node1 || !node2)
@@ -16102,7 +16563,7 @@ class AnimatorGameAI extends Animator {
     }
 
     /**
-     * @private
+     * @public
      */
     isPositionVisibleFromPosition(pos1, pos2) {
         if (!this.World || !this.TheSceneManager)
@@ -16116,7 +16577,7 @@ class AnimatorGameAI extends Animator {
     }
 
     /**
-     * @private
+     * @public
      */
     getNearestSceneNodeFromAIAnimatorAndDistance(node,
         currentpos,
@@ -16153,7 +16614,7 @@ class AnimatorGameAI extends Animator {
     }
 
     /**
-     * @private
+     * @public
      */
     scanForAttackTargetIfNeeded(timems, currentpos) {
         if (this.ActivationRadius <= 0 || !this.TheObject || this.AttacksAIWithTags.length == 0 || !this.TheSceneManager)
@@ -16175,7 +16636,7 @@ class AnimatorGameAI extends Animator {
     }
 
     /**
-     * @private
+     * @public
      */
     getAttackDistanceFromWeapon() {
         var ret = 1000;
@@ -16190,7 +16651,7 @@ class AnimatorGameAI extends Animator {
     }
 
     /**
-     * @private
+     * @public
      */
     getCharacterWidth(node) {
         if (node != null)
@@ -16202,7 +16663,7 @@ class AnimatorGameAI extends Animator {
     }
 
     /**
-     * @private
+     * @public
      */
     getAnimationNameFromType(t) {
         switch (t) {
@@ -16216,7 +16677,7 @@ class AnimatorGameAI extends Animator {
     }
 
     /**
-     * @private
+     * @public
      */
     setAnimation(node, animationType) {
         if (!node || node.getType() != 'animatedmesh')
@@ -16252,28 +16713,28 @@ class AnimatorGameAI extends Animator {
     }
 
     /**
-     * @private
+     * @public
      */
     isCurrentlyShooting() {
         return this.CurrentlyShooting;
     }
 
     /**
-     * @private
+     * @public
      */
     getCurrentlyShootingLine() {
         return this.CurrentlyShootingLine;
     }
 
     /**
-     * @private
+     * @public
      */
     isAlive() {
         return this.Health > 0;
     }
 
     /**
-     * @private
+     * @public
      */
     OnHit(damage, node) {
         if (!node)
@@ -16300,7 +16761,7 @@ class AnimatorGameAI extends Animator {
     }
 
     /**
-     * @private
+     * @public
      */
     findActionByType(type) {
         var ret = null;
@@ -16341,7 +16802,7 @@ class AnimatorGameAI extends Animator {
 /**
  * @constructor
  * @class
- * @private
+ * @public
  * @extends CL3D.Animator
  */
 class AnimatorOnFirstFrame extends Animator {
@@ -16357,7 +16818,7 @@ class AnimatorOnFirstFrame extends Animator {
     /**
      * Returns the type of the animator.
      * For the AnimatorOnFirstFrame, this will return 'onfirstframe'.
-     * @private
+     * @public
      */
     getType() {
         return 'onfirstframe';
@@ -16365,18 +16826,18 @@ class AnimatorOnFirstFrame extends Animator {
 
     /**
      * Animates the scene node it is attached to and returns true if scene node was modified.
-     * @private
-     * @param {CL3D.SceneNode} n The Scene node which needs to be animated this frame.
-     * @param {Integer} timeMs The time in milliseconds since the start of the scene.
+     * @public
+     * @param {CL3D.SceneNode} node The Scene node which needs to be animated this frame.
+     * @param {Number} timeMs The time in milliseconds since the start of the scene.
      */
-    animateNode(n, timeMs) {
+    animateNode(node, timeMs) {
         if (this.RunAlready)
             return false;
 
         this.RunAlready = true;
 
         if (this.TheActionHandler) {
-            this.TheActionHandler.execute(n);
+            this.TheActionHandler.execute(node);
             return true;
         }
 
@@ -16392,7 +16853,7 @@ class AnimatorOnFirstFrame extends Animator {
 /**
  * @constructor
  * @class
- * @private
+ * @public
  * @extends CL3D.Animator
  */
 class AnimatorTimer extends Animator {
@@ -16409,14 +16870,17 @@ class AnimatorTimer extends Animator {
     /**
      * Returns the type of the animator.
      * For the AnimatorTimer, this will return 'timer'.
-     * @private
+     * @public
      */
     getType() {
         return 'timer';
     }
     
     /**
-     * @private
+	 * @param {CL3D.SceneNode} node
+	 * @param {CL3D.Scene} newManager
+	 * @param {Number} oldNodeId
+	 * @param {Number} newNodeId
      */
     createClone(node, newManager, oldNodeId, newNodeId) {
         var a = new AnimatorTimer(this.SMGr);
@@ -16428,9 +16892,9 @@ class AnimatorTimer extends Animator {
     
     /**
      * Animates the scene node it is attached to and returns true if scene node was modified.
-     * @private
+     * @public
      * @param {CL3D.SceneNode} n The Scene node which needs to be animated this frame.
-     * @param {Integer} timeMs The time in milliseconds since the start of the scene.
+     * @param {Number} timeMs The time in milliseconds since the start of the scene.
      */
     animateNode(n, timeMs) {
         if (n == null)
@@ -16461,7 +16925,7 @@ class AnimatorTimer extends Animator {
  * won't be visible either. In this way, it is for example easily possible to attach a light to a moving car,
  * or to place a walking character on a moving platform on a moving ship.
  * <br/> <br/>
- * Concrete implementations are for example: {@link CL3D.CameraSceneNode}, {@link CL3D.BillboardSceneNode}, {@link CL3D.PathSceneNode}, {@link CL3D.MeshSceneNode}, {@link CL3D.SkyBoxSceneNode}.
+ * Concrete implementations are for example: {@link CameraSceneNode}, {@link BillboardSceneNode}, {@link PathSceneNode}, {@link MeshSceneNode}, {@link SkyBoxSceneNode}.
  * @constructor
  * @class The base class for scene nodes, a node in the hierarchical 3d scene rendering graph.
  */
@@ -16523,7 +16987,7 @@ class SceneNode {
 	Selector = null;
 
 	/**
-	 * @private
+	 * @public
 	 */
 	Parent = null;
 
@@ -16576,7 +17040,7 @@ class SceneNode {
 	/**
 	 * Returns an array with all child scene nodes of this node
 	 * @public
-	 * @returns {CL3D.SceneNode}
+	 * @returns {CL3D.SceneNode[]}
 	 */
 	getChildren() {
 		return this.Children;
@@ -16632,7 +17096,7 @@ class SceneNode {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	findActionOfType(type) {
 		for (var i = 0; i < this.Animators.length; ++i) {
@@ -16657,7 +17121,7 @@ class SceneNode {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	cloneMembers(b, newparent, oldNodeId, newNodeId) {
 		b.Name = new String(this.Name);
@@ -16802,7 +17266,7 @@ class SceneNode {
 	 * depending on what they are. Also, OnAnimate() should be called for all child scene nodes here.
 	 * This method will be called once per frame, independent of whether the scene node is visible or not.
 	 * @param {CL3D.Scene} scene the current scene
-	 * @param {Number} current time in milliseconds
+	 * @param {Number} timeMs current time in milliseconds
 	 * @public
 	 */
 	OnAnimate(scene, timeMs) {
@@ -16946,7 +17410,7 @@ class SceneNode {
 
 	/**
 	 * Called after the deserialization process. Internal method used so that linked nodes link them with the deserialized other nodes.
-	 * @private
+	 * @public
 	 */
 	onDeserializedWithChildren() {
 		// to be implemented in a specific node if at all.
@@ -16954,7 +17418,7 @@ class SceneNode {
 
 	/**
 	 * replaces all referenced ids of referenced nodes when the referenced node was a child and was cloned
-	 * @private
+	 * @public
 	 */
 	replaceAllReferencedNodes(nodeChildOld, nodeChildNew) {
 		// to be implemented in a specific node if at all.
@@ -16962,7 +17426,7 @@ class SceneNode {
 
 	/**
 	 * replaces all referenced ids of referenced nodes when the referenced node was a child and was cloned
-	 * @private
+	 * @public
 	 */
 	isParentActiveFPSCameraToRenderChildrenWithoutZBuffer() {
 		if (!this.scene)
@@ -16984,8 +17448,8 @@ class SceneNode {
 
 
 /**
- * The scene is usually rendered from the currently active camera. Some cameras have an {@link CL3D.Animator} attached to
- * them which controlls the position and look target of the camera, for example a {@link CL3D.AnimatorCameraFPS}. You can 
+ * The scene is usually rendered from the currently active camera. Some cameras have an {@link Animator} attached to
+ * them which controlls the position and look target of the camera, for example a {@link AnimatorCameraFPS}. You can 
  * get access to this animator using camera.getAnimatorOfType('camerafps');. 
  * @class Scene Node which is a (controlable) camera.
  * @constructor
@@ -16998,6 +17462,7 @@ class CameraSceneNode extends SceneNode {
 
 		this.init();
 
+		this.Type = 1835098982;
 		this.Box = new Box3d();
 		this.DoesCollision = false;
 		this.Active = false;
@@ -17019,7 +17484,7 @@ class CameraSceneNode extends SceneNode {
 		//this.recalculateViewArea();
 	}
 	/**
-	 * @private
+	 * @public
 	 */
 	recalculateProjectionMatrix() {
 		this.Projection.buildProjectionMatrixPerspectiveFovLH(this.Fovy, this.Aspect, this.ZNear, this.ZFar);
@@ -17153,13 +17618,13 @@ class CameraSceneNode extends SceneNode {
 		}
 	}
 	/**
-	 * @private
+	 * @public
 	 */
 	recalculateViewArea() {
 		// TODO: implement
 	}
 	/**
-	 * @private
+	 * @public
 	 */
 	OnAnimate(mgr, timeMs) {
 		// old, simple version:
@@ -17177,7 +17642,7 @@ class CameraSceneNode extends SceneNode {
 		return ret;
 	}
 	/**
-	 * @private
+	 * @public
 	 */
 	calculateViewMatrix() {
 		var pos = this.getAbsolutePosition();
@@ -17189,7 +17654,7 @@ class CameraSceneNode extends SceneNode {
 		this.recalculateViewArea();
 	}
 	/**
-	 * @private
+	 * @public
 	 */
 	OnRegisterSceneNode(mgr) {
 		if (mgr.getActiveCamera() === this) {
@@ -17198,7 +17663,7 @@ class CameraSceneNode extends SceneNode {
 		}
 	}
 	/**
-	 * @private
+	 * @public
 	 */
 	render(renderer) {
 		// we need to rebuild the camera lookat matrix again because the user might have changed 
@@ -17218,7 +17683,7 @@ class CameraSceneNode extends SceneNode {
 		renderer.setView(this.ViewMatrix);
 	}
 	/**
-	 * @private
+	 * @public
 	 */
 	onMouseDown(event) {
 		for (var i = 0; i < this.Animators.length; ++i) {
@@ -17226,7 +17691,7 @@ class CameraSceneNode extends SceneNode {
 		}
 	}
 	/**
-	 * @private
+	 * @public
 	 */
 	onMouseWheel(delta) {
 		for (var i = 0; i < this.Animators.length; ++i) {
@@ -17234,7 +17699,7 @@ class CameraSceneNode extends SceneNode {
 		}
 	}
 	/**
-	 * @private
+	 * @public
 	 */
 	onMouseUp(event) {
 		for (var i = 0; i < this.Animators.length; ++i) {
@@ -17242,7 +17707,7 @@ class CameraSceneNode extends SceneNode {
 		}
 	}
 	/**
-	 * @private
+	 * @public
 	 */
 	onMouseMove(event) {
 		for (var i = 0; i < this.Animators.length; ++i) {
@@ -17250,7 +17715,7 @@ class CameraSceneNode extends SceneNode {
 		}
 	}
 	/**
-	 * @private
+	 * @public
 	 */
 	onKeyDown(event) {
 		var ret = false;
@@ -17263,7 +17728,7 @@ class CameraSceneNode extends SceneNode {
 		return ret;
 	}
 	/**
-	 * @private
+	 * @public
 	 */
 	onKeyUp(event) {
 		var ret = false;
@@ -17307,7 +17772,7 @@ class CameraSceneNode extends SceneNode {
 		return c;
 	}
 	/**
-	 * @private
+	 * @public
 	 */
 	setAutoAspectIfNoFixedSet(viewPortWidth, viewPortHeight) {
 		if (viewPortWidth == 0 || viewPortHeight == 0)
@@ -17343,6 +17808,7 @@ class MeshSceneNode extends SceneNode {
 
 		this.init();
 
+		this.Type = 1752395110;
 		this.Box = new Box3d();
 		this.DoesCollision = false;
 		this.OwnedMesh = null;
@@ -17395,7 +17861,7 @@ class MeshSceneNode extends SceneNode {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	OnRegisterSceneNode(mgr) {
 		var mesh = this.OwnedMesh;
@@ -17434,7 +17900,7 @@ class MeshSceneNode extends SceneNode {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	render(renderer) {
 		renderer.setWorld(this.AbsoluteTransformation);
@@ -17459,7 +17925,7 @@ class MeshSceneNode extends SceneNode {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	getMaterialCount() {
 		if (this.OwnedMesh)
@@ -17469,7 +17935,7 @@ class MeshSceneNode extends SceneNode {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	getMaterial(i) {
 		if (this.OwnedMesh != null) {
@@ -17605,7 +18071,7 @@ class CubeSceneNode extends MeshSceneNode {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	createVertex(x, y, z, nx, ny, nz, clr, s, t) {
 		var vtx = new Vertex3D(true);
@@ -17621,7 +18087,7 @@ class CubeSceneNode extends MeshSceneNode {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	createClone(newparent, oldNodeId, newNodeId) {
 		var c = new CubeSceneNode();
@@ -17645,7 +18111,7 @@ class CubeSceneNode extends MeshSceneNode {
 
 /**
  * A class rendering a sky box around the whole scene. It is a cube with 6 faces and six textures, which
- * can be accessed using {@link CL3D.SceneNode}.getMaterial().
+ * can be accessed using {@link SceneNode}.getMaterial().
  * @constructor
  * @extends CL3D.MeshSceneNode 
  * @class A class rendering a sky box around the whole scene. 
@@ -17653,6 +18119,8 @@ class CubeSceneNode extends MeshSceneNode {
 class SkyBoxSceneNode extends MeshSceneNode  {
 	constructor() {
 		super();
+
+		this.Type = 2037085030;
 
 		this.OwnedMesh = new Mesh();
 
@@ -17730,7 +18198,7 @@ class SkyBoxSceneNode extends MeshSceneNode  {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	createVertex(x, y, z, nx, ny, nz, s, t) {
 		var vtx = new Vertex3D(true);
@@ -17743,7 +18211,7 @@ class SkyBoxSceneNode extends MeshSceneNode  {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	OnRegisterSceneNode(mgr) {
 		if (this.Visible) {
@@ -17753,7 +18221,7 @@ class SkyBoxSceneNode extends MeshSceneNode  {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	render(renderer) {
 		//renderer.setWorld(this.AbsoluteTransformation);
@@ -17776,7 +18244,7 @@ class SkyBoxSceneNode extends MeshSceneNode  {
 	}
 	
 	/**
-	 * @private
+	 * @public
 	 */
 	createClone(newparent, oldNodeId, newNodeId) {
 		var c = new SkyBoxSceneNode();
@@ -17812,6 +18280,7 @@ class BillboardSceneNode extends SceneNode {
 
 		this.init();
 
+		this.Type = 1819042406;
 		this.Box = new Box3d();
 		this.SizeX = 10;
 		this.SizeY = 10;
@@ -17876,7 +18345,7 @@ class BillboardSceneNode extends SceneNode {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	OnRegisterSceneNode(mgr) {
 		if (this.Visible) {
@@ -17891,7 +18360,7 @@ class BillboardSceneNode extends SceneNode {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	render(renderer) {
 		var cam = this.scene.getActiveCamera();
@@ -17984,21 +18453,21 @@ class BillboardSceneNode extends SceneNode {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	getMaterialCount() {
 		return 1;
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	getMaterial(i) {
 		return this.MeshBuffer.Mat;
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	createClone(newparent, oldNodeId, newNodeId) {
 		var c = new BillboardSceneNode();
@@ -18099,6 +18568,8 @@ class WaterSurfaceSceneNode extends MeshSceneNode {
 	constructor() {
 		super();
 
+		this.Type = 1920235366;
+
 		// settings
 		this.Details = 0;
 		this.WaterFlowDirection = new Vect2d(1.0, 1.0);
@@ -18133,7 +18604,7 @@ class WaterSurfaceSceneNode extends MeshSceneNode {
 		return 'water';
 	}
 	/**
-	 * @private
+	 * @public
 	 */
 	OnRegisterSceneNode(mgr) {
 		if (this.Visible) {
@@ -18203,7 +18674,7 @@ class WaterSurfaceSceneNode extends MeshSceneNode {
 		return true; // water is animated, so force redraw
 	}
 	/**
-	 * @private
+	 * @public
 	 */
 	render(renderer) {
 		var cam = this.scene.getActiveCamera();
@@ -18349,7 +18820,7 @@ class WaterSurfaceSceneNode extends MeshSceneNode {
 		}
 	}
 	/**
-	 * @private
+	 * @public
 	 */
 	createClone(newparent, oldNodeId, newNodeId) {
 		var c = new WaterSurfaceSceneNode();
@@ -18367,7 +18838,7 @@ class WaterSurfaceSceneNode extends MeshSceneNode {
 		return c;
 	}
 	/**
-	 * @private
+	 * @public
 	 */
 	prepareForRendering(renderer) {
 		if (this.PreparedForRendering)
@@ -18392,7 +18863,7 @@ class WaterSurfaceSceneNode extends MeshSceneNode {
 		return true;
 	}
 	/**
-	 * @private
+	 * @public
 	 */
 	setShaderConstants(renderer) {
 		var gl = renderer.getWebGL();
@@ -18422,7 +18893,7 @@ class WaterSurfaceSceneNode extends MeshSceneNode {
 		gl.uniform1f(locmWaveHeight, this.WaveHeight);
 	}
 	/**
-	 * @private
+	 * @public
 	 */
 	initRTT(renderer) {
 		if (renderer == null)
@@ -18456,7 +18927,7 @@ class WaterSurfaceSceneNode extends MeshSceneNode {
 		this.RTTexture = renderer.addRenderTargetTexture(rttX, rttY);
 	}
 	/*
-	 * @private
+	 * @public
 	 */
 	OnAfterDrawSkyboxes(renderer) {
 		renderer.setProjection(this.FrustumCullingProjection);
@@ -18479,6 +18950,7 @@ class AnimatedMeshSceneNode extends SceneNode {
 
 		this.init();
 
+		this.Type = 1835950438;
 		this.Box = new Box3d();
 		this.DoesCollision = false;
 		this.Mesh = null;
@@ -18522,7 +18994,7 @@ class AnimatedMeshSceneNode extends SceneNode {
 	/**
 	 * Returns the amount of named animations in the animated mesh.
 	 * @public
-	 * @returns {Integer} Amount of named animations.
+	 * @returns {Number} Amount of named animations.
 	 */
 	getNamedAnimationCount() {
 		if (this.Mesh && this.Mesh.NamedAnimationRanges)
@@ -18533,7 +19005,7 @@ class AnimatedMeshSceneNode extends SceneNode {
 	/**
 	 * Returns information about a named animation in the animated mesh by index
 	 * @public
-	 * @param {Integer} idx index of the animation. Must be a value >=0 and <getNamedAnimationCount().
+	 * @param {Number} idx index of the animation. Must be a value >=0 and <getNamedAnimationCount().
 	 * @returns {Object} returns an object with info about the animation or null if there is no such animation. The object
 	 * will have the members .Name for the animation name, .Begin for the begin frame, .End for the end frame and
 	 * .FPS for the frames per second.
@@ -18579,7 +19051,7 @@ class AnimatedMeshSceneNode extends SceneNode {
 	
 	/**
 	 * Sets the animation to a new one by name, also includes 'none' and 'all' as parameters
-	 * @private
+	 * @public
 	 * @returns {Boolean} True if successful, false if not
 	 */
 	setAnimationByEditorName(name, loop) {
@@ -18619,7 +19091,7 @@ class AnimatedMeshSceneNode extends SceneNode {
 	}
 	
 	/**
-	 * @private
+	 * @public
 	 */
 	setMesh(m) {
 		if (!m)
@@ -18644,7 +19116,7 @@ class AnimatedMeshSceneNode extends SceneNode {
 	}
 	
 	/**
-	 * @private
+	 * @public
 	 */
 	OnRegisterSceneNode(mgr) {
 		if (this.Visible && this.Mesh) {
@@ -18683,7 +19155,7 @@ class AnimatedMeshSceneNode extends SceneNode {
 	}
 	
 	/**
-	 * @private
+	 * @public
 	 */
 	getMaterialCount() {
 		if (this.Materials != null)
@@ -18696,7 +19168,7 @@ class AnimatedMeshSceneNode extends SceneNode {
 	}
 	
 	/**
-	 * @private
+	 * @public
 	 */
 	getMaterial(i) {
 		if (this.Materials) {
@@ -18789,8 +19261,8 @@ class AnimatedMeshSceneNode extends SceneNode {
 	/**
 	 * Sets the begin and end frame for a looped animation
 	 * @public
-	 * @param {Integer} begin start frame of the loop
-	 * @param {Integer} end end frame of the loop
+	 * @param {Number} begin start frame of the loop
+	 * @param {Number} end end frame of the loop
 	 */
 	setFrameLoop(begin, end) {
 		if (!this.Mesh)
@@ -18832,7 +19304,7 @@ class AnimatedMeshSceneNode extends SceneNode {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	buildFrameNr(timeMs) {
 		var deltaFrame = 0; //:Number;
@@ -18910,7 +19382,7 @@ class AnimatedMeshSceneNode extends SceneNode {
 	}
 	
 	/**
-	 * @private
+	 * @public
 	 */
 	hasDynamicLightedMaterials() {
 		for (var i = 0; i < this.Materials.length; ++i)
@@ -18921,7 +19393,7 @@ class AnimatedMeshSceneNode extends SceneNode {
 	}
 	
 	/**
-	 * @private
+	 * @public
 	 */
 	calculateMeshForCurrentFrame() {
 		// As multiple scene nodes may be sharing the same skinned mesh, we have to
@@ -18961,7 +19433,7 @@ class AnimatedMeshSceneNode extends SceneNode {
 	}
 	
 	/**
-	 * @private
+	 * @public
 	 */
 	OnAnimate(mgr, timeMs) {
 		var now = CLTimer.getTime();
@@ -18984,7 +19456,7 @@ class AnimatedMeshSceneNode extends SceneNode {
 	}
 	
 	/**
-	 * @private
+	 * @public
 	 */
 	render(renderer) {
 		// skip if the mesh isn't visible in the frustum
@@ -19057,7 +19529,7 @@ class AnimatedMeshSceneNode extends SceneNode {
 	}
 	
 	/**
-	 * @private
+	 * @public
 	 */
 	ensureJointCopyArrayHasCorrectSize(joints) {
 		var sz1 = joints.length;
@@ -19073,7 +19545,7 @@ class AnimatedMeshSceneNode extends SceneNode {
 	}
 	
 	/**
-	 * @private
+	 * @public
 	 */
 	startAnimationBlending(frameNumberBeforeAnimationChange) {
 		if (!this.WasAnimatedBefore)
@@ -19104,7 +19576,7 @@ class AnimatedMeshSceneNode extends SceneNode {
 	}
 	
 	/**
-	 * @private
+	 * @public
 	 */
 	animateJointsWithCurrentBlendingSettings(framenumber) {
 		var skinnedMesh = this.Mesh; // as SkinnedMesh;
@@ -19141,7 +19613,7 @@ class AnimatedMeshSceneNode extends SceneNode {
 	
 	/**
 	 * Called after the deserialization process. Internal method used so that linked nodes link them with the deserialized other nodes.
-	 * @private
+	 * @public
 	 */
 	onDeserializedWithChildren() {
 		if (this.scene == null)
@@ -19166,7 +19638,7 @@ class AnimatedMeshSceneNode extends SceneNode {
 	
 	/**
 	 * Called after the deserialization process. Internal method used so that linked nodes link them with the deserialized other nodes.
-	 * @private
+	 * @public
 	 */
 	updatePositionsOfAttachedNodes() {
 		var skinnedMesh = this.Mesh; // as SkinnedMesh;
@@ -19192,7 +19664,7 @@ class AnimatedMeshSceneNode extends SceneNode {
 	
 	/**
 	 * replaces all referenced ids of referenced nodes when the referenced node was a child and was cloned
-	 * @private
+	 * @public
 	 */
 	replaceAllReferencedNodes(nodeChildOld, nodeChildNew) {
 		for (var i = 0; i < this.AnimatedDummySceneNodes.length; ++i) {
@@ -19208,7 +19680,7 @@ class AnimatedMeshSceneNode extends SceneNode {
 }
 /**
  * Structure storing data about scene nodes attached to a joint of this item
- * @private
+ * @public
  */
 class SAnimatedDummySceneNodeChild {
 	constructor() {
@@ -19230,9 +19702,10 @@ class SAnimatedDummySceneNodeChild {
  * @extends CL3D.SceneNode
  */
 class HotspotSceneNode extends SceneNode {
-	constructor() {
+	constructor(engine, scene) {
 		super();
 
+		this.Type = 1953526632;
 		this.Box = new Box3d();
 		this.Width = 0;
 		this.Height = 0;
@@ -19244,7 +19717,7 @@ class HotspotSceneNode extends SceneNode {
 /**
  * @constructor
  * @extends CL3D.SceneNode
- * @private
+ * @public
  */
 class DummyTransformationSceneNode extends SceneNode {
 	constructor() {
@@ -19252,12 +19725,13 @@ class DummyTransformationSceneNode extends SceneNode {
 
 		this.init();
 
+		this.Type = 1954112614;
 		this.Box = new Box3d();
 		this.RelativeTransformationMatrix = new Matrix4();
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	createClone(newparent, oldNodeId, newNodeId) {
 		var c = new DummyTransformationSceneNode();
@@ -19273,14 +19747,14 @@ class DummyTransformationSceneNode extends SceneNode {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	getRelativeTransformation() {
 		return this.RelativeTransformationMatrix;
 	}
 
 	/**
-	 * @private
+	 * @public
 	 * @returns {String} type name of the scene node.
 	 */
 	getType() {
@@ -19314,7 +19788,7 @@ class TerrainSceneNode extends SceneNode {
 
 
 /**
- * A class holding the data of a point light. This is used by the {@link CL3D.LightSceneNode} to send data to the renderer.
+ * A class holding the data of a point light. This is used by the {@link LightSceneNode} to send data to the renderer.
  * @public
  * @constructor
  * @class A class holding the data of a point light.
@@ -19414,6 +19888,7 @@ class LightSceneNode extends SceneNode {
 	constructor(size) {
 		super();
 
+		this.Type = 1751608422;
 		this.LightData = new Light();
 		this.Box = new Box3d();
 		this.init();
@@ -19430,7 +19905,7 @@ class LightSceneNode extends SceneNode {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	createClone(newparent, oldNodeId, newNodeId) {
 		var c = new LightSceneNode();
@@ -19443,7 +19918,7 @@ class LightSceneNode extends SceneNode {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	OnRegisterSceneNode(mgr) {
 		if (this.Visible)
@@ -19467,7 +19942,7 @@ class LightSceneNode extends SceneNode {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	render(renderer) {
 		if (this.LightData.IsDirectional)
@@ -19494,6 +19969,7 @@ class Mobile2DInputSceneNode extends SceneNode {
 
 		Overlay2DSceneNode.call(this, engine);
 
+		this.Type = 1835283046;
 		this.CursorTex = null;
 		this.CursorPosX = 0;
 		this.CursorPosY = 0;
@@ -19521,14 +19997,14 @@ class Mobile2DInputSceneNode extends SceneNode {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	blocksCameraInput() {
 		return true;
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	render(renderer) {
 		var rctTarget = this.getScreenCoordinatesRect(true, renderer);
@@ -19684,6 +20160,9 @@ class Overlay2DSceneNode extends SceneNode {
 		super();
 
 		this.init();
+
+		this.Type = 1868837478;
+
 		this.engine = engine;
 
 		/*private static const ETA_TOP_LEFT:int					= 0;
@@ -19725,9 +20204,9 @@ class Overlay2DSceneNode extends SceneNode {
 
 		this.AnimateOnHover = false; //:Boolean;
 		this.OnHoverSetFontColor = false; //:Boolean;
-		this.HoverFontColor = false; //:int;
+		this.HoverFontColor = 0; //:int;
 		this.OnHoverSetBackgroundColor = false; //:Boolean;
-		this.HoverBackgroundColor = false; //:int;
+		this.HoverBackgroundColor = 0; //:int;
 		this.OnHoverDrawTexture = false; //:Boolean;
 
 
@@ -19744,7 +20223,7 @@ class Overlay2DSceneNode extends SceneNode {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	blocksCameraInput() {
 		return false;
@@ -19804,7 +20283,7 @@ class Overlay2DSceneNode extends SceneNode {
 	/**
 	 * Sets if the overlay scene node should show a image
 	 * @public
-	 * @param {CL3D.Texture} tex a {@link CL3D.Texture} to show as image on the 2d overlay
+	 * @param {CL3D.Texture} tex a {@link Texture} to show as image on the 2d overlay
 	 */
 	setShowImage(tex) {
 		this.Texture = tex;
@@ -19826,7 +20305,7 @@ class Overlay2DSceneNode extends SceneNode {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	OnRegisterSceneNode(mgr) {
 		if (this.Visible) {
@@ -19836,7 +20315,7 @@ class Overlay2DSceneNode extends SceneNode {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	render(renderer) {
 		// TODO: ScreenShot
@@ -19940,7 +20419,7 @@ class Overlay2DSceneNode extends SceneNode {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	destroyTextTextures(renderer) {
 		renderer.deleteTexture(this.TextTexture);
@@ -19950,7 +20429,7 @@ class Overlay2DSceneNode extends SceneNode {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	createNewTextTexturesIfNecessary(renderer, forcedwidth) {
 		var needsDifferentHoverTexture = false;
@@ -20042,7 +20521,7 @@ class Overlay2DSceneNode extends SceneNode {
 		this.CreatedTextTextureFontName = this.FontName;
 	}
 	/**
-	 * @private
+	 * @public
 	 * Breaks the text into multiple lines for text rendering
 	 */
 	breakText(BrokenText, rectWidth, text, ctx) {
@@ -20128,14 +20607,14 @@ class Overlay2DSceneNode extends SceneNode {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	getMaterialCount() {
 		return 0;
 	}
 
 	/**
-	 * @private
+	 * @public
 	 * Calculates 2d screen position from a 3d position, including displacement from view ports drawn in editors
 	 * Returns rectangle object with x, y, w, and h
 	 */
@@ -20168,7 +20647,7 @@ class Overlay2DSceneNode extends SceneNode {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	createClone(newparent, oldNodeId, newNodeId) {
 		var c = new Overlay2DSceneNode();
@@ -20211,7 +20690,7 @@ class Overlay2DSceneNode extends SceneNode {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	parseCopperCubeFontString(fontStr) {
 		// we only need to return something like
@@ -20526,6 +21005,7 @@ class ParticleSystemSceneNode extends SceneNode {
 
 		this.init();
 
+		this.Type = 1668575334;
 		this.Box = new Box3d();
 		this.Buffer = new MeshBuffer();
 
@@ -20599,7 +21079,7 @@ class ParticleSystemSceneNode extends SceneNode {
 	}
 	
 	/**
-	 * @private
+	 * @public
 	 */
 	OnRegisterSceneNode(mgr) {
 		if (this.Visible) {
@@ -20609,7 +21089,7 @@ class ParticleSystemSceneNode extends SceneNode {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	OnRegisterSceneNode = function(mgr) {
 		if (this.Visible) {				
@@ -20620,21 +21100,21 @@ class ParticleSystemSceneNode extends SceneNode {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	getMaterialCount() {
 		return 1;
 	}
 	
 	/**
-	 * @private
+	 * @public
 	 */
 	getMaterial(i) {
 		return this.Buffer.Mat;
 	}
 	
 	/**
-	 * @private
+	 * @public
 	 */
 	OnAnimate(mgr, timeMs) {
 		var framechanged = false;
@@ -20646,7 +21126,7 @@ class ParticleSystemSceneNode extends SceneNode {
 	}
 	
 	/**
-	 * @private
+	 * @public
 	 */
 	render(renderer) {
 		var cam = this.scene.getActiveCamera();
@@ -20727,7 +21207,7 @@ class ParticleSystemSceneNode extends SceneNode {
 	}
 	
 	/**
-	 * @private
+	 * @public
 	 */
 	doParticleSystem(time) {
 		if (this.LastEmitTime == 0) {
@@ -20796,7 +21276,7 @@ class ParticleSystemSceneNode extends SceneNode {
 	}
 	
 	/**
-	 * @private
+	 * @public
 	 */
 	emit(time, diff) {
 		var pps = (this.MaxParticlesPerSecond - this.MinParticlesPerSecond);
@@ -20896,7 +21376,7 @@ class ParticleSystemSceneNode extends SceneNode {
 	}
 	
 	/**
-	 * @private
+	 * @public
 	 */
 	affect(now, diff) {
 		if (!this.FadeOutAffector && !this.GravityAffector && !this.ScaleAffector)
@@ -20949,7 +21429,7 @@ class ParticleSystemSceneNode extends SceneNode {
 	}
 	
 	/**
-	 * @private
+	 * @public
 	 */
 	reallocateBuffers() {
 		if (this.Particles.length * 4 > this.Buffer.Vertices.length ||
@@ -21003,7 +21483,7 @@ class ParticleSystemSceneNode extends SceneNode {
  * A 3d particle, internally used in {@link ParticleSystemSceneNode}
  * @constructor
  * @class A 3d particle, internally used in {@link ParticleSystemSceneNode}
- * @private
+ * @public
  */
 class Particle {
 	constructor (init) {
@@ -21026,8 +21506,8 @@ class Particle {
 
 
 /**
- * A path scene node stores a 3d path which can be used for example by {@link CL3D.Animator}s to move {@link CL3D.SceneNode}s along it.
- * @class A path scene node stores a 3d path which can be used for example by {@link CL3D.Animator}s to move {@link CL3D.SceneNode}s along it.
+ * A path scene node stores a 3d path which can be used for example by {@link Animator}s to move {@link SceneNode}s along it.
+ * @class A path scene node stores a 3d path which can be used for example by {@link Animator}s to move {@link SceneNode}s along it.
  * @constructor
  * @extends CL3D.SceneNode
  */
@@ -21059,6 +21539,7 @@ class PathSceneNode extends SceneNode {
 
 		this.init();
 
+		this.Type = 1752461414;
 		this.Box = new Box3d();
 		this.Tightness = 0; //;
 		this.IsClosedCircle = false; //:Boolean;
@@ -21088,7 +21569,7 @@ class PathSceneNode extends SceneNode {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	createClone(newparent, oldNodeId, newNodeId) {
 		var c = new PathSceneNode();
@@ -21110,7 +21591,7 @@ class PathSceneNode extends SceneNode {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	getPathNodeCount() {
 		return this.Nodes.length;
@@ -21137,7 +21618,7 @@ class PathSceneNode extends SceneNode {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	clampPathIndex(idx, size) {
 		if (this.IsClosedCircle)
@@ -21150,8 +21631,8 @@ class PathSceneNode extends SceneNode {
 	 * @public
 	 * Returns the position of a point on the path, based on a value between 0 and 1. Can be
 	 * Used to interpolate a position on the path.
-	 * @param posOnPath {Number} Value between 0 and 1, meaning 0 is the start of the path and 1 is the end of the path.
-	 * @param relative {Boolean} set to true to get the position relative to the position of the path scene node, set to
+	 * @param {Number} posOnPath Value between 0 and 1, meaning 0 is the start of the path and 1 is the end of the path.
+	 * @param {Boolean=} relative set to true to get the position relative to the position of the path scene node, set to
 	 * false to receive the position in absolute world space.
 	 * @returns {CL3D.Vect3d} returns the 3d vector of the position
 	 */
@@ -21228,6 +21709,7 @@ class SoundSceneNode extends SceneNode {
 
 		this.init();
 
+		this.Type = 1935946598;
 		this.Box = new Box3d();
 		this.TheSound = "";
 		this.MinDistance = 0;
@@ -21252,7 +21734,7 @@ class SoundSceneNode extends SceneNode {
 	 * If you need to find the smallest amount to turn a gun or head or whatever
 	 * to a certain angle, or find the smallest amount to turn to go a certain direction,
 	 * you shouldn't have to go more than 180 degrees in either direction.
-	 * @private
+	 * @public
 	 */
 	static normalizeRelativeAngle(angleInGrad) {
 		return ((angleInGrad + 7 * 180.0) % (360.0)) - 1800.0;
@@ -21281,7 +21763,7 @@ class SoundSceneNode extends SceneNode {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	OnRegisterSceneNode(mgr) {
 		if (this.Visible) {
@@ -21292,7 +21774,7 @@ class SoundSceneNode extends SceneNode {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	get2DAngle(X, Y) {
 		if (Y == 0)
@@ -21320,14 +21802,14 @@ class SoundSceneNode extends SceneNode {
 
 	/**
 	 * normalizes an angle, returns the same angle clamped into (0;360)
-	 * @private
+	 * @public
 	 */
 	normalizeAngle(angleInGrad) {
 		return ((angleInGrad % 360.0) + 360.0) % 360.0;
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	updateSoundFor3DSound(playingSnd, Position, mgr) {
 		// unfortunately, HTML5 audio currently is very primitive, so we can only set the volume for this right now
@@ -21435,7 +21917,7 @@ class SoundSceneNode extends SceneNode {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	startSound(loop) {
 		if (!this.PlayingSound && this.TheSound) {
@@ -21450,7 +21932,7 @@ class SoundSceneNode extends SceneNode {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	OnAnimate(scene, timeMs) {
 		try {
@@ -21521,7 +22003,7 @@ class SoundSceneNode extends SceneNode {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	createClone(newparent, oldNodeId, newNodeId) {
 		var c = new SoundSceneNode();
@@ -21540,14 +22022,12 @@ class SoundSceneNode extends SceneNode {
 // ---------------------------------------------------------------------
 
 /**
- * @private
+ * @public
  * @constructor
  * @class
  */
-class VideoStream
-{
-    constructor(filename, renderer)
-    {
+class VideoStream {
+    constructor(filename, renderer) {
         this.filename = filename;
         this.videoElement = null;
         this.renderer = renderer;
@@ -21560,52 +22040,48 @@ class VideoStream
         this.state = 0; // 0=stopped, 1=loading, 2=playing, 3=paused
         this.playLooped = false;
         this.isError = false;
+    }
 
-        videoBufferReady();
-        {
-            this.state = 2; // playing
+    videoBufferReady() {
+        this.state = 2; // playing
 
 
-            // start video
-            this.videoElement.play();
-            this.readyToShow = true;
+        // start video
+        this.videoElement.play();
+        this.readyToShow = true;
 
-            var oldTexture = this.texture;
-            var newTexture = this.renderer.createTextureFrom2DCanvas(this.videoElement, true);
+        var oldTexture = this.texture;
+        var newTexture = this.renderer.createTextureFrom2DCanvas(this.videoElement, true);
 
-            // now replace content of the new texture with the old placeholder texture
-            this.renderer.replacePlaceholderTextureWithNewTextureContent(oldTexture, newTexture);
-        }
+        // now replace content of the new texture with the old placeholder texture
+        this.renderer.replacePlaceholderTextureWithNewTextureContent(oldTexture, newTexture);
+    }
 
-        videoPlaybackDone();
-        {
-            this.state = 0; // 0=stopped, 1=loading, 2=playing, 3=paused
-            this.playBackEnded = true;
-        }
+    videoPlaybackDone() {
+        this.state = 0; // 0=stopped, 1=loading, 2=playing, 3=paused
+        this.playBackEnded = true;
+    }
 
-        errorHappened();
-        {
-            this.state = 0;
-            this.playBackEnded = true;
-            this.isError = true;
-        }
+    errorHappened() {
+        this.state = 0;
+        this.playBackEnded = true;
+        this.isError = true;
+    }
 
-        play(playLooped);
-        {
-            if (this.state == 2 || this.state == 1) // playing or loading
-                return;
+    play(playLooped) {
+        if (this.state == 2 || this.state == 1) // playing or loading
+            return;
 
-            if (this.videoElement)
+        if (this.videoElement) {
+            if (this.state == 3) // paused
             {
-                if (this.state == 3) // paused
-                {
-                    // unpause
-                    this.videoElement.play();
-                    this.state = 2;
-                    this.playBackEnded = false;
-                    return;
-                }
-                else
+                // unpause
+                this.videoElement.play();
+                this.state = 2;
+                this.playBackEnded = false;
+                return;
+            }
+            else
                 if (this.state == 0) // stopped
                 {
                     this.videoElement.currentTime = 0;
@@ -21614,86 +22090,81 @@ class VideoStream
                     this.playBackEnded = false;
                     return;
                 }
-            }
-
-            var v = document.createElement('video');
-
-            var me = this;
-
-            this.videoElement = v;
-            this.playLooped = playLooped;
-
-            v.addEventListener("canplaythrough", function () { me.videoBufferReady(); }, true);
-            v.addEventListener("ended", function () { me.videoPlaybackDone(); }, true);
-            v.addEventListener("error", function () { me.errorHappened(); }, true);
-
-            v['preload'] = "auto";
-            v.src = filename; // works with .ogv and .mp4
-            v.style.display = 'none';
-
-            if (this.playLooped)
-                v.loop = true;
-
-            this.state = 1; // loading
-
-
-
-            // create placeholder texture
-            var canvas = document.createElement("canvas");
-            if (canvas == null)
-                return;
-            canvas.width = 16;
-            canvas.height = 16;
-
-            //ctx = canvas.getContext("2d");
-            //ctx.fillStyle = "rgba(255, 0, 255, 1)";
-            //ctx.fillRect(0, 0, canvas.width, canvas.height);
-            this.texture = this.renderer.createTextureFrom2DCanvas(canvas, true);
         }
 
-        pause();
-        {
-            if (this.state != 2)
-                return;
+        var v = document.createElement('video');
 
-            this.videoElement.pause();
-            this.state = 3;
-        }
+        var me = this;
 
-        stop();
-        {
-            if (this.state != 2)
-                return;
+        this.videoElement = v;
+        this.playLooped = playLooped;
 
-            this.videoElement.pause();
-            this.state = 0;
-        }
+        v.addEventListener("canplaythrough", function () { me.videoBufferReady(); }, true);
+        v.addEventListener("ended", function () { me.videoPlaybackDone(); }, true);
+        v.addEventListener("error", function () { me.errorHappened(); }, true);
 
-        updateVideoTexture();
-        {
-            if (!this.readyToShow)
-                return;
+        v['preload'] = "auto";
+        v.src = this.filename; // works with .ogv and .mp4
+        v.style.display = 'none';
 
-            if (this.state != 2) // playing
-                return;
+        if (this.playLooped)
+            v.loop = true;
 
-            this.renderer.updateTextureFrom2DCanvas(this.texture, this.videoElement);
-        }
+        this.state = 1; // loading
 
-        hasPlayBackEnded();
-        {
-            if (this.state == 0) // 0=stopped, 1=loading, 2=playing, 3=paused
-                return true;
 
-            return this.playBackEnded;
-        }
+
+        // create placeholder texture
+        var canvas = document.createElement("canvas");
+        if (canvas == null)
+            return;
+        canvas.width = 16;
+        canvas.height = 16;
+
+        //ctx = canvas.getContext("2d");
+        //ctx.fillStyle = "rgba(255, 0, 255, 1)";
+        //ctx.fillRect(0, 0, canvas.width, canvas.height);
+        this.texture = this.renderer.createTextureFrom2DCanvas(canvas, true);
+    }
+
+    pause() {
+        if (this.state != 2)
+            return;
+
+        this.videoElement.pause();
+        this.state = 3;
+    }
+
+    stop() {
+        if (this.state != 2)
+            return;
+
+        this.videoElement.pause();
+        this.state = 0;
+    }
+
+    updateVideoTexture() {
+        if (!this.readyToShow)
+            return;
+
+        if (this.state != 2) // playing
+            return;
+
+        this.renderer.updateTextureFrom2DCanvas(this.texture, this.videoElement);
+    }
+
+    hasPlayBackEnded() {
+        if (this.state == 0) // 0=stopped, 1=loading, 2=playing, 3=paused
+            return true;
+
+        return this.playBackEnded;
     }
 }
 
 /**
  * data is the .responseText of a GET operation
  * @constructor
- * @private
+ * @public
  */
 class StringBinary {
 	constructor(data) {
@@ -21707,7 +22178,7 @@ class StringBinary {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	bytesAvailable() {
 		return this._length - this._offset;
@@ -21983,6 +22454,12 @@ class Buffer {
 //
 
 // sensless function preventing jsinflace overriding concatenated files for compression
+
+/**
+ * @type {{inflate: (data: string) => string}} JSInflate
+ */
+globalThis.JSInflate = null;
+
 ((GLOBAL) => {
     /*
      * Port of script by Masanao Izumo.
@@ -22061,12 +22538,12 @@ class Buffer {
     }
 
     function zip_HuftBuild(b,	// code lengths in bits (all assumed <= BMAX)
-                           n,	// number of codes (assumed <= N_MAX)
-                           s,	// number of simple-valued codes (0..s-1)
-                           d,	// list of base values for non-simple codes
-                           e,	// list of extra bits for non-simple codes
-                           mm	// maximum lookup bits
-                          ) {
+        n,	// number of codes (assumed <= N_MAX)
+        s,	// number of simple-valued codes (0..s-1)
+        d,	// list of base values for non-simple codes
+        e,	// list of extra bits for non-simple codes
+        mm	// maximum lookup bits
+    ) {
         this.BMAX = 16;   // maximum bit length of any code
         this.N_MAX = 288; // maximum number of codes in any set
         this.status = 0;	// 0: success, 1: incomplete table, 2: bad input
@@ -22083,7 +22560,7 @@ class Buffer {
            decoded. */
         {
             var a;			// counter for codes of length k
-            var c = new Array(this.BMAX+1);	// bit length count table
+            var c = new Array(this.BMAX + 1);	// bit length count table
             var el;			// length of EOB code (value 256)
             var f;			// i repeats in table every f entries
             var g;			// maximum code length
@@ -22091,7 +22568,7 @@ class Buffer {
             var i;			// counter, current code
             var j;			// counter
             var k;			// number of bits in current code
-            var lx = new Array(this.BMAX+1);	// stack of bits per table
+            var lx = new Array(this.BMAX + 1);	// stack of bits per table
             var p;			// pointer into c[], b[], or v[]
             var pidx;		// index of p
             var q;			// (zip_HuftNode) points to current table
@@ -22099,7 +22576,7 @@ class Buffer {
             var u = new Array(this.BMAX); // zip_HuftNode[BMAX][]  table stack
             var v = new Array(this.N_MAX); // values in order of bit length
             var w;
-            var x = new Array(this.BMAX+1);// bit offsets, then code stack
+            var x = new Array(this.BMAX + 1);// bit offsets, then code stack
             var xp;			// pointer into x or c
             var y;			// number of dummy codes added
             var z;			// number of entries in current table
@@ -22107,15 +22584,15 @@ class Buffer {
             var tail;		// (zip_HuftList)
 
             tail = this.root = null;
-            for(i = 0; i < c.length; i++)
+            for (i = 0; i < c.length; i++)
                 c[i] = 0;
-            for(i = 0; i < lx.length; i++)
+            for (i = 0; i < lx.length; i++)
                 lx[i] = 0;
-            for(i = 0; i < u.length; i++)
+            for (i = 0; i < u.length; i++)
                 u[i] = null;
-            for(i = 0; i < v.length; i++)
+            for (i = 0; i < v.length; i++)
                 v[i] = 0;
-            for(i = 0; i < x.length; i++)
+            for (i = 0; i < x.length; i++)
                 x[i] = 0;
 
             // Generate counts for each bit length
@@ -22125,8 +22602,8 @@ class Buffer {
             do {
                 c[p[pidx]]++;	// assume all entries <= BMAX
                 pidx++;
-            } while(--i > 0);
-            if(c[0] == n) {	// null input--all zero length codes
+            } while (--i > 0);
+            if (c[0] == n) {	// null input--all zero length codes
                 this.root = null;
                 this.m = 0;
                 this.status = 0;
@@ -22134,27 +22611,27 @@ class Buffer {
             }
 
             // Find minimum and maximum length, bound *m by those
-            for(j = 1; j <= this.BMAX; j++)
-                if(c[j] != 0)
+            for (j = 1; j <= this.BMAX; j++)
+                if (c[j] != 0)
                     break;
             k = j;			// minimum code length
-            if(mm < j)
+            if (mm < j)
                 mm = j;
-            for(i = this.BMAX; i != 0; i--)
-                if(c[i] != 0)
+            for (i = this.BMAX; i != 0; i--)
+                if (c[i] != 0)
                     break;
             g = i;			// maximum code length
-            if(mm > i)
+            if (mm > i)
                 mm = i;
 
             // Adjust last length count to fill out codes, if needed
-            for(y = 1 << j; j < i; j++, y <<= 1)
-                if((y -= c[j]) < 0) {
+            for (y = 1 << j; j < i; j++, y <<= 1)
+                if ((y -= c[j]) < 0) {
                     this.status = 2;	// bad input: more codes than bits
                     this.m = mm;
                     return;
                 }
-            if((y -= c[i]) < 0) {
+            if ((y -= c[i]) < 0) {
                 this.status = 2;
                 this.m = mm;
                 return;
@@ -22166,16 +22643,16 @@ class Buffer {
             p = c;
             pidx = 1;
             xp = 2;
-            while(--i > 0)		// note that i == g from above
+            while (--i > 0)		// note that i == g from above
                 x[xp++] = (j += p[pidx++]);
 
             // Make a table of values in order of bit lengths
             p = b; pidx = 0;
             i = 0;
             do {
-                if((j = p[pidx++]) != 0)
+                if ((j = p[pidx++]) != 0)
                     v[x[j]++] = i;
-            } while(++i < n);
+            } while (++i < n);
             n = x[g];			// set n to length of v
 
             // Generate the Huffman codes and for each, make the table entries
@@ -22187,65 +22664,65 @@ class Buffer {
             z = 0;			// ditto
 
             // go through the bit lengths (k already is bits in shortest code)
-            for(; k <= g; k++) {
+            for (; k <= g; k++) {
                 a = c[k];
-                while(a-- > 0) {
+                while (a-- > 0) {
                     // here i is the Huffman code of length k bits for value p[pidx]
                     // make tables up to required level
-                    while(k > w + lx[1 + h]) {
+                    while (k > w + lx[1 + h]) {
                         w += lx[1 + h]; // add bits already decoded
                         h++;
 
                         // compute minimum size table less than or equal to *m bits
                         z = (z = g - w) > mm ? mm : z; // upper limit
-                        if((f = 1 << (j = k - w)) > a + 1) { // try a k-w bit table
+                        if ((f = 1 << (j = k - w)) > a + 1) { // try a k-w bit table
                             // too few codes for k-w bit table
                             f -= a + 1;	// deduct codes from patterns left
                             xp = k;
-                            while(++j < z) { // try smaller tables up to z bits
-                                if((f <<= 1) <= c[++xp])
+                            while (++j < z) { // try smaller tables up to z bits
+                                if ((f <<= 1) <= c[++xp])
                                     break;	// enough codes to use up j bits
                                 f -= c[xp];	// else deduct codes from patterns
                             }
                         }
-                        if(w + j > el && w < el)
+                        if (w + j > el && w < el)
                             j = el - w;	// make EOB code end at table
                         z = 1 << j;	// table entries for j-bit table
                         lx[1 + h] = j; // set table size in stack
 
                         // allocate and link in new table
                         q = new Array(z);
-                        for(o = 0; o < z; o++) {
+                        for (o = 0; o < z; o++) {
                             q[o] = new zip_HuftNode();
                         }
 
-                        if(tail == null)
+                        if (tail == null)
                             tail = this.root = new zip_HuftList();
                         else
-                            tail = tail.next = new zip_HuftList();
+                            tail.next = tail = new zip_HuftList();
                         tail.next = null;
                         tail.list = q;
                         u[h] = q;	// table starts after link
 
                         /* connect to last table, if there is one */
-                        if(h > 0) {
+                        if (h > 0) {
                             x[h] = i;		// save pattern for backing up
                             r.b = lx[h];	// bits to dump before this table
                             r.e = 16 + j;	// bits in this table
                             r.t = q;		// pointer to this table
                             j = (i & ((1 << w) - 1)) >> (w - lx[h]);
-                            u[h-1][j].e = r.e;
-                            u[h-1][j].b = r.b;
-                            u[h-1][j].n = r.n;
-                            u[h-1][j].t = r.t;
+                            u[h - 1][j].e = r.e;
+                            u[h - 1][j].b = r.b;
+                            u[h - 1][j].n = r.n;
+                            u[h - 1][j].t = r.t;
                         }
                     }
 
                     // set up table entry in r
                     r.b = k - w;
-                    if(pidx >= n)
+                    if (pidx >= n)
                         r.e = 99;		// out of values--invalid code
-                    else if(p[pidx] < s) {
+                    else if (p[pidx] < s) {
                         r.e = (p[pidx] < 256 ? 16 : 15); // 256 is end-of-block code
                         r.n = p[pidx++];	// simple code is just the value
                     } else {
@@ -22255,7 +22732,7 @@ class Buffer {
 
                     // fill code-like entries with r //
                     f = 1 << (k - w);
-                    for(j = i >> w; j < z; j += f) {
+                    for (j = i >> w; j < z; j += f) {
                         q[j].e = r.e;
                         q[j].b = r.b;
                         q[j].n = r.n;
@@ -22263,12 +22740,12 @@ class Buffer {
                     }
 
                     // backwards increment the k-bit code i
-                    for(j = 1 << (k - 1); (i & j) != 0; j >>= 1)
+                    for (j = 1 << (k - 1); (i & j) != 0; j >>= 1)
                         i ^= j;
                     i ^= j;
 
                     // backup over finished tables
-                    while((i & ((1 << w) - 1)) != x[h]) {
+                    while ((i & ((1 << w) - 1)) != x[h]) {
                         w -= lx[h];		// don't need to update q
                         h--;
                     }
@@ -22287,13 +22764,13 @@ class Buffer {
     /* routines (inflate) */
 
     function zip_GET_BYTE() {
-        if(zip_inflate_data.length == zip_inflate_pos)
+        if (zip_inflate_data.length == zip_inflate_pos)
             return -1;
         return zip_inflate_data.charCodeAt(zip_inflate_pos++) & 0xff;
     }
 
     function zip_NEEDBITS(n) {
-        while(zip_bit_len < n) {
+        while (zip_bit_len < n) {
             zip_bit_buf |= zip_GET_BYTE() << zip_bit_len;
             zip_bit_len += 8;
         }
@@ -22315,17 +22792,17 @@ class Buffer {
         var t;		// (zip_HuftNode) pointer to table entry
         var n;
 
-        if(size == 0)
+        if (size == 0)
             return 0;
 
         // inflate the coded data
         n = 0;
-        for(;;) {			// do until end of block
+        for (; ;) {			// do until end of block
             zip_NEEDBITS(zip_bl);
             t = zip_tl.list[zip_GETBITS(zip_bl)];
             e = t.e;
-            while(e > 16) {
-                if(e == 99)
+            while (e > 16) {
+                if (e == 99)
                     return -1;
                 zip_DUMPBITS(t.b);
                 e -= 16;
@@ -22335,16 +22812,16 @@ class Buffer {
             }
             zip_DUMPBITS(t.b);
 
-            if(e == 16) {		// then it's a literal
+            if (e == 16) {		// then it's a literal
                 zip_wp &= zip_WSIZE - 1;
                 buff[off + n++] = zip_slide[zip_wp++] = t.n;
-                if(n == size)
+                if (n == size)
                     return size;
                 continue;
             }
 
             // exit if end of block
-            if(e == 15)
+            if (e == 15)
                 break;
 
             // it's an EOB or a length
@@ -22359,8 +22836,8 @@ class Buffer {
             t = zip_td.list[zip_GETBITS(zip_bd)];
             e = t.e;
 
-            while(e > 16) {
-                if(e == 99)
+            while (e > 16) {
+                if (e == 99)
                     return -1;
                 zip_DUMPBITS(t.b);
                 e -= 16;
@@ -22374,7 +22851,7 @@ class Buffer {
             zip_DUMPBITS(e);
 
             // do the copy
-            while(zip_copy_leng > 0 && n < size) {
+            while (zip_copy_leng > 0 && n < size) {
                 zip_copy_leng--;
                 zip_copy_dist &= zip_WSIZE - 1;
                 zip_wp &= zip_WSIZE - 1;
@@ -22382,7 +22859,7 @@ class Buffer {
                     = zip_slide[zip_copy_dist++];
             }
 
-            if(n == size)
+            if (n == size)
                 return size;
         }
 
@@ -22403,7 +22880,7 @@ class Buffer {
         n = zip_GETBITS(16);
         zip_DUMPBITS(16);
         zip_NEEDBITS(16);
-        if(n != ((~zip_bit_buf) & 0xffff))
+        if (n != ((~zip_bit_buf) & 0xffff))
             return -1;			// error in compressed data
         zip_DUMPBITS(16);
 
@@ -22411,7 +22888,7 @@ class Buffer {
         zip_copy_leng = n;
 
         n = 0;
-        while(zip_copy_leng > 0 && n < size) {
+        while (zip_copy_leng > 0 && n < size) {
             zip_copy_leng--;
             zip_wp &= zip_WSIZE - 1;
             zip_NEEDBITS(8);
@@ -22420,7 +22897,7 @@ class Buffer {
             zip_DUMPBITS(8);
         }
 
-        if(zip_copy_leng == 0)
+        if (zip_copy_leng == 0)
             zip_method = -1; // done
         return n;
     }
@@ -22431,40 +22908,40 @@ class Buffer {
            Huffman tables. */
 
         // if first time, set up tables for fixed blocks
-        if(zip_fixed_tl == null) {
+        if (zip_fixed_tl == null) {
             var i;			// temporary variable
             var l = new Array(288);	// length list for huft_build
             var h;	// zip_HuftBuild
 
             // literal table
-            for(i = 0; i < 144; i++)
+            for (i = 0; i < 144; i++)
                 l[i] = 8;
-            for(; i < 256; i++)
+            for (; i < 256; i++)
                 l[i] = 9;
-            for(; i < 280; i++)
+            for (; i < 280; i++)
                 l[i] = 7;
-            for(; i < 288; i++)	// make a complete, but wrong code set
+            for (; i < 288; i++)	// make a complete, but wrong code set
                 l[i] = 8;
             zip_fixed_bl = 7;
 
             h = new zip_HuftBuild(l, 288, 257, zip_cplens, zip_cplext,
-                                  zip_fixed_bl);
-            if(h.status != 0) {
-                alert("HufBuild error: "+h.status);
+                zip_fixed_bl);
+            if (h.status != 0) {
+                alert("HufBuild error: " + h.status);
                 return -1;
             }
             zip_fixed_tl = h.root;
             zip_fixed_bl = h.m;
 
             // distance table
-            for(i = 0; i < 30; i++)	// make an incomplete code set
+            for (i = 0; i < 30; i++)	// make an incomplete code set
                 l[i] = 5;
             zip_fixed_bd = 5;
 
             h = new zip_HuftBuild(l, 30, 0, zip_cpdist, zip_cpdext, zip_fixed_bd);
-            if(h.status > 1) {
+            if (h.status > 1) {
                 zip_fixed_tl = null;
-                alert("HufBuild error: "+h.status);
+                alert("HufBuild error: " + h.status);
                 return -1;
             }
             zip_fixed_td = h.root;
@@ -22488,10 +22965,10 @@ class Buffer {
         var nb;		// number of bit length codes
         var nl;		// number of literal/length codes
         var nd;		// number of distance codes
-        var ll = new Array(286+30); // literal/length and distance code lengths
+        var ll = new Array(286 + 30); // literal/length and distance code lengths
         var h;		// (zip_HuftBuild)
 
-        for(i = 0; i < ll.length; i++)
+        for (i = 0; i < ll.length; i++)
             ll[i] = 0;
 
         // read in table lengths
@@ -22504,23 +22981,22 @@ class Buffer {
         zip_NEEDBITS(4);
         nb = 4 + zip_GETBITS(4);	// number of bit length codes
         zip_DUMPBITS(4);
-        if(nl > 286 || nd > 30)
+        if (nl > 286 || nd > 30)
             return -1;		// bad lengths
 
         // read in bit-length-code lengths
-        for(j = 0; j < nb; j++)
-        {
+        for (j = 0; j < nb; j++) {
             zip_NEEDBITS(3);
             ll[zip_border[j]] = zip_GETBITS(3);
             zip_DUMPBITS(3);
         }
-        for(; j < 19; j++)
+        for (; j < 19; j++)
             ll[zip_border[j]] = 0;
 
         // build decoding table for trees--single level, 7 bit lookup
         zip_bl = 7;
         h = new zip_HuftBuild(ll, 19, 19, null, null, zip_bl);
-        if(h.status != 0)
+        if (h.status != 0)
             return -1;	// incomplete code set
 
         zip_tl = h.root;
@@ -22529,38 +23005,38 @@ class Buffer {
         // read in literal and distance code lengths
         n = nl + nd;
         i = l = 0;
-        while(i < n) {
+        while (i < n) {
             zip_NEEDBITS(zip_bl);
             t = zip_tl.list[zip_GETBITS(zip_bl)];
             j = t.b;
             zip_DUMPBITS(j);
             j = t.n;
-            if(j < 16)		// length of code in bits (0..15)
+            if (j < 16)		// length of code in bits (0..15)
                 ll[i++] = l = j;	// save last length in l
-            else if(j == 16) {	// repeat last length 3 to 6 times
+            else if (j == 16) {	// repeat last length 3 to 6 times
                 zip_NEEDBITS(2);
                 j = 3 + zip_GETBITS(2);
                 zip_DUMPBITS(2);
-                if(i + j > n)
+                if (i + j > n)
                     return -1;
-                while(j-- > 0)
+                while (j-- > 0)
                     ll[i++] = l;
-            } else if(j == 17) {	// 3 to 10 zero length codes
+            } else if (j == 17) {	// 3 to 10 zero length codes
                 zip_NEEDBITS(3);
                 j = 3 + zip_GETBITS(3);
                 zip_DUMPBITS(3);
-                if(i + j > n)
+                if (i + j > n)
                     return -1;
-                while(j-- > 0)
+                while (j-- > 0)
                     ll[i++] = 0;
                 l = 0;
             } else {		// j == 18: 11 to 138 zero length codes
                 zip_NEEDBITS(7);
                 j = 11 + zip_GETBITS(7);
                 zip_DUMPBITS(7);
-                if(i + j > n)
+                if (i + j > n)
                     return -1;
-                while(j-- > 0)
+                while (j-- > 0)
                     ll[i++] = 0;
                 l = 0;
             }
@@ -22569,30 +23045,30 @@ class Buffer {
         // build the decoding tables for literal/length and distance codes
         zip_bl = zip_lbits;
         h = new zip_HuftBuild(ll, nl, 257, zip_cplens, zip_cplext, zip_bl);
-        if(zip_bl == 0)	// no literals or lengths
+        if (zip_bl == 0)	// no literals or lengths
             h.status = 1;
-        if(h.status != 0) {
-            if(h.status == 1)
-                ;// **incomplete literal tree**
+        if (h.status != 0) {
+            if (h.status == 1) ;
+
             return -1;		// incomplete code set
         }
         zip_tl = h.root;
         zip_bl = h.m;
 
-        for(i = 0; i < nd; i++)
+        for (i = 0; i < nd; i++)
             ll[i] = ll[i + nl];
         zip_bd = zip_dbits;
         h = new zip_HuftBuild(ll, nd, 0, zip_cpdist, zip_cpdext, zip_bd);
         zip_td = h.root;
         zip_bd = h.m;
 
-        if(zip_bd == 0 && nl > 257) {   // lengths but no distances
+        if (zip_bd == 0 && nl > 257) {   // lengths but no distances
             // **incomplete distance tree**
             return -1;
         }
 
-        if(h.status == 1) ;
-        if(h.status != 0)
+        if (h.status == 1) ;
+        if (h.status != 0)
             return -1;
 
         // decompress until an end-of-block code
@@ -22601,7 +23077,7 @@ class Buffer {
 
     function zip_inflate_start() {
 
-        if(zip_slide == null)
+        if (zip_slide == null)
             zip_slide = new Array(2 * zip_WSIZE);
         zip_wp = 0;
         zip_bit_buf = 0;
@@ -22617,14 +23093,14 @@ class Buffer {
         var n, i;
 
         n = 0;
-        while(n < size) {
-            if(zip_eof && zip_method == -1)
+        while (n < size) {
+            if (zip_eof && zip_method == -1)
                 return n;
 
-            if(zip_copy_leng > 0) {
-                if(zip_method != zip_STORED_BLOCK) {
+            if (zip_copy_leng > 0) {
+                if (zip_method != zip_STORED_BLOCK) {
                     // STATIC_TREES or DYN_TREES
-                    while(zip_copy_leng > 0 && n < size) {
+                    while (zip_copy_leng > 0 && n < size) {
                         zip_copy_leng--;
                         zip_copy_dist &= zip_WSIZE - 1;
                         zip_wp &= zip_WSIZE - 1;
@@ -22632,27 +23108,27 @@ class Buffer {
                             zip_slide[zip_copy_dist++];
                     }
                 } else {
-                    while(zip_copy_leng > 0 && n < size) {
+                    while (zip_copy_leng > 0 && n < size) {
                         zip_copy_leng--;
                         zip_wp &= zip_WSIZE - 1;
                         zip_NEEDBITS(8);
                         buff[off + n++] = zip_slide[zip_wp++] = zip_GETBITS(8);
                         zip_DUMPBITS(8);
                     }
-                    if(zip_copy_leng == 0)
+                    if (zip_copy_leng == 0)
                         zip_method = -1; // done
                 }
-                if(n == size)
+                if (n == size)
                     return n;
             }
 
-            if(zip_method == -1) {
-                if(zip_eof)
+            if (zip_method == -1) {
+                if (zip_eof)
                     break;
 
                 // read in last block bit
                 zip_NEEDBITS(1);
-                if(zip_GETBITS(1) != 0)
+                if (zip_GETBITS(1) != 0)
                     zip_eof = true;
                 zip_DUMPBITS(1);
 
@@ -22664,32 +23140,32 @@ class Buffer {
                 zip_copy_leng = 0;
             }
 
-            switch(zip_method) {
-            case 0: // zip_STORED_BLOCK
-                i = zip_inflate_stored(buff, off + n, size - n);
-                break;
+            switch (zip_method) {
+                case 0: // zip_STORED_BLOCK
+                    i = zip_inflate_stored(buff, off + n, size - n);
+                    break;
 
-            case 1: // zip_STATIC_TREES
-                if(zip_tl != null)
-                    i = zip_inflate_codes(buff, off + n, size - n);
-                else
-                    i = zip_inflate_fixed(buff, off + n, size - n);
-                break;
+                case 1: // zip_STATIC_TREES
+                    if (zip_tl != null)
+                        i = zip_inflate_codes(buff, off + n, size - n);
+                    else
+                        i = zip_inflate_fixed(buff, off + n, size - n);
+                    break;
 
-            case 2: // zip_DYN_TREES
-                if(zip_tl != null)
-                    i = zip_inflate_codes(buff, off + n, size - n);
-                else
-                    i = zip_inflate_dynamic(buff, off + n, size - n);
-                break;
+                case 2: // zip_DYN_TREES
+                    if (zip_tl != null)
+                        i = zip_inflate_codes(buff, off + n, size - n);
+                    else
+                        i = zip_inflate_dynamic(buff, off + n, size - n);
+                    break;
 
-            default: // error
-                i = -1;
-                break;
+                default: // error
+                    i = -1;
+                    break;
             }
 
-            if(i == -1) {
-                if(zip_eof)
+            if (i == -1) {
+                if (zip_eof)
                     return 0;
                 return -1;
             }
@@ -22712,8 +23188,8 @@ class Buffer {
 
         buff = new Array(1024);
         out = "";
-        while((i = zip_inflate_internal(buff, 0, buff.length)) > 0) {
-            for(j = 0; j < i; j++)
+        while ((i = zip_inflate_internal(buff, 0, buff.length)) > 0) {
+            for (j = 0; j < i; j++)
                 out += String.fromCharCode(buff[j]);
         }
         zip_inflate_data = null; // G.C.
@@ -22738,7 +23214,7 @@ class Buffer {
 
 /**
  * @const
- * @private
+ * @public
  */
 const base64DecodeChars = new Array(
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
@@ -22751,7 +23227,7 @@ const base64DecodeChars = new Array(
     41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, -1, -1, -1, -1, -1);
 
 /**
- * @private
+ * @public
  */
 const base64decode = function(str) {
     var c1, c2, c3, c4;
@@ -22820,26 +23296,26 @@ globalThis._ccbScriptCache = new Array();
 let gScriptingInterface = null;
 
 /**
- * @private
+ * @public
  */
 class vector3d {
 	/**
 	 * X coordinate of the vector
-	 * @private
+	 * @public
 	 * @type Number
 	 */
 	x = 0;
 
 	/**
 	 * Y coordinate of the vector
-	 * @private
+	 * @public
 	 * @type Number
 	 */
 	y = 0;
 
 	/**
 	 * Z coordinate of the vector
-	 * @private
+	 * @public
 	 * @type Number
 	 */
 	z = 0;
@@ -22859,28 +23335,28 @@ class vector3d {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	add(other) {
 		return new vector3d(this.x + other.x, this.y + other.y, this.z + other.z);
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	substract(other) {
 		return new vector3d(this.x - other.x, this.y - other.y, this.z - other.z);
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	getLength() {
 		return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	normalize() {
 		var l = this.getLength();
@@ -22893,7 +23369,7 @@ class vector3d {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	toString() {
 		return "(" + this.x + ", " + this.y + ", " + this.z + ")";
@@ -22904,7 +23380,7 @@ class vector3d {
 // ------------------------------------------------------------------------------------------------
 
 /**
- * @private
+ * @public
  * @constructor
  * @class
  */
@@ -22931,7 +23407,7 @@ class ScriptingInterface {
 		//this.registerScriptingFunctions();
 	}
 	/**
-	 * @private
+	 * @public
 	 */
 	static getScriptingInterface() {
 		if (gScriptingInterface == null)
@@ -22940,43 +23416,43 @@ class ScriptingInterface {
 		return gScriptingInterface;
 	}
 	/**
-	 * @private
+	 * @public
 	 */
 	static getScriptingInterfaceReadOnly() {
 		return gScriptingInterface;
 	}
 	/**
-	 * @private
+	 * @public
 	 */
 	setTextureManager(t) {
 		this.TheTextureManager = t;
 	}
 	/**
-	 * @private
+	 * @public
 	 */
 	setEngine(t) {
 		this.Engine = t;
 	}
 	/**
-	 * @private
+	 * @public
 	 */
 	needsRedraw() {
 		return this.ccbRegisteredFunctionArray.length != 0;
 	}
 	/**
-	 * @private
+	 * @public
 	 */
 	setCurrentlyRunningExtensionScriptAnimator(s) {
 		this.CurrentlyRunningExtensionScriptAnimator = s;
 	}
 	/**
-	 * @private
+	 * @public
 	 */
 	setActiveScene(s) {
 		this.CurrentlyActiveScene = s;
 	}
 	/**
-	 * @private
+	 * @public
 	 */
 	executeCode(code) {
 		try {
@@ -22987,7 +23463,7 @@ class ScriptingInterface {
 		}
 	}
 	/**
-	 * @private
+	 * @public
 	 */
 	async importCode(code) {
 		try {
@@ -23002,14 +23478,14 @@ class ScriptingInterface {
 		}
 	}
 	/**
-	 * @private
+	 * @public
 	 */
 	getUniqueCounterID() {
 		++this.nUniqueCounterID;
 		return this.nUniqueCounterID;
 	}
 	/**
-	 * @private
+	 * @public
 	 */
 	registerExtensionScriptActionHandler(handler) {
 		for (var i = 0; i < this.StoredExtensionScriptActionHandlers.length; ++i) {
@@ -23030,7 +23506,7 @@ class ScriptingInterface {
 		return actionid;
 	}
 	/**
-	 * @private
+	 * @public
 	 */
 	runDrawCallbacks(theRenderer, timeMs) {
 		this.IsInDrawCallback = true;
@@ -23047,7 +23523,7 @@ class ScriptingInterface {
 		this.IsInDrawCallback = false;
 	}
 	/**
-	 * @private
+	 * @public
 	 */
 	setSceneNodePropertyFromOverlay(overlaynode, propName, arg0, argsAsColor) {
 		switch (propName) {
@@ -23094,7 +23570,7 @@ class ScriptingInterface {
 		}
 	}
 	/**
-	 * @private
+	 * @public
 	 */
 	getSceneNodePropertyFromOverlay(overlaynode, propName) {
 		switch (propName) {
@@ -23143,7 +23619,7 @@ class ScriptingInterface {
 // --------------------------------------------------------------
 
 /**
- * @private
+ * @public
  */
 class AnimatorExtensionScript extends Animator {
 	constructor(scenemanager) {
@@ -23159,7 +23635,7 @@ class AnimatorExtensionScript extends Animator {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	setAcceptsEvents(bForMouse, bForKeyboard) {
 		this.bAcceptsMouseEvents = bForMouse;
@@ -23177,14 +23653,14 @@ class AnimatorExtensionScript extends Animator {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	getType() {
 		return 'extensionscript';
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	createClone(node, newManager, oldNodeId, newNodeId) {
 		var a = new AnimatorExtensionScript(newManager);
@@ -23205,7 +23681,7 @@ class AnimatorExtensionScript extends Animator {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	animateNode(n, timeMs) {
 		if (n == null)
@@ -23239,7 +23715,7 @@ class AnimatorExtensionScript extends Animator {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	initScript(n, engine) {
 		if (engine.executeCode(`typeof ${this.JsClassName} == 'undefined'`))
@@ -23294,7 +23770,7 @@ class AnimatorExtensionScript extends Animator {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	sendMouseEvent(mouseEvtId, wheelDelta) {
 		if (this.bAcceptsMouseEvents)
@@ -23305,7 +23781,7 @@ class AnimatorExtensionScript extends Animator {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	sendKeyEvent(keycode, pressed) {
 		if (this.bAcceptsKeyboardEvents)
@@ -23316,7 +23792,7 @@ class AnimatorExtensionScript extends Animator {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	onMouseUp(event) {
 		var wasRightButton = false;
@@ -23327,14 +23803,14 @@ class AnimatorExtensionScript extends Animator {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	onMouseWheel(delta) {
 		this.sendMouseEvent(1, delta);
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	onMouseDown(event) {
 		var wasRightButton = false;
@@ -23345,24 +23821,26 @@ class AnimatorExtensionScript extends Animator {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	onMouseMove(event) {
 		this.sendMouseEvent(0, 0);
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	onKeyDown(evt) {
 		this.sendKeyEvent(evt.keyCode, true);
+		return false;
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	onKeyUp(evt) {
 		this.sendKeyEvent(evt.keyCode, false);
+		return false;
 	}
 }
 // --------------------------------------------------------------
@@ -23370,7 +23848,7 @@ class AnimatorExtensionScript extends Animator {
 // --------------------------------------------------------------
 
 /**
- * @private
+ * @public
  * @constructor
  * @class
  */
@@ -23388,14 +23866,14 @@ class ExtensionScriptProperty {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	static stringReplace(source, find, replacement) {
 		return source.split(find).join(replacement);
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	static generateInitJavaScriptCode(objPrefix, properties) {
 		let code = "";
@@ -23420,7 +23898,7 @@ class ExtensionScriptProperty {
 					value = `new vector3d(${prop.VectorValue.X}, ${prop.VectorValue.Y}, ${prop.VectorValue.Z})`;
 					break;
 				case 7: //irr::scene::EESAT_TEXTURE:
-					value = "\"" + prop.TextureValue ? prop.TextureValue.Name : "" + "\"";
+					value = "\"" + (prop.TextureValue ? prop.TextureValue.Name : "") + "\"";
 					break;
 				case 8: //irr::scene::EESAT_SCENE_NODE_ID:
 					value = `ccbGetSceneNodeFromId(${prop.IntValue})`;
@@ -23445,7 +23923,7 @@ class ExtensionScriptProperty {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	createClone(oldNodeId, newNodeId) {
 		var c = new ExtensionScriptProperty();
@@ -23472,7 +23950,7 @@ class ExtensionScriptProperty {
 // --------------------------------------------------------------
 
 /**
- * @private
+ * @public
  * @constructor
  * @class
  */
@@ -23486,7 +23964,7 @@ class ActionExtensionScript extends Action {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	createClone(oldNodeId, newNodeId) {
 		var a = new ActionExtensionScript();
@@ -23507,7 +23985,7 @@ class ActionExtensionScript extends Action {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	execute(currentNode, sceneManager) {
 		if (this.JsClassName == null || this.JsClassName.length == 0 || currentNode == null)
@@ -23572,8 +24050,8 @@ const GLSL = String.raw;
 
 /**
  * @constructor
- * @class A 3d scene, containing all {@link CL3D.SceneNode}s.
- * The scene holds all {@link CL3D.SceneNode}s and is able to draw and animate them.
+ * @class A 3d scene, containing all {@link SceneNode}s.
+ * The scene holds all {@link SceneNode}s and is able to draw and animate them.
  */
 class Scene {
 	/**
@@ -23741,34 +24219,34 @@ class Scene {
 	static EPOSTEFFECT_COUNT = 9;
 
 	/**
-	 * @private
+	 * @public
 	 */
 	TriedShadowInit = false;
 
 	/**
-	 * @private
+	 * @public
 	 * Render target texture for creating shadow maps
 	 */
 	ShadowBuffer = null;
 
 	/**
-	 * @private
+	 * @public
 	 * Second eender target texture for creating shadow maps, but only used in case CL3D.UseShadowCascade is true
 	 */
 	ShadowBuffer2 = null;
 
 	/**
-	 * @private
+	 * @public
 	 */
 	ShadowDrawMaterialSolid = null;
 
 	/**
-	 * @private
+	 * @public
 	 */
 	ShadowDrawMaterialAlphaRef = null;
 
 	/**
-	 * @private
+	 * @public
 	 */
 	ShadowMapLightMatrix = null;
 
@@ -23958,7 +24436,7 @@ class Scene {
 
 	/**
 	 * Initializes the scene node, can be called by scene nodes derived from this class.
-	 * @private
+	 * @public
 	 */
 	init() {
 		this.RootNode = new SceneNode();
@@ -23981,10 +24459,12 @@ class Scene {
 		this.WindSpeed = 1.0;
 		this.WindStrength = 4.0;
 
+		/**
+		 * @type {Array.<{Active: boolean}>}
+		 */
 		this.PostEffectData = new Array();
 		for (var ip = 0; ip < 6; ++ip) {
-			var peo = new Object();
-			peo.Active = false;
+			var peo = { Active: false };
 			this.PostEffectData.push(peo);
 		}
 
@@ -24022,6 +24502,9 @@ class Scene {
 
 		// runtime
 		this.WasAlreadyActivatedOnce = false;
+		/**
+		 * @type {Array.<{node: CL3D.SceneNode, timeAfterToDelete: Number}>}
+		 */
 		this.DeletionList = new Array();
 		this.LastBulletImpactPosition = new Vect3d; // hack for IRR_SCENE_MANAGER_LAST_BULLET_IMPACT_POSITION parameter
 
@@ -24037,7 +24520,7 @@ class Scene {
 
 	/**
 	  * Returns the type string of the current scene.
-	  * @private
+	  * @public
 	*/
 	getCurrentCameraFrustrum() {
 		return this.CurrentCameraFrustrum;
@@ -24053,7 +24536,7 @@ class Scene {
 
 	/**
 	  * returns true if rendering needs to be done at all
-	  * @private
+	  * @public
 	*/
 	doAnimate(renderer) {
 		this.LastUsedRenderer = renderer;
@@ -24660,7 +25143,7 @@ class Scene {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	HasViewChangedSinceLastRedraw() {
 		if (!this.ActiveCamera)
@@ -24674,7 +25157,7 @@ class Scene {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	StoreViewMatrixForRedrawCheck() {
 		if (!this.ActiveCamera)
@@ -24685,7 +25168,7 @@ class Scene {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	getLastUsedRenderer() {
 		return this.LastUsedRenderer;
@@ -24693,7 +25176,7 @@ class Scene {
 
 	/**
 	 * Sets the background color for the scene
-	 * @param clr {Number} New color. See {@link CL3D.createColor} on how to create such a color value.
+	 * @param clr {Number} New color. See {@link createColor} on how to create such a color value.
 	 * @public
 	 */
 	setBackgroundColor(clr) {
@@ -24702,7 +25185,7 @@ class Scene {
 
 	/**
 	 * Gets the background color of the scene
-	 * @returns {Number} Background color. See {@link CL3D.createColor} on how to create such a color value.
+	 * @returns {Number} Background color. See {@link createColor} on how to create such a color value.
 	 * @public
 	 */
 	getBackgroundColor() {
@@ -24727,8 +25210,8 @@ class Scene {
 
 	/**
 	 * Specifies when the scene should be redrawn.
-	 * @param mode Possible values are {@link CL3D.Scene.REDRAW_WHEN_CAM_MOVED},
-	 * {@link CL3D.Scene.REDRAW_WHEN_SCENE_CHANGED} and {@link CL3D.Scene.REDRAW_EVERY_FRAME}.
+	 * @param mode Possible values are {@link Scene.REDRAW_WHEN_CAM_MOVED},
+	 * {@link Scene.REDRAW_WHEN_SCENE_CHANGED} and {@link Scene.REDRAW_EVERY_FRAME}.
 	 * @public
 	 */
 	setRedrawMode(mode) {
@@ -24775,8 +25258,8 @@ class Scene {
 	 * this method to register itself for rendering if it decides that it wants to be rendered.
 	 * In this way, scene nodes can be rendered in the optimal order.
 	 * @param {CL3D.SceneNode} s Node which registers itself for rendering
-	 * @param {Integer} mode render mode the scene node wishes to register itself. Usually, use {@link CL3D.Scene.RENDER_MODE_DEFAULT}. For
-	 * transparent nodes, {@link CL3D.Scene.RENDER_MODE_TRANSPARENT} is ideal.
+	 * @param {Number} mode render mode the scene node wishes to register itself. Usually, use {@link Scene.RENDER_MODE_DEFAULT}. For
+	 * transparent nodes, {@link Scene.RENDER_MODE_TRANSPARENT} is ideal.
 	 * @public
 	 */
 	registerNodeForRendering(s, mode) {
@@ -24830,7 +25313,7 @@ class Scene {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	getAllSceneNodesOfTypeImpl(n, c, a) {
 		if (n.getType() == c)
@@ -24844,7 +25327,7 @@ class Scene {
 
 	/**
 	 * Returns all scene nodes in this scene with the specified animator type {@link SceneNode}s.
-	 * @private
+	 * @public
 	 * @param type {String} type name of the animator
 	 * @returns {Array} array with all scene nodes found with this type.
 	 */
@@ -24858,7 +25341,7 @@ class Scene {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	getAllSceneNodesWithAnimatorImpl(n, t, a) {
 		if (n.getAnimatorOfType(t) != null)
@@ -24884,7 +25367,7 @@ class Scene {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	getSceneNodeFromNameImpl(n, name) {
 		if (n.Name == name)
@@ -24914,7 +25397,7 @@ class Scene {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	getSceneNodeFromIdImpl(n, id) {
 		if (n.Id == id)
@@ -24940,7 +25423,7 @@ class Scene {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	registerSceneNodeAnimatorForEvents(a) {
 		if (a == null)
@@ -24956,7 +25439,7 @@ class Scene {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	unregisterSceneNodeAnimatorForEvents(a) {
 		if (a == null)
@@ -24972,7 +25455,7 @@ class Scene {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	postMouseWheelToAnimators(delta) {
 		for (var i = 0; i < this.RegisteredSceneNodeAnimatorsForEventsList.length; ++i) {
@@ -24982,7 +25465,7 @@ class Scene {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	postMouseDownToAnimators(event) {
 		for (var i = 0; i < this.RegisteredSceneNodeAnimatorsForEventsList.length; ++i) {
@@ -24992,7 +25475,7 @@ class Scene {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	postMouseUpToAnimators(event) {
 		for (var i = 0; i < this.RegisteredSceneNodeAnimatorsForEventsList.length; ++i) {
@@ -25002,7 +25485,7 @@ class Scene {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	postMouseMoveToAnimators(event) {
 		for (var i = 0; i < this.RegisteredSceneNodeAnimatorsForEventsList.length; ++i) {
@@ -25021,7 +25504,7 @@ class Scene {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 * @param storeInNodes: Boolean, if set to true the selector for each node is stored in the scene nodes
 	 * @param selectorToReuse: Metatriangle selector, can be null. If not null, will be cleared and used to be filled with geometry
 	 * @returns Returns a meta triangle selector with the collision geomertry
@@ -25101,18 +25584,21 @@ class Scene {
 	}
 
 	/**
-	 @private
-	*/
+	 * @public
+	 * @param {CL3D.SceneNode} node 
+	 * @param {Number} afterTimeMs 
+	 */
 	addToDeletionQueue(node, afterTimeMs) {
-		var e = new Object();
-		e.node = node;
-		e.timeAfterToDelete = afterTimeMs + CLTimer.getTime();
+		var e = {
+			node: node,
+			timeAfterToDelete: afterTimeMs + CLTimer.getTime()
+		};
 
 		this.DeletionList.push(e);
 	}
 
 	/**
-	 @private
+	 @public
 	*/
 	clearDeletionList(deleteAll) {
 		if (this.DeletionList.length == 0)
@@ -25142,7 +25628,7 @@ class Scene {
 	}
 
 	/**
-	 @private
+	 @public
 	*/
 	isCoordOver2DOverlayNode(x, y, onlyThoseWhoBlockCameraInput) {
 		if (this.RootNode == null || this.LastUsedRenderer == null)
@@ -25152,7 +25638,7 @@ class Scene {
 	}
 
 	/**
-	 @private
+	 @public
 	*/
 	isCoordOver2DOverlayNodeImpl(n, x, y, onlyThoseWhoBlockCameraInput) {
 		if (n && n.Visible && (n.getType() == '2doverlay' || n.getType() == 'mobile2dinput')) {
@@ -25177,7 +25663,7 @@ class Scene {
 	}
 
 	/**
-	 @private
+	 @public
 	*/
 	getUnusedSceneNodeId() {
 		for (var tries = 0; tries < 1000; ++tries) {
@@ -25191,7 +25677,7 @@ class Scene {
 	}
 
 	/**
-	 @private
+	 @public
 	*/
 	replaceAllReferencedNodes(nold, nnew) {
 		if (!nold || !nnew)
@@ -25215,7 +25701,7 @@ class Scene {
 	  * @example
 	  * scene.setFog(true, CL3D.createColor(1, 100, 100, 100), 0.1);
 	  * @param enabled {Boolean} (optional) set to true to enable fog and false not to enable
-	  * @param color {Number} Fog color. See {@link CL3D.createColor} on how to create such a color value.
+	  * @param color {Number} Fog color. See {@link createColor} on how to create such a color value.
 	  * @param density {Number} Density of the fog. A value like 0.001 is default.
 	*/
 	setFog(enabled, color, density) {
@@ -25229,7 +25715,7 @@ class Scene {
 	}
 
 	/**
-	 @private
+	 @public
 	*/
 	isAnyPostEffectActive() {
 		if (Global_PostEffectsDisabled)
@@ -25242,7 +25728,7 @@ class Scene {
 	}
 
 	/**
-	 @private
+	 @public
 	*/
 	isAnyPostEffectEnabledByUser() {
 		for (var ip = 0; ip < this.PostEffectData.length; ++ip) {
@@ -25254,7 +25740,7 @@ class Scene {
 	}
 
 	/**
-	 @private
+	 @public
 	*/
 	initPostProcessingQuad() {
 		this.LastUsedRenderer.getRenderTargetSize();
@@ -25283,15 +25769,15 @@ class Scene {
 
 		this.PostProcessingVerticesQuadBuffer.Vertices[2] = createVertex(
 			-1.0, 1.0, 0.0, 0.0, 0.0, -1.0, clr,
-			shiftX, 1 + shiftY);
+			shiftX, 1.0 + shiftY);
 
 		this.PostProcessingVerticesQuadBuffer.Vertices[3] = createVertex(
 			1.0, 1.0, 0.0, 0.0, 0.0, -1.0, clr,
-			1.0 + shiftX, 1 + shiftY);
+			1.0 + shiftX, 1.0 + shiftY);
 	}
 
 	/**
-	 @private
+	 @public
 	*/
 	getNextPowerOfTwo(aSize) {
 		return Math.pow(2, Math.ceil(Math.log(aSize) / Math.log(2)));
@@ -25301,7 +25787,7 @@ class Scene {
 	}
 
 	/**
-	 @private
+	 @public
 	*/
 	createOrGetPostEffectRTT(nCopyNumber, bCreateIfNotExisting, sizeFactor) {
 		if (sizeFactor == null)
@@ -25338,7 +25824,7 @@ class Scene {
 	}
 
 	/**
-	 @private
+	 @public
 	*/
 	processPostEffects() {
 		if (!this.PostEffectsInitialized)
@@ -25372,7 +25858,7 @@ class Scene {
 	}
 
 	/**
-	 @private
+	 @public
 	*/
 	runPostProcessEffect(type, rttSizeFactor) {
 		var renderer = this.LastUsedRenderer;
@@ -25459,7 +25945,7 @@ class Scene {
 	}
 
 	/**
-	 @private
+	 @public
 	*/
 	initPostProcessingEffects() {
 		if (this.PostEffectsInitialized)
@@ -25570,7 +26056,7 @@ class Scene {
 	}
 
 	/**
-	 @private
+	 @public
 	*/
 	drawPostprocessingQuad() {
 		var renderer = this.LastUsedRenderer;
@@ -25580,7 +26066,7 @@ class Scene {
 	}
 
 	/**
-	 @private
+	 @public
 	*/
 	copyPostProcessingTexture(source, target) {
 		var renderer = this.LastUsedRenderer;
@@ -25600,7 +26086,7 @@ class Scene {
 
 /**
  * @constructor
- * @private
+ * @public
  */
 class CCDocument {
 	constructor() {
@@ -25610,6 +26096,10 @@ class CCDocument {
 		 * @type {CL3D.Free3dScene[]}
 		 */
 		this.Scenes = new Array();
+		/**
+		 * @type {String[]}
+		 */
+		this.Scripts = new Array();
 		//this.UpdateMode = CL3D.Scene.REDRAW_WHEN_SCENE_CHANGED;
 		this.UpdateMode = Scene.REDRAW_EVERY_FRAME;
 		this.WaitUntilTexturesLoaded = false;
@@ -25650,7 +26140,7 @@ class CCDocument {
 /**
  * @constructor
  * @extends CL3D.Scene
- * @private
+ * @public
  */
 class Free3dScene extends Scene {
 	constructor() {
@@ -25688,7 +26178,7 @@ else {
 /**
  * 
  * @param {string | URL | globalThis.Request} input This defines the resource that you wish to fetch.
- * @param {RequestInit} init An object containing any custom settings you want to apply to the request.
+ * @param {RequestInit=} init An object containing any custom settings you want to apply to the request.
  * @returns {Promise<Response>}
  */
 const doFetch = (input, init) => {
@@ -25701,7 +26191,7 @@ const doFetch = (input, init) => {
 
 /**
  * @constructor
- * @private
+ * @public
  */
 class CCFileLoader {
 	constructor(filetoload, useArrayBufferReturn, isBrowser) {
@@ -25723,7 +26213,7 @@ class CCFileLoader {
 			}
 			
 			doFetch(me.FileToLoad, { signal })
-				.then((response) => {
+				.then(async (response) => {
 					if (!response.ok) {
 						let reportedError = false;
 
@@ -25737,9 +26227,9 @@ class CCFileLoader {
 						}
 					}
 					if (me.useArrayBufferReturn)
-						return response.arrayBuffer();
+						return await response.arrayBuffer();
 					else
-						return response.text();
+						return await response.text();
 				})
 				.then((data) => {
 					if (functionCallBack)
@@ -25760,7 +26250,7 @@ class CCFileLoader {
 			this.Controller.abort();
 		}
 		catch (e) {
-			console.log("Could not abort " + me.FileToLoad);
+			console.log("Could not abort " + this.FileToLoad);
 		}
 	}
 }
@@ -25785,6 +26275,9 @@ else {
     };
 }
 
+/**
+ * @returns {String}
+ */
 const getDirName = () => {
     return getDirNameImpl();
 };
@@ -25866,22 +26359,31 @@ class FlaceLoader {
 		this.CursorControl = cursorControl;
 		this.TheTextureManager != null && ScriptingInterface.getScriptingInterface().setTextureManager(this.TheTextureManager);
 
-		if(filecontent != null && this.Filename.indexOf(".ccbz") != -1 || this.Filename.indexOf(".ccp") != -1)
+		let loadedfile = null;
+
+		if(typeof filecontent == 'string')
 		{
-			filecontent = this.ArrayBufferToString(filecontent);
+			loadedfile = filecontent;
 		}
-		if(filecontent == null || filecontent.length == 0 || filecontent.byteLength != null)
+		else if(filecontent instanceof ArrayBuffer)
+		{
+			if(this.Filename.indexOf(".ccbz") != -1 || this.Filename.indexOf(".ccp") != -1)
+			{
+				loadedfile = this.ArrayBufferToString(filecontent);
+			}
+		}
+		if(loadedfile == null || loadedfile.length == 0)
 		{
 			console.log("Error: Could not load file '" + this.Filename + "'");
 			return null;
 		}
-		if(this.Filename.indexOf(".ccbz") != -1) filecontent = JSInflate.inflate(filecontent);
-		else if(this.Filename.indexOf(".ccbjs") != -1) filecontent = base64decode(filecontent);
+		if(this.Filename.indexOf(".ccbz") != -1) loadedfile = JSInflate.inflate(loadedfile);
+		else if(this.Filename.indexOf(".ccbjs") != -1) loadedfile = base64decode(loadedfile);
 		this.Document = new CCDocument;
 		this.setRootPath();
-		this.Data = new StringBinary(filecontent);
+		this.Data = new StringBinary(loadedfile);
 		if(!await this.parseFile()) return null;
-		this.StoredFileContent = filecontent;
+		this.StoredFileContent = loadedfile;
 		return this.Document;
 	}
 
@@ -26065,6 +26567,7 @@ class FlaceLoader {
 							}
 						};
 
+						// @ts-ignore
 						this.readFreeScene2(flacescene);
 						break;
 					default:
@@ -26085,8 +26588,6 @@ class FlaceLoader {
 	 * @param {CL3D.TextureManager} textureManager
 	 * @param {CL3D.MeshCache} meshCache
 	 * @param {CL3D.CopperLicht} cursorControl
-	 * @param {Boolean} copyRootNodeChildren
-	 * @param {CL3D.SceneNode} newRootNodeChildrenParent
 	 * @returns
 	 */
 	reloadScene(filecontent, scene, sceneindex, filename, textureManager, meshCache, cursorControl)
@@ -26316,7 +26817,7 @@ class FlaceLoader {
 
 	JumpBackFromTagReading()
 	{
-		this.Data.position -= 10;
+		this.Data._offset -= 10;
 	}
 
 	/**
@@ -26990,7 +27491,7 @@ class FlaceLoader {
 					animator.SlidingSpeed = this.Data.readFloat();
 					break;
 				case 104:
-					animator = new AnimatorCameraFPS(node, this.CursorControl);
+					animator = new AnimatorCameraFPS(node instanceof CameraSceneNode && node, this.CursorControl);
 					animator.MaxVerticalAngle = this.Data.readFloat();
 					animator.MoveSpeed = this.Data.readFloat();
 					animator.RotateSpeed = this.Data.readFloat();
@@ -27009,15 +27510,11 @@ class FlaceLoader {
 					}
 					if(flag & 2) animator.MoveSmoothing = this.Data.readInt();
 					if(flag & 4) animator.ChildrenDontUseZBuffer = true;
-					if(node.getType() == "camera")
-					{
-						animator.targetZoomValue = radToDeg(node.Fovy);
-						animator.maxZoom = node.targetZoomValue + 10;
-						animator.zoomSpeed = (node.maxZoom - node.minZoom) / 50;
-					}
+					if(node instanceof CameraSceneNode && node.getType() == "camera")
+					;
 					break;
 				case 105:
-					animator = new AnimatorCameraModelViewer(node, this.CursorControl);
+					animator = new AnimatorCameraModelViewer(node instanceof CameraSceneNode && node, this.CursorControl);
 					animator.Radius = this.Data.readFloat();
 					animator.RotateSpeed = this.Data.readFloat();
 					animator.NoVerticalMovement = this.Data.readBoolean();
@@ -27075,7 +27572,7 @@ class FlaceLoader {
 					animator.TimePerFrame = this.Data.readInt();
 					animator.TextureIndexToChange = this.Data.readInt();
 					animator.Loop = this.Data.readBoolean();
-					tanimcount = this.Data.readInt();
+					let tanimcount = this.Data.readInt();
 					animator.Textures = [];
 					for(let index = 0; index < tanimcount; ++index) animator.Textures.push(this.ReadTextureRef());
 					break;
@@ -27186,7 +27683,7 @@ class FlaceLoader {
 
 	/**
 	 * @param {Array} props
-	 * @param {CL3D.Free3dScene} scene
+	 * @param {CL3D.Scene} scene
 	 */
 	ReadExtensionScriptProperties(props, scene)
 	{
@@ -27733,7 +28230,7 @@ let gDocument = new CCDocument();
  * Creates an instance of the CopperLicht 3D engine by loading the scene from a CopperCube file.
  * @param {String} filetoload a filename such as 'test.ccbjs' or 'test.ccbz' which will be loaded, displayed and animated by the 3d engine.
  * .ccbjs and .ccbz files can be created using {@link http://www.ambiera.com/coppercube/index.html | the CopperCube editor}.
- * @param {HTMLCanvasElement=} mainElement The id of the canvas in your html document.
+ * @param {HTMLCanvasElement} mainElement The id of the canvas in your html document.
  * @param {String=} loadingScreenText specifying a loadingScreen text. Setting this to a text like "Loading" will cause
  * a loading screen with this text to appear while the file is being loaded.
  * @param {String=} loadingScreenBackgroundColor  specifying a loadingScreen backfround color.
@@ -27756,15 +28253,6 @@ const startCopperLichtFromFile = function (filetoload, mainElement, loadingScree
  * var engine = new CL3D.CopperLicht(document.getElementById('yourCanvasID'));
  * engine.load('somefile.ccbz');
  * @class The main class of the CopperLicht engine, representing the 3D engine itself.
- * @param elementIdOfCanvas id of the canvas element embedded in the html, used to draw 3d graphics.
- * @param showInfoTexts if set to true, this shows loading indicators and error texts. If set to false no text is shown and
- * you have to do this yourself.
- * @param showFPSCounter {Boolean} set to true to show a frames per second counter
- * @param loadingScreenText {String} optional parameter specifying a loadingScreen text. Setting this to a text like "Loading" will cause
- * a loading screen with this text to appear while the file is being loaded.
- * @param noWebGLText {String} optional parameter specifying a text to show when there is no webgl.
- * @param fullpage {Boolean} optional  parameter, set to true to expand canvas automatically to the full browser size.
- *
  * @constructor
  */
 class CopperLicht {
@@ -27880,7 +28368,16 @@ class CopperLicht {
 	 */
 	OnLoadingComplete = null;
 
-	constructor(mainElement, loadingScreenText, loadingScreenBackgroundColor, noWebGLText, fullpage) {
+	/**
+	 * @param {HTMLCanvasElement} mainElement id of the canvas element embedded in the html, used to draw 3d graphics.
+	 * @param {String=} loadingScreenText optional parameter specifying a loadingScreen text. Setting this to a text like "Loading" will cause
+	 * a loading screen with this text to appear while the file is being loaded.
+	 * @param {String=} loadingScreenBackgroundColor
+	 * @param {String=} noWebGLText optional parameter specifying a text to show when there is no webgl.
+	 * @param {Boolean=} fullpage optional parameter, set to true to expand canvas automatically to the full browser size.
+	 * @param {Boolean=} pointerLockForFPSCameras optional parameter, set to true to automatically use pointer lock for FPS cameras
+	 */
+	constructor(mainElement, loadingScreenText, loadingScreenBackgroundColor, noWebGLText, fullpage, pointerLockForFPSCameras) {
 		//
 		this.FPS = 60;
 		this.DPR = getDevicePixelRatio();
@@ -27903,6 +28400,7 @@ class CopperLicht {
 		this.requestPointerLockAfterFullscreen = false;
 		this.pointerIsCurrentlyLocked = false;
 		this.playingVideoStreams = new Array();
+		this.pointerLockForFPSCameras = pointerLockForFPSCameras;
 
 		//
 		this.RegisteredAnimatorsForKeyUp = new Array();
@@ -27974,8 +28472,8 @@ class CopperLicht {
 	 * Initializes the renderer, you need to call this if you create the engine yourself without
 	 * using one of the startup functions like {@link startCopperLichtFromFile}.
 	 * @public
-	 * @param {Integer} width the width of the rendering surface in pixels.
-	 * @param {Integer} height the height of the rendering surface in pixels.
+	 * @param {Number} width the width of the rendering surface in pixels.
+	 * @param {Number} height the height of the rendering surface in pixels.
 	 * @param {WebGLContextAttributes} options
 	 * @param {HTMLCanvasElement=} canvas
 	 * @return returns true if successful and false if not (if the browser does not support webgl,
@@ -28003,7 +28501,7 @@ class CopperLicht {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	registerEventHandlers() {
 		if (this.IsBrowser) {
@@ -28081,7 +28579,7 @@ class CopperLicht {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	getPinchDistance(evt) {
 		var t = evt.touches;
@@ -28120,7 +28618,7 @@ class CopperLicht {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	createRenderer(width, height, options, canvas) {
 		if (this.TheRenderer != null)
@@ -28140,7 +28638,7 @@ class CopperLicht {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	initMakeWholePageSize() {
 		document.body.style.margin = "0";
@@ -28149,46 +28647,46 @@ class CopperLicht {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	makeWholePageSize() {
 		if (this.tmpWidth != globalThis.innerWidth || this.tmpHeight != globalThis.innerHeight) {
 			this.tmpWidth = globalThis.innerWidth;
 			this.tmpHeight = globalThis.innerHeight;
-	
+
 			this.MainElement.style.width = this.tmpWidth + "px";
 			this.MainElement.style.height = this.tmpHeight + "px";
-	
+
 			this.DPR = getDevicePixelRatio();
-	
-			this.MainElement.setAttribute("width", Math.floor(this.tmpWidth * this.DPR));
-			this.MainElement.setAttribute("height", Math.floor(this.tmpHeight * this.DPR));
+
+			this.MainElement.setAttribute("width", String(Math.floor(this.tmpWidth * this.DPR)));
+			this.MainElement.setAttribute("height", String(Math.floor(this.tmpHeight * this.DPR)));
 		}
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	makeWholeCanvasSize() {
 		if (this.MainElement && (this.tmpWidth != this.MainElement.width || this.tmpHeight != this.MainElement.height)) {
 			var w = this.MainElement.width;
 			var h = this.MainElement.height;
-	
+
 			this.MainElement.style.width = w + "px";
 			this.MainElement.style.height = h + "px";
-	
+
 			this.DPR = getDevicePixelRatio();
 
 			this.tmpWidth = Math.floor(w * this.DPR);
 			this.tmpHeight = Math.floor(h * this.DPR);
-	
-			this.MainElement.setAttribute("width", this.tmpWidth);
-			this.MainElement.setAttribute("height", this.tmpHeight);
+
+			this.MainElement.setAttribute("width",  String(this.tmpWidth));
+			this.MainElement.setAttribute("height", String(this.tmpHeight));
 		}
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	draw3DIntervalHandler(timeMs) {
 		// resize
@@ -28202,7 +28700,7 @@ class CopperLicht {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	loadingUpdateIntervalHandler() {
 		if (this.LoadingDialog != null)
@@ -28239,7 +28737,7 @@ class CopperLicht {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	async parseFile(filecontent, filename, importIntoExistingDocument, copyRootNodeChildren, newRootNodeChildrenParent) {
 		this.LoadingAFile = false;
@@ -28285,7 +28783,7 @@ class CopperLicht {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	startFirstSceneAfterEverythingLoaded() {
 		// set active scene
@@ -28355,14 +28853,14 @@ class CopperLicht {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	internalOnAfterRendering() {
 		this.setNextCameraActiveIfNeeded();
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	internalOnBeforeRendering() {
 		this.setNextCameraActiveIfNeeded();
@@ -28423,7 +28921,7 @@ class CopperLicht {
 
 	/**
 	 * Switches the current scene to a new CL3D.Scene.
-	 * @param {CL3D.Scene} scene The new CL3D.Scene to be activated.
+	 * @param {CL3D.Free3dScene} scene The new CL3D.Scene to be activated.
 	 * @public
 	 */
 	gotoScene(scene) {
@@ -28529,7 +29027,7 @@ class CopperLicht {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	setNextCameraActiveIfNeeded() {
 		if (this.NextCameraToSetActive == null)
@@ -28598,7 +29096,7 @@ class CopperLicht {
 
 	/**
 	 * Causes a key event to stop propagating if it has been used inside an animator
-	 * @private
+	 * @public
 	 */
 	handleEventPropagation(evt, usedToDoAction) {
 		if (this.IsBrowser && usedToDoAction) {
@@ -28616,7 +29114,7 @@ class CopperLicht {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	registerAnimatorForKeyUp(an) {
 		if (an != null)
@@ -28624,7 +29122,7 @@ class CopperLicht {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	registerAnimatorForKeyDown(an) {
 		if (an != null)
@@ -28632,7 +29130,7 @@ class CopperLicht {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	updateCanvasTopLeftPosition(e) {
 		var x = 0;
@@ -28643,6 +29141,7 @@ class CopperLicht {
 		while (obj != null) {
 			x += obj.offsetLeft;
 			y += obj.offsetTop;
+			// @ts-ignore
 			obj = obj.offsetParent;
 		}
 
@@ -28659,7 +29158,7 @@ class CopperLicht {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	getMousePosXFromEvent(evt) {
 		if (this.isInPointerLockMode()) {
@@ -28679,7 +29178,7 @@ class CopperLicht {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	getMousePosYFromEvent(evt) {
 		if (this.isInPointerLockMode()) {
@@ -28807,7 +29306,7 @@ class CopperLicht {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	setMouseDownWhereMouseIsNow() {
 		if (this.isInPointerLockMode()) {
@@ -28985,7 +29484,7 @@ class CopperLicht {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 */
 	setActiveCameraNextFrame(cam) {
 		if (cam == null)
@@ -29004,7 +29503,7 @@ class CopperLicht {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 * @param n: Current scene node
 	 * @param {CL3D.TriangleSelector} world: TriangleSelector
 	 */
@@ -29040,7 +29539,7 @@ class CopperLicht {
 
 	/**
 	 * Reloads a scene, triggered only by the CopperCube Action 'RestartScene'
-	 * @param {CL3D.Scene} scene The new CL3D.Scene to be reloaded.
+	 * @param {String} sceneName The new CL3D.Scene to be reloaded.
 	 * @public
 	 */
 	reloadScene(sceneName) {
@@ -29083,7 +29582,7 @@ class CopperLicht {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 * Updates the loading dialog if it is existing
 	 */
 	updateLoadingDialog() {
@@ -29094,15 +29593,17 @@ class CopperLicht {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 * Creates a nicely looking loading dialog, with the specified loading text
 	 */
 	createTextDialog(forLoadingDlg, text, loadingScreenBackgroundColor) {
 		if (this.MainElement == null)
 			return;
 
-		this.MainElement.setAttribute("width", globalThis.innerWidth);
-		this.MainElement.setAttribute("height", globalThis.innerHeight);
+		if (this.fullpage) {
+			this.MainElement.setAttribute("width", String(globalThis.innerWidth));
+			this.MainElement.setAttribute("height", String(globalThis.innerHeight));
+		}
 
 		var dlg_div = document.createElement("div");
 		this.MainElement.parentNode.appendChild(dlg_div);
@@ -29162,7 +29663,7 @@ class CopperLicht {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 * Enables pointer lock after fullscreen change, if whished
 	 */
 	onFullscreenChanged() {
@@ -29173,7 +29674,7 @@ class CopperLicht {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 * Notifies the engine if a pointer lock was used
 	 */
 	requestPointerLock() {
@@ -29190,7 +29691,7 @@ class CopperLicht {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 * Notifies the engine if a pointer lock was used
 	 */
 	onPointerLockChanged() {
@@ -29211,7 +29712,7 @@ class CopperLicht {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 * Handlers for pointer lock and fullscreen change
 	 */
 	setupEventHandlersForFullscreenChange() {
@@ -29251,7 +29752,7 @@ class CopperLicht {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 * Internal video playback handler
 	 */
 	getOrCreateVideoStream(filename, createIfNotFound, handlerOnVideoEnded, handlerOnVideoFailed) {
@@ -29275,7 +29776,7 @@ class CopperLicht {
 	}
 
 	/**
-	 * @private
+	 * @public
 	 * update all video streams
 	 */
 	updateAllVideoStreams() {
@@ -29351,6 +29852,13 @@ const endProgram = (url) => {
 // ----------------------------------------------------------------------------------------------------------------------------
 // ============================================================================================================================
 
+
+/**
+ * @returns {Number} the ratio of the resolution in physical pixels and in pixels for the current display device.
+ */
+globalThis.ccbGetDevicePixelRatio = () => {
+	return getDevicePixelRatio();
+};
 
 /**
  * @param {Number} id Searches the whole scene graph for a scene node with this 'id'.
@@ -30448,7 +30956,7 @@ globalThis.ccbRegisterBehaviorEventReceiver = (bForMouse, bForKeyboard) => {
 
 /**
  * makes a GET network request via HTTP to any web server, and {@link ccbCancelHTTPRequest} can cancel this request while it is running.
- * @param {string} url  set it an URL to request, like {@link http://www.example.com} or similar.
+ * @param {String} url  set it an URL to request, like {@link http://www.example.com} or similar.
  * @param {function} fobj A callback function which will be called with the received data once the request is finished. This will also be called if the request ailed, with an empty string as parameter.
  * @returns {Number} The function returns an unique Id, for identifying this request.
  */
