@@ -181,8 +181,8 @@ export default class behavior_RadioButton
 			this.init = true;
 		}
 
-		this.mouseX = ccbGetMousePosX() * CL3D.engine.DPR;
-		this.mouseY = ccbGetMousePosY() * CL3D.engine.DPR;
+		this.mouseX = ccbGetMousePosX() * ccbGetDevicePixelRatio();
+		this.mouseY = ccbGetMousePosY() * ccbGetDevicePixelRatio();
 
 		this.posX_Radio = ccbGetSceneNodeProperty(this.Radio, "Pos X (percent)");
 		this.posY_Radio = ccbGetSceneNodeProperty(this.Radio, "Pos Y (percent)");

@@ -241,8 +241,8 @@ export default class behavior_ToggleButton
 
 			this.init = true;
 		}
-		this.mouseX = ccbGetMousePosX() * CL3D.engine.DPR;
-		this.mouseY = ccbGetMousePosY() * CL3D.engine.DPR;
+		this.mouseX = ccbGetMousePosX() * ccbGetDevicePixelRatio();
+		this.mouseY = ccbGetMousePosY() * ccbGetDevicePixelRatio();
 
 		this.posX_Knob = ccbGetSceneNodeProperty(this.Knob, "Pos X (percent)");
 		this.posY_Knob = ccbGetSceneNodeProperty(this.Knob, "Pos Y (percent)");
@@ -303,6 +303,7 @@ export default class behavior_ToggleButton
 			}
 			else
 			{
+				let color = ccbGetSceneNodeProperty(this.Knob, "Background Color");
 				let Knob_OFF_Color = CL3D.convertIntColor(this.Knob_OFF_Color);
 				Knob_OFF_Color = CL3D.createColor(this.Knob_Alpha, Knob_OFF_Color.r, Knob_OFF_Color.g, Knob_OFF_Color.b);
 				let Bar_OFF_Color = CL3D.convertIntColor(this.Bar_OFF_Color);

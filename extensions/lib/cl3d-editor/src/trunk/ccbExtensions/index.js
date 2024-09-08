@@ -1,0 +1,2 @@
+export { SpecialNumber, defineSpecialNumber, defineProperties, defineActionHandler } from './define.js';
+export { createAnimatorExtensionScriptFromProps, createAnimatorExtensionScriptFromHTML } from './utils.js';

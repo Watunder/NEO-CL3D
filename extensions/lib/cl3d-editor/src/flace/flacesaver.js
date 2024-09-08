@@ -1,4 +1,4 @@
-import * as CL3D from "../../../.././../../src/main.js";
+import * as CL3D from "cl3d";
 import BinaryStream from "binarystream";
 import { saveFile } from "../share/saveFile.js";
 
@@ -23,6 +23,7 @@ export class FlaceSaver {
             this.savePublishSettings();
 
             for (let index = 0; index < (CL3D.gDocument.Scenes.length); ++index) {
+                this.Data.write(new Uint8Array(18)); // unknown data definition
                 let pos = this.startTag(2);
                 {
                     this.Data.writeInt32LE(0);
@@ -179,20 +180,22 @@ export class FlaceSaver {
      */
     saveActionHandler(actionHandler)
     {
-        if (actionHandler) this.Data.writeInt32LE(1);
-        else this.Data.writeInt32LE(0);
+        if (actionHandler) {
+            this.Data.writeInt32LE(1);
 
-        let pos = this.startTag(29);
-        {
-            let pos = this.startTag(30);
+            let pos = this.startTag(29);
             {
-                for (let index = 0; index < actionHandler.Actions.length; ++index) {
-                    this.saveAction(actionHandler.Actions[index]);
+                let pos = this.startTag(30);
+                {
+                    for (let index = 0; index < actionHandler.Actions.length; ++index) {
+                        this.saveAction(actionHandler.Actions[index]);
+                    }
                 }
+                this.endTag(pos);
             }
             this.endTag(pos);
         }
-        this.endTag(pos);
+        else this.Data.writeInt32LE(0);
     }
 
     /**
@@ -570,7 +573,6 @@ export class FlaceSaver {
                         flag += 1;
                         this.Data.writeInt32LE(TimeDisplacement);
                     }
-
                     if(animator.EndMode == 3 || animator.EndMode == 4) {
                         this.saveActionHandler(animator.TheActionHandler);
                     }
@@ -722,6 +724,12 @@ export class FlaceSaver {
                 this.Data.writeInt32LE();
                 this.saveActionHandler(animator.TheActionHandler);
                 break;
+            case "extensionscript":
+                this.Data.writeInt32LE(117);
+                this.saveString(animator.JsClassName);
+                this.Data.writeInt32LE();
+                this.saveExtensionScriptProperties(animator.Properties);
+                break;
         }
     }
 
@@ -751,17 +759,14 @@ export class FlaceSaver {
             switch (index)
 			{
 				case 0:
-                    if (mat.Tex1) {
-                        let path = mat.Tex1.Name;
-                        this.saveString(path);
-                    }
+                    mat.Tex1 ? this.saveString(mat.Tex1.Name) : this.saveString("");
 					break;
 				case 1:
-                    if (mat.Tex2) {
-                        let path = mat.Tex2.Name;
-                        this.saveString(path);
-                    }
+                    mat.Tex2 ? this.saveString(mat.Tex2.Name) : this.saveString("");
 					break;
+                default:
+                    this.saveString("");
+                    break;
 			}
 			this.Data.writeBoolean();
 			this.Data.writeBoolean();
@@ -911,7 +916,9 @@ export class FlaceSaver {
                 {
                     this.saveSceneNodeParams(currentNode);
 
-                    let pos = this.startTag(10)
+                    let pos = 0;
+
+                    pos = this.startTag(10)
                     {
                         switch (currentNode.Type) {
                             case 2037085030:
@@ -947,6 +954,7 @@ export class FlaceSaver {
                                 console.log("DummyTransformationSceneNode");
                                 break;
                             case 1868837478:
+                                this.saveFlaceOverlay2DNode(currentNode);
                                 console.log("Overlay2DSceneNode");
                                 break;
                             case 1668575334:
@@ -1006,6 +1014,49 @@ export class FlaceSaver {
         }
     }
 
+    /**
+	 * @param {CL3D.ExtensionScriptProperty[]} props
+	 */
+    saveExtensionScriptProperties(props)
+    {
+        const propCount = props.length;
+        this.Data.writeInt32LE(propCount);
+		for(let index = 0; index < propCount; ++index)
+		{
+            const prop = props[index];
+
+            this.Data.writeInt32LE(prop.Type);
+            this.saveString(prop.Name);
+
+            switch (prop.Type)
+			{
+				case 1:
+					this.Data.writeFloat32LE(prop.FloatValue);
+					break;
+				case 2:
+                    this.saveString(prop.StringValue);
+					break;
+				case 6:
+					this.write3DVectF(prop.VectorValue);
+					break;
+				case 7:
+					this.saveString(prop.TextureValue);
+					break;
+				case 9:
+                    this.saveActionHandler(prop.ActionHandlerValue);
+					break;
+				case 0:
+				case 4:
+				case 5:
+				case 8:
+				case 3:
+				default:
+					this.Data.writeInt32LE(prop.IntValue);
+					break;
+			}
+        }
+    }
+
 	/**
 	 * @param {CL3D.BillboardSceneNode} node
 	 */
@@ -1031,4 +1082,43 @@ export class FlaceSaver {
 		this.Data.writeFloat32LE(node.ZFar);
 		this.Data.writeBoolean(node.Active);
 	}
+
+	/**
+	 * @param {CL3D.Overlay2DSceneNode} node
+	 */
+    saveFlaceOverlay2DNode(node)
+    {
+        node.BlurImage ? this.Data.writeInt32LE(1) : this.Data.writeInt32LE(0);
+        this.Data.writeBoolean(node.SizeModeIsAbsolute);
+		if(node.SizeModeIsAbsolute)
+		{
+            this.Data.writeInt32LE(node.PosAbsoluteX);
+            this.Data.writeInt32LE(node.PosAbsoluteY);
+            this.Data.writeInt32LE(node.SizeAbsoluteWidth);
+            this.Data.writeInt32LE(node.SizeAbsoluteHeight);
+		}
+		else
+		{
+            this.Data.writeFloat32LE(node.PosRelativeX);
+            this.Data.writeFloat32LE(node.PosRelativeY);
+            this.Data.writeFloat32LE(node.SizeRelativeWidth);
+            this.Data.writeFloat32LE(node.SizeRelativeHeight);
+		}
+        this.Data.writeBoolean(node.ShowBackGround);
+        this.Data.writeInt32LE(node.BackGroundColor);
+        node.Texture ? this.saveString(node.Texture.Name) : this.saveString("");
+        node.TextureHover ? this.saveString(node.TextureHover.Name) : this.saveString("");
+        this.Data.writeBoolean(node.RetainAspectRatio);
+        this.Data.writeBoolean(node.DrawText);
+        this.Data.writeByte(node.TextAlignment);
+        this.saveString(node.Text);
+        this.saveString(node.FontName);
+        this.Data.writeInt32LE(node.TextColor);
+        this.Data.writeBoolean(node.AnimateOnHover);
+        this.Data.writeBoolean(node.OnHoverSetFontColor);
+        this.Data.writeInt32LE(node.HoverFontColor);
+        this.Data.writeBoolean(node.OnHoverSetBackgroundColor);
+        this.Data.writeInt32LE(node.HoverBackgroundColor);
+        this.Data.writeBoolean(node.OnHoverDrawTexture);
+    }
 };
