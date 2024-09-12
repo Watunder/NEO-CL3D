@@ -11798,10 +11798,10 @@ class AnimatorOnClick extends Animator {
 			return false;
 		}
 
-		var now = CLTimer.getTime();
+		// var now = CL3D.CLTimer.getTime();
 
-		if (now - this.engine.LastCameraDragTime < 250)
-			return false;
+		// if (now - this.engine.LastCameraDragTime < 250)
+		// 	return false;
 
 		var x = this.engine.getMousePosXFromEvent(event);
 		var y = this.engine.getMousePosYFromEvent(event);
@@ -11815,7 +11815,7 @@ class AnimatorOnClick extends Animator {
 		}
 
 		if (this.TheObject.Parent == null) {
-			// object seems to be deleted 
+			// object seems to be deleted
 			this.TheObject = null;
 			return false;
 		}
@@ -11847,10 +11847,10 @@ class AnimatorOnClick extends Animator {
 			return false;
 		}
 
-		var now = CLTimer.getTime();
+		// var now = CL3D.CLTimer.getTime();
 
-		if (now - this.engine.LastCameraDragTime < 250)
-			return false;
+		// if (now - this.engine.LastCameraDragTime < 250)
+		// 	return false;
 
 		var x = this.engine.getMousePosXFromEvent(event);
 		var y = this.engine.getMousePosYFromEvent(event);
@@ -11864,13 +11864,13 @@ class AnimatorOnClick extends Animator {
 		}
 
 		if (this.TheObject.Parent == null) {
-			// object seems to be deleted 
+			// object seems to be deleted
 			this.TheObject = null;
 			return false;
 		}
 
-		if (n.isActuallyVisible() &&
-			this.isOverNode(n, x, y)) {
+		if (n.isActuallyVisible()/*&&
+			this.isOverNode(n, x, y)*/) {
 			this.LastTimeDoneSomething = true;
 
 			this.invokeAction(n);
@@ -11947,7 +11947,7 @@ class AnimatorOnClick extends Animator {
 	getDistanceToNearestCollisionPointWithWorld(begin, end) {
 		return this.static_getDistanceToNearestCollisionPointWithWorld(this.SMGr, begin, end, this.World, true);
 	}
-	
+
 	/**
 	 * @public
 	 * returns true if collides (and no wall between), false if not
@@ -11960,7 +11960,7 @@ class AnimatorOnClick extends Animator {
 		var mat = new Matrix4(false);
 		if (node.AbsoluteTransformation.getInverse(mat)) {
 			if (box.intersectsWithLine(mat.getTransformedVect(ray.Start), mat.getTransformedVect(ray.End))) {
-				// the click was inside the bounding box 
+				// the click was inside the bounding box
 				//Debug.print("Click was in BB!");
 				var meshSceneNode = null;
 				if (node.getMesh && node.OwnedMesh) meshSceneNode = node; // instead of checking for the type, we are checking for the method, that should be enough
@@ -11992,7 +11992,7 @@ class AnimatorOnClick extends Animator {
 								var collisionDistance = collisionPoint.getDistanceTo(ray.Start);
 
 								if (distance + TOLERANCE < collisionDistance) {
-									return false; // a wall was between us 
+									return false; // a wall was between us
 								}
 
 								else {
@@ -12050,7 +12050,7 @@ class AnimatorOnClick extends Animator {
 						var raytestlen = rayworldtestend.getDistanceTo(rayworldteststart) - maxradius;
 
 						if (distance < raytestlen)
-							return false; // a wall was between us 
+							return false; // a wall was between us
 
 						else {
 							if (outDistance != null)

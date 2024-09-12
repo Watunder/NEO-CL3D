@@ -1,8 +1,10 @@
 import AmmoLib from './ammo.js';
 import effekseerLib from './effekseer.js';
+import FmodLib from './fmodstudio.js';
 import mitt from './mitt.js';
 import { Rekapi, Actor } from './rekapi.js';
 import * as CL3D from './cl3d.js';
+import Creature from './creature.js';
 import { Utils, Player, SsPartType, PART_FLAG } from './ss6player-lib.js';
 
 class AnimatorRigidPhysicsBody extends CL3D.Animator {
@@ -35,46 +37,184 @@ class AnimatorRigidPhysicsBody extends CL3D.Animator {
     }
 }
 
-const nameList =
-{
+class CreaturePackage {
+    constructor(filePath, callback) {
+        const index1 = filePath.lastIndexOf("/");
+        this.rootPath = filePath.slice(0, index1 + 1);
+        const index2 = filePath.lastIndexOf(".");
+        this.name = filePath.slice(index1 + 1, index2);
 
-};
-
-globalThis.rename = (name) => {
-    if (typeof name !== "string")
-        return;
-
-    if (nameList.hasOwnProperty(name)) {
-        let order = String(++nameList[name]);
-        let _name = name + "_" + order;
-
-        return _name;
+        this.onComplete = callback;
+        this.loadFile(filePath);
     }
 
-    nameList[name] = 1;
-    let _name = name + "_1";
+    /**
+     * Load json and parse (then, load textures)
+     * @param {string} filePath - CreaturePack file path
+     */
+    loadFile(filePath) {
+        let result = false;
 
-    return _name;
-};
+        const loader = new CL3D.CCFileLoader(filePath, true, true);
+        loader.load((data) => {
+            let byteArray = new Uint8Array(data);
+            console.log("Loaded CreaturePack Data with size: " + byteArray.byteLength);
 
-Array.prototype.flatAll = function () {
-    let array = this;
-    
-    while (array.some(item => Array.isArray(item)))
-        array = [].concat(...array);
+            let loadArray = Creature.wasmHeap(byteArray);
+            result = Creature.PackManager.addPackLoader(this.name, loadArray.byteOffset, loadArray.byteLength);
 
-    return array;
-};
+            this.loadTexture();
+        });
 
-/// TODO
-// function _addScenesFromDocument(filetoload, newRootNodeChildrenParent, functionToCallWhenLoaded) {
-//     var loader = new CL3D.CCFileLoader(filetoload, filetoload.indexOf('.ccbz') != -1);
-//     loader.load(function (filecontent) {
-//         CL3D.engine.parseFile(filecontent, filetoload, true, true, newRootNodeChildrenParent);
-//         if (functionToCallWhenLoaded) functionToCallWhenLoaded();
-//     });
-// }
-///
+        if (result == false)
+            return;
+    }
+
+    loadTexture() {
+        let resources = {};
+
+        resources[this.name] = this.rootPath + this.name + ".png";
+
+        // CreaturePackage is ready.
+        this.resources = resources;
+        this.status = "ready";
+
+        if (this.onComplete !== null)
+            this.onComplete();
+    }
+}
+
+class SimpleMeshSceneNode extends CL3D.SceneNode {
+    constructor(texture, vertices, uvs, indices) {
+        super();
+
+        this.init();
+
+        this._Mesh = new CL3D.Mesh();
+        let buf = new CL3D.MeshBuffer();
+        this._Mesh.AddMeshBuffer(buf);
+
+        // set indices and vertices
+        buf.Indices = indices;
+
+        this.vertices = vertices;
+        this.uvs = uvs;
+
+        this.update(vertices);
+
+        // set the texture of the material
+        buf.Mat.Type = CL3D.Material.EMT_TRANSPARENT_ALPHA_CHANNEL;
+        buf.Mat.BackfaceCulling = false;
+        buf.Mat.Tex1 = CL3D.ScriptingInterface.getScriptingInterface().Engine.getTextureManager().getTexture(texture, true);
+    }
+
+    update(vertices) {
+        const me = this;
+        me._Mesh.GetMeshBuffers()[0].Vertices = [];
+        me._Mesh.GetMeshBuffers()[0].update(true, true);
+
+        for (let i = 0, len = vertices.length / 2; i < len; i++) {
+            me._Mesh.GetMeshBuffers()[0].Vertices.push(CL3D.createSimpleVertex(vertices[i * 2], vertices[i * 2 + 1], 0, this.uvs[i * 2], this.uvs[i * 2 + 1]));
+        }
+
+        me.vertices = vertices;
+    }
+
+    OnRegisterSceneNode(scene) {
+        if (this.Visible) {
+            if (this.Parent._Type == "ss6" || this.Parent._Type == "cp") {
+                scene.registerNodeForRendering(this, CL3D.Scene.TRANSPARENT_SOLID_AFTER_ZBUFFER_CLEAR);
+                CL3D.SceneNode.prototype.OnRegisterSceneNode.call(this, scene);
+            }
+
+            else if (this.Parent._Type == "ss6ui") {
+                scene.registerNodeForRendering(this, CL3D.Scene.RENDER_MODE_2DOVERLAY);
+                CL3D.SceneNode.prototype.OnRegisterSceneNode.call(this, scene);
+            }
+        }
+    }
+
+    render(renderer) {
+        renderer.setWorld(this.getAbsoluteTransformation());
+        renderer.drawMesh(this._Mesh);
+    }
+}
+
+class CreaturePlayer {
+    // Properties
+    playerId;
+    creaturepackage;
+
+    animations = [];
+
+    startTime;
+    endTime;
+    isLoop;
+
+    set loop(loop) {
+        this.isLoop = loop;
+    }
+
+    get loop() {
+        return this.isLoop;
+    }
+
+    /**
+     * CreaturePlayer
+     * @constructor
+     * @param {CreaturePackage} creaturepackage - CreaturePackage that contains animations.
+     * @param {string} animePackName - The name of animePack.
+     * @param {string} animeName - The name of animation.
+     */
+    constructor(node, creaturepackage, animePackName, animeName) {
+        this.node = node;
+        this.creaturepackage = creaturepackage;
+
+        if (animePackName !== null && animeName !== null)
+            this.Setup(animePackName, animeName);
+    }
+
+    Setup(animePackName, animeName) {
+        this.playerId = Creature.PackManager.addPackPlayer(animePackName);
+        this.animations.push(Creature.PackManager.getAllAnimNames(this.playerId));
+
+        Creature.PackManager.setPlayerActiveAnimation(this.playerId, animeName);
+
+        let texture = this.creaturepackage.resources[this.creaturepackage.name];
+        let vertices = Creature.PackManager.getPlayerPoints(this.playerId);
+        let uvs = Creature.PackManager.getPlayerUVs(this.playerId);
+        let indices = Creature.PackManager.getPlayerIndices(this.playerId);
+
+        let mesh = new SimpleMeshSceneNode(texture, vertices, uvs, indices);
+        mesh.name = this.creaturepackage.name;
+
+        this.node.addChild(mesh);
+    }
+
+    Update(timeMs) {
+        // delta time
+        if (this.lastTime == null)
+            this.lastTime = timeMs;
+
+        timeMs - this.lastTime;
+        this.lastTime = timeMs;
+
+        Creature.PackManager.stepPlayer(this.playerId, 1.0);
+
+        let vertices = Creature.PackManager.getPlayerPoints(this.playerId);
+        this.node.Children[0].update(vertices);
+    }
+
+    SetAnimationSelection(startTime = 0, endTime = 1000, isLoop = false) {
+        this.startTime = startTime;
+        this.endTime = endTime;
+
+        // Creature.PackManager.getActiveAnimStartTime(this.playerId);
+        // Creature.PackManager.getActiveAnimEndTime(this.playerId);
+
+        Creature.PackManager.setPlayerLoop(this.playerId, this.isLoop);
+    }
+}
 
 class SS6Project
 {
@@ -258,62 +398,6 @@ class ColorMatrix {
         this.m05, this.m06, this.m07, this.m08, this.m09,
         this.m10, this.m11, this.m12, this.m13, this.m14,
         this.m15, this.m16, this.m17, this.m18, this.m19];
-    }
-}
-
-class SimpleMeshSceneNode extends CL3D.SceneNode {
-    constructor(texture, vertices, uvs, indices) {
-        super();
-
-        this.init();
-
-        this._Mesh = new CL3D.Mesh();
-        let buf = new CL3D.MeshBuffer();
-        this._Mesh.AddMeshBuffer(buf);
-
-        // set indices and vertices
-        buf.Indices = indices;
-
-        this.vertices = vertices;
-        this.uvs = uvs;
-
-        this.update(vertices);
-
-        // set the texture of the material
-        buf.Mat.Type = CL3D.Material.EMT_TRANSPARENT_ALPHA_CHANNEL;
-        buf.Mat.BackfaceCulling = false;
-        buf.Mat.Tex1 = CL3D.ScriptingInterface.getScriptingInterface().Engine.getTextureManager().getTexture(texture, true);
-    }
-
-    update(vertices) {
-        const me = this;
-        me._Mesh.GetMeshBuffers()[0].Vertices = [];
-        me._Mesh.GetMeshBuffers()[0].update(true, true);
-
-        for (let i = 0, len = vertices.length / 2; i < len; i++) {
-            me._Mesh.GetMeshBuffers()[0].Vertices.push(CL3D.createSimpleVertex(vertices[i * 2], vertices[i * 2 + 1], 0, this.uvs[i * 2], this.uvs[i * 2 + 1]));
-        }
-
-        me.vertices = vertices;
-    }
-
-    OnRegisterSceneNode(scene) {
-        if (this.Visible) {
-            if (this.Parent._Type == "ss6") {
-                scene.registerNodeForRendering(this, CL3D.Scene.TRANSPARENT_SOLID_AFTER_ZBUFFER_CLEAR);
-                CL3D.SceneNode.prototype.OnRegisterSceneNode.call(this, scene);
-            }
-
-            else if (this.Parent._Type == "ss6ui") {
-                scene.registerNodeForRendering(this, CL3D.Scene.RENDER_MODE_2DOVERLAY);
-                CL3D.SceneNode.prototype.OnRegisterSceneNode.call(this, scene);
-            }
-        }
-    }
-
-    render(renderer) {
-        renderer.setWorld(this.getAbsoluteTransformation());
-        renderer.drawMesh(this._Mesh);
     }
 }
 
@@ -1490,6 +1574,47 @@ class SS6Player
   } 
 }
 
+const nameList =
+{
+
+};
+
+globalThis.rename = (name) => {
+    if (typeof name !== "string")
+        return;
+
+    if (nameList.hasOwnProperty(name)) {
+        let order = String(++nameList[name]);
+        let _name = name + "_" + order;
+
+        return _name;
+    }
+
+    nameList[name] = 1;
+    let _name = name + "_1";
+
+    return _name;
+};
+
+Array.prototype.flatAll = function () {
+    let array = this;
+    
+    while (array.some(item => Array.isArray(item)))
+        array = [].concat(...array);
+
+    return array;
+};
+
+/// TODO
+// function _addScenesFromDocument(filetoload, newRootNodeChildrenParent, functionToCallWhenLoaded) {
+//     var loader = new CL3D.CCFileLoader(filetoload, filetoload.indexOf('.ccbz') != -1);
+//     loader.load(function (filecontent) {
+//         CL3D.engine.parseFile(filecontent, filetoload, true, true, newRootNodeChildrenParent);
+//         if (functionToCallWhenLoaded) functionToCallWhenLoaded();
+//     });
+// }
+///
+
 class FrameEvent {
 	constructor(context, type = "seque") {
 		const me = this;
@@ -1797,6 +1922,11 @@ const Ammo = await AmmoLib();
  */
 const effekseer = effekseerLib;
 
+/**
+ * @type {import('fmodstudio').FMOD}
+ */
+const FMOD = await FmodLib({});
+
 class RekapiActor extends Actor {
     constructor(config) {
         super(config);
@@ -1829,4 +1959,4 @@ Global.Emitter.on("set_behavior_state", (behavior) => {
     Global.StateList[behavior.StateIndex] = behavior.State;
 });
 
-export { Ammo, AnimatorRigidPhysicsBody, FrameEvent, Global, ImmediateEvent, RekapiActor, SS6Player, SS6PlayerInstanceKeyParam, SS6Project, effekseer };
+export { Ammo, AnimatorRigidPhysicsBody, CreaturePackage, CreaturePlayer, FMOD, FrameEvent, Global, ImmediateEvent, RekapiActor, SS6Player, SS6PlayerInstanceKeyParam, SS6Project, effekseer };
