@@ -1,0 +1,5 @@
+{
+    "type": "module",
+    "name": "creature",
+    "main": "./dist/creature.js"
+}
