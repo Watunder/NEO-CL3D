@@ -22,6 +22,9 @@ importers:
       cl3d:
         specifier: workspace:*
         version: link:../externals/cl3d
+      creature:
+        specifier: workspace:*
+        version: link:../externals/creature
       effekseer:
         specifier: workspace:*
         version: link:../externals/effekseer
@@ -55,6 +58,12 @@ importers:
       cl3d:
         specifier: workspace:*
         version: link:../../../externals/cl3d
+      fairygui-dom:
+        specifier: workspace:*
+        version: link:../../../externals/fairygui-dom
+      html-to-json:
+        specifier: workspace:*
+        version: link:../../../externals/html-to-json
 
   externals/ammo:
     devDependencies:
@@ -93,6 +102,8 @@ importers:
         version: 5.5.4
 
   externals/cl3d: {}
+
+  externals/creature: {}
 
   externals/effekseer: {}
 
@@ -187,6 +198,8 @@ importers:
   externals/fmodstudio: {}
 
   externals/html-to-image: {}
+
+  externals/html-to-json: {}
 
   externals/localforage: {}
 
