@@ -38,7 +38,7 @@ export class SimpleMeshSceneNode extends CL3D.SceneNode {
 
     OnRegisterSceneNode(scene) {
         if (this.Visible) {
-            if (this.Parent._Type == "ss6") {
+            if (this.Parent._Type == "ss6" || this.Parent._Type == "cp") {
                 scene.registerNodeForRendering(this, CL3D.Scene.TRANSPARENT_SOLID_AFTER_ZBUFFER_CLEAR);
                 CL3D.SceneNode.prototype.OnRegisterSceneNode.call(this, scene);
             }
