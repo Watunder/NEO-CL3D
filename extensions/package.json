@@ -5,6 +5,7 @@
     "ammo": "workspace:*",
     "binarystream": "workspace:*",
     "cl3d": "workspace:*",
+    "creature": "workspace:*",
     "effekseer": "workspace:*",
     "fairygui-dom": "workspace:*",
     "fmodstudio": "workspace:*",

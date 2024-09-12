@@ -54,7 +54,7 @@ class _action_OnEnter
 
 	execute(currentNode)
 	{
-		// console.log("[Custom:Enter]")
+
 	}
 };
 
@@ -67,7 +67,6 @@ class _action_OnClick
 
 	execute(currentNode)
 	{
-		// console.log("[Custom:Click]")
 		if (this.animater.scaled)
 		{
 			ccbSetSceneNodeProperty(this.animater.Radio, "Pos X (percent)", this.animater.originalClicked.x);
@@ -76,7 +75,6 @@ class _action_OnClick
 			ccbSetSceneNodeProperty(this.animater.Radio, "Height (percent)", this.animater.originalClicked.height);
 
 			this.animater.scaled = false;
-			// console.log("[Origin:Click]")
 		}
 	}
 };
@@ -90,7 +88,6 @@ class _action_OnLeave
 
 	execute(currentNode)
 	{
-		// console.log("[Custom:Leave]")
 		if (this.animater.scaled)
 		{
 			ccbSetSceneNodeProperty(this.animater.Radio, "Pos X (percent)", this.animater.overlayData.x);
@@ -99,7 +96,6 @@ class _action_OnLeave
 			ccbSetSceneNodeProperty(this.animater.Radio, "Height (percent)", this.animater.overlayData.height);
 
 			this.animater.scaled = false;
-			// console.log("[Origin:Leave]")
 		}
 	}
 };
@@ -133,7 +129,6 @@ export default class behavior_RadioButton
 			this.screenX = ccbGetScreenWidth();
 			this.screenY = ccbGetScreenHeight();
 
-			let __action_OnClick = new _action_OnClick(this);
 			let animator1 = new CL3D.AnimatorOnClick(CL3D.gScriptingInterface.CurrentlyActiveScene, CL3D.gScriptingInterface.Engine, () =>
 			{
 				if (!this.scaledup)
@@ -148,7 +143,6 @@ export default class behavior_RadioButton
 					ccbSetSceneNodeProperty(this.Radio, "Height (percent)", scaledClick.height);
 
 					this.scaled = true;
-					// console.log("[Origin:Pressed]")
 				}
 
 				ccbSetCopperCubeVariable(this.Variable, this.Value);
@@ -157,21 +151,9 @@ export default class behavior_RadioButton
 					ccbInvokeAction(this.Action);
 				}
 			});
-			animator1.TheActionHandler = __action_OnClick;
+			animator1.TheActionHandler = new _action_OnClick(this);
 
-			let animator2 = new CL3D.AnimatorOnMove(CL3D.gScriptingInterface.CurrentlyActiveScene, CL3D.gScriptingInterface.Engine, () =>
-			{
-				if (this.scaled)
-				{
-					ccbSetSceneNodeProperty(this.Radio, "Pos X (percent)", this.overlayData.x);
-					ccbSetSceneNodeProperty(this.Radio, "Pos Y (percent)", this.overlayData.y);
-					ccbSetSceneNodeProperty(this.Radio, "Width (percent)", this.overlayData.width);
-					ccbSetSceneNodeProperty(this.Radio, "Height (percent)", this.overlayData.height);
-
-					this.scaled = false;
-					// console.log("[Origin:Leave]")
-				}
-			});
+			let animator2 = new CL3D.AnimatorOnMove(CL3D.gScriptingInterface.CurrentlyActiveScene, CL3D.gScriptingInterface.Engine);
 			animator2.ActionHandlerOnEnter = new _action_OnEnter(this);
 			animator2.ActionHandlerOnLeave = new _action_OnLeave(this);
 

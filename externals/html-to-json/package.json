@@ -1,0 +1,5 @@
+{
+  "name": "html-to-json",
+  "type": "module",
+  "main": "./dist/html-to-json.js"
+}

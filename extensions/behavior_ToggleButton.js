@@ -78,7 +78,7 @@ class _action_Knob_OnClick
 
 	execute()
 	{
-		if (this.animater.scaledKnob && this.animater.originalClickedKnob)
+		if (this.animater.scaledKnob)
 		{
 			if (this.animater.KnobName == this.animater.BarName) ccbSetSceneNodeProperty(this.animater.Knob, "Pos X (percent)", this.animater.originalClickedKnob.x);
 			ccbSetSceneNodeProperty(this.animater.Knob, "Pos Y (percent)", this.animater.originalClickedKnob.y);
@@ -102,14 +102,12 @@ class _action_Knob_OnLeave
 		if (this.animater.scaledKnob)
 		{
 			if (this.animater.KnobName == this.animater.BarName) ccbSetSceneNodeProperty(this.animater.Knob, "Pos X (percent)", this.animater.KnobData.x);
-
 			ccbSetSceneNodeProperty(this.animater.Knob, "Pos Y (percent)", this.animater.KnobData.y);
 			ccbSetSceneNodeProperty(this.animater.Knob, "Width (percent)", this.animater.KnobData.width);
 			ccbSetSceneNodeProperty(this.animater.Knob, "Height (percent)", this.animater.KnobData.height);
 
 			this.animater.scaledKnob = false;
 		}
-		this.animater.KnobHover = false;
 	}
 };
 
@@ -135,7 +133,7 @@ class _action_Bar_OnEnter
 
 	execute(currentNode)
 	{
-		this.animater.BarHover = true;
+
 	}
 };
 
@@ -159,10 +157,7 @@ export default class behavior_ToggleButton
 		this.mouseX = false;
 		this.mouseY = false;
 		this.init = false;
-		this.drag = false;
-		this.valueboxOverlay = false;
-		this.hover = false;
-		this.init = false;
+		this.scaledKnob = false;
 	}
 
 	onAnimate(currentNode)
@@ -189,55 +184,31 @@ export default class behavior_ToggleButton
 
 			let animator1 = new CL3D.AnimatorOnClick(CL3D.gScriptingInterface.CurrentlyActiveScene, CL3D.gScriptingInterface.Engine, () =>
 			{
-				if (this.KnobHover || this.BarHover)
+				if (!this.scaledup)
 				{
-					if (!this.scaledup)
-					{
-						this.originalKnob = { ...this.KnobData };
-						this.originalClickedKnob = scaleOverlay(this.originalKnob, 1)
-							.originalOverlay;
-						let scaledClickKnob = scaleOverlay(this.originalKnob, this.Scale_Click_Knob)
-							.scaledOverlay;
-						if (this.KnobName == this.BarName) ccbSetSceneNodeProperty(this.Knob, "Pos X (percent)", scaledClickKnob.x);
-						ccbSetSceneNodeProperty(this.Knob, "Pos Y (percent)", scaledClickKnob.y);
-						ccbSetSceneNodeProperty(this.Knob, "Width (percent)", scaledClickKnob.width);
-						ccbSetSceneNodeProperty(this.Knob, "Height (percent)", scaledClickKnob.height);
+					this.originalKnob = { ...this.KnobData };
+					this.originalClickedKnob = scaleOverlay(this.originalKnob, 1)
+						.originalOverlay;
+					let scaledClickKnob = scaleOverlay(this.originalKnob, this.Scale_Click_Knob)
+						.scaledOverlay;
+					if (this.KnobName == this.BarName) ccbSetSceneNodeProperty(this.Knob, "Pos X (percent)", scaledClickKnob.x);
+					ccbSetSceneNodeProperty(this.Knob, "Pos Y (percent)", scaledClickKnob.y);
+					ccbSetSceneNodeProperty(this.Knob, "Width (percent)", scaledClickKnob.width);
+					ccbSetSceneNodeProperty(this.Knob, "Height (percent)", scaledClickKnob.height);
 
-						this.scaledKnob = true;
-					}
-				}
-				this.KnobHover = true;
+					this.scaledKnob = true;
 
-				if (this.KnobHover || this.BarHover)
 					this.toggle = !this.toggle;
+				}
 			});
 			animator1.TheActionHandler = new _action_Knob_OnClick(this);
 
-			let animator2 = new CL3D.AnimatorOnMove(CL3D.gScriptingInterface.CurrentlyActiveScene, CL3D.gScriptingInterface.Engine, () =>
-			{
-
-            });
+			let animator2 = new CL3D.AnimatorOnMove(CL3D.gScriptingInterface.CurrentlyActiveScene, CL3D.gScriptingInterface.Engine);
 			animator2.ActionHandlerOnEnter = new _action_Knob_OnEnter(this);
 			animator2.ActionHandlerOnLeave = new _action_Knob_OnLeave(this);
 
 			this.Knob.addAnimator(animator1);
 			this.Knob.addAnimator(animator2);
-
-			let animator3 = new CL3D.AnimatorOnClick(CL3D.gScriptingInterface.CurrentlyActiveScene, CL3D.gScriptingInterface.Engine, () =>
-			{
-
-            });
-			animator3.TheActionHandler = new _action_Bar_OnClick(this);
-
-			let animator4 = new CL3D.AnimatorOnMove(CL3D.gScriptingInterface.CurrentlyActiveScene, CL3D.gScriptingInterface.Engine, () =>
-			{
-				this.BarHover = false;
-			});
-			animator4.ActionHandlerOnEnter = new _action_Bar_OnEnter(this);
-			animator4.ActionHandlerOnLeave = new _action_Bar_OnLeave(this);
-
-			this.Bar.addAnimator(animator3);
-			this.Bar.addAnimator(animator4);
 
 			this.init = true;
 		}
@@ -291,7 +262,6 @@ export default class behavior_ToggleButton
 					ccbSetSceneNodeProperty(this.Bar, "Background Color", color);
 				}
 				else ccbSetSceneNodeProperty(this.Bar, "Background Color", Bar_ON_Color);
-				//ccbSetSceneNodeProperty(this.Bar, "Background Color", Bar_ON_Color);
 			}
 		}
 		else

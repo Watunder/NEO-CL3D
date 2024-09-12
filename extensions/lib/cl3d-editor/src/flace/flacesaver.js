@@ -584,7 +584,6 @@ export class FlaceSaver {
                 this.Data.writeBoolean(animator.BoundingBoxTestOnly);
                 this.Data.writeBoolean(animator.CollidesWithWorld);
                 this.Data.writeInt32LE();
-                console.log(animator.TheActionHandler.Actions);
                 this.saveActionHandler(animator.TheActionHandler);
                 break;
             case "onproximity":
@@ -792,47 +791,47 @@ export class FlaceSaver {
         pos = this.startTag(26);
         {
             this.saveString(scene.Name);
-            this.Data.writeInt32LE(this.rgbToInt(65, 65, 65));
+            this.Data.writeInt32LE(scene.BackgroundColor || this.rgbToInt(65, 65, 65));
         }
         this.endTag(pos);
 
         pos = this.startTag(1007);
         {
-            this.write3DVectF(new CL3D.Vect3d());
-            this.write3DVectF(new CL3D.Vect3d());
+            this.write3DVectF(scene.DefaultCameraPos);
+            this.write3DVectF(scene.DefaultCameraTarget);
         }
         this.endTag(pos);
 
         pos = this.startTag(1008);
         {
-            this.Data.writeFloat32LE(10.0);
+            this.Data.writeFloat32LE(scene.Gravity);
         }
         this.endTag(pos);
 
         pos = this.startTag(1009);
         {
-            this.Data.writeBoolean(false);
-            this.Data.writeFloat32LE(0.007);
-            this.Data.writeInt32LE(this.rgbToInt(200,200,200));
+            this.Data.writeBoolean(scene.FogEnabled);
+            this.Data.writeFloat32LE(scene.FogDensity);
+            this.Data.writeInt32LE(scene.FogColor);
         }
         this.endTag(pos);
 
         pos = this.startTag(1010);
         {
             this.Data.writeBoolean(false);
-            this.Data.writeFloat32LE(1.0);
-            this.Data.writeFloat32LE(2.0);
+            this.Data.writeFloat32LE(scene.WindSpeed);
+            this.Data.writeFloat32LE(scene.WindStrength);
         }
         this.endTag(pos);
 
         pos = this.startTag(1011);
         {
-            this.Data.writeBoolean(false);
-            this.Data.writeFloat32LE(0.5);
-            this.Data.writeFloat32LE(0.2);
-            this.Data.writeFloat32LE(0.001);
-            this.Data.writeFloat32LE(0.005);
-            this.Data.writeFloat32LE(0.5);
+            this.Data.writeBoolean(scene.ShadowMappingEnabled);
+            this.Data.writeFloat32LE(scene.ShadowMapBias1);
+            this.Data.writeFloat32LE(scene.ShadowMapBias2);
+            this.Data.writeFloat32LE(scene.ShadowMapBackFaceBias);
+            this.Data.writeFloat32LE(scene.ShadowMapOpacity);
+            this.Data.writeFloat32LE(scene.ShadowMapCameraViewDetailFactor);
         }
         this.endTag(pos);
 
@@ -840,13 +839,13 @@ export class FlaceSaver {
         {
             for(let index = 0; index < 6; ++index)
                 this.Data.writeBoolean(false);
-            this.Data.writeInt32LE(2);
-            this.Data.writeFloat32LE(0.7);
-            this.Data.writeInt32LE(2);
-            this.Data.writeInt32LE(this.rgbToInt(255, 0, 0));
-            this.Data.writeFloat32LE(0.8);
-            this.Data.writeFloat32LE(0.4);
-            this.Data.writeFloat32LE(0.55);
+            this.Data.writeInt32LE(scene.PE_bloomBlurIterations);
+            this.Data.writeFloat32LE(scene.PE_bloomTreshold);
+            this.Data.writeInt32LE(scene.PE_blurIterations);
+            this.Data.writeInt32LE(scene.PE_colorizeColor);
+            this.Data.writeFloat32LE(scene.PE_vignetteIntensity);
+            this.Data.writeFloat32LE(scene.PE_vignetteRadiusA);
+            this.Data.writeFloat32LE(scene.PE_vignetteRadiusB);
         }
         this.endTag(pos);
     }

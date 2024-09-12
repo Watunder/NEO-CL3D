@@ -39,8 +39,10 @@ const imports = [
 		libModules: [
 			'ammo',
 			'cl3d',
+			'creature',
 			'effekseer',
 			'fairygui-dom',
+			'fmodstudio',
 			'html-to-image',
 			'mitt',
 			'rekapi',

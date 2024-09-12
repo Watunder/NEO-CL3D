@@ -9,10 +9,10 @@ import { Rekapi, Actor } from "rekapi";
 //import { toImage, toCanvas, toPng } from "html-to-image";
 
 export * from "./src/ammo-cl3d/main.js";
-
-export * from "./src/utils.js";
+export * from "./src/creature-cl3d/main.js"
 export * from "./src/ss6player-cl3d/main.js";
 
+export * from "./src/utils.js";
 export { FrameEvent } from "./src/frameevent.js";
 export { ImmediateEvent } from "./src/immediateevent.js";
 
