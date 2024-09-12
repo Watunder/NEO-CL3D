@@ -133,7 +133,6 @@ export default class behavior_Slider
 		this.init = false;
 		this.drag = false;
 		this.valueboxOverlay = false;
-		this.hover = false;
 		this.KnobData = false;
 	}
 
