@@ -1,0 +1,18 @@
+.text-box
+{
+	position: fixed;
+	left: 25%;
+	right: 25%;
+	top: 78%;
+	bottom: 0%;
+	pointer-events: none;
+	opacity: 1;
+	text-align: start;
+}
+
+.text-char
+{
+	color: white;
+	opacity: 0;
+	transition: 100ms;
+}
