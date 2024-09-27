@@ -1,0 +1,15 @@
+{
+  "type": "module",
+  "name": "global",
+  "main": "./src/index.js",
+  "dependencies": {
+    "ammo": "workspace:*",
+    "cl3d": "workspace:*",
+    "creature": "workspace:*",
+    "effekseer": "workspace:*",
+    "fmodstudio": "workspace:*",
+    "mitt": "workspace:*",
+    "rekapi": "workspace:*",
+    "ss6player-lib": "workspace:*"
+  }
+}
