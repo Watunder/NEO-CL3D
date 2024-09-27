@@ -75,7 +75,6 @@ interface LocalForageDbMethods extends LocalForageDbMethodsCore, LocalForageDbMe
 
 interface LocalForage extends LocalForageDbMethods {
     LOCALSTORAGE: string;
-    WEBSQL: string;
     INDEXEDDB: string;
 
     /**
