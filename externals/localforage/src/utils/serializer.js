@@ -1,7 +1,7 @@
 /* eslint-disable no-bitwise */
 import createBlob from './createBlob';
 
-// Sadly, the best way to save binary data in WebSQL/localStorage is serializing
+// Sadly, the best way to save binary data in localStorage is serializing
 // it to Base64, so this is how we store it to prevent very strange errors with less
 // verbose ways of binary <-> string data storage.
 var BASE_CHARS =

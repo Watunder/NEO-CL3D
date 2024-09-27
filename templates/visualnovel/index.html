@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<meta name="viewport" />
+
+<head>
+	<link rel="stylesheet" href="copperlichtdata/style/text.css">
+	<link rel='stylesheet' href='patchs/menubar/style.css'>
+</head>
+
+<body>
+	<div class="dragMe drag"> </div>
+
+	<div class="menuBar">
+		<div class="menuBar--gameTitle">NEO-CL3D</div>
+
+		<div class="menuBar--icon-fullscreen" onclick="click_icon_fullscreen();">
+			<svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 14 16" height="32px"
+				width="32px" xmlns="http://www.w3.org/2000/svg">
+				<path fill-rule="evenodd"
+					d="M13 10h1v3c0 .547-.453 1-1 1h-3v-1h3v-3zM1 10H0v3c0 .547.453 1 1 1h3v-1H1v-3zm0-7h3V2H1c-.547 0-1 .453-1 1v3h1V3zm1 1h10v8H2V4zm2 6h6V6H4v4zm6-8v1h3v3h1V3c0-.547-.453-1-1-1h-3z">
+				</path>
+			</svg>
+		</div>
+
+		<div class="menuBar--icon-x" onclick="click_icon_x();">
+			<svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" height="32px"
+				width="32px" xmlns="http://www.w3.org/2000/svg">
+				<path
+					d="M464 32H48C21.5 32 0 53.5 0 80v352c0 26.5 21.5 48 48 48h416c26.5 0 48-21.5 48-48V80c0-26.5-21.5-48-48-48zm0 394c0 3.3-2.7 6-6 6H54c-3.3 0-6-2.7-6-6V86c0-3.3 2.7-6 6-6h404c3.3 0 6 2.7 6 6v340zM356.5 194.6L295.1 256l61.4 61.4c4.6 4.6 4.6 12.1 0 16.8l-22.3 22.3c-4.6 4.6-12.1 4.6-16.8 0L256 295.1l-61.4 61.4c-4.6 4.6-12.1 4.6-16.8 0l-22.3-22.3c-4.6-4.6-4.6-12.1 0-16.8l61.4-61.4-61.4-61.4c-4.6-4.6-4.6-12.1 0-16.8l22.3-22.3c4.6-4.6 12.1-4.6 16.8 0l61.4 61.4 61.4-61.4c4.6-4.6 12.1-4.6 16.8 0l22.3 22.3c4.7 4.6 4.7 12.1 0 16.8z">
+				</path>
+			</svg>
+		</div>
+	</div>
+
+	<div style="text-align: center;">
+		<div id="text" class="text-box"></div>
+		<canvas id="3darea"></canvas>
+	</div>
+	<script type="module" defer src="index.js"></script>
+	<script type="module" async src="./patchs/menubar/index.js"></script>
+</body>
+
+</html>

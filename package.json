@@ -1,21 +1,22 @@
 {
   "type": "module",
   "name": "neo_frameworks",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "",
-  "keywords": [],
+  "keywords": [
+    "browser",
+    "game-framework",
+    "visual-novel"
+  ],
   "maintainers": [
     "Watunder (https://github.com/Watunder)"
   ],
   "contributors": [
     "Watunder (https://github.com/Watunder)"
   ],
-  "license": "",
-  "repository": {},
-  "scripts": {
-    "build": "npx rollup -c"
-  },
-  "dependencies": {},
-  "devDependencies": {},
-  "optionalDependencies": {}
+  "license": "See license in LICENSE.md",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com:Watunder/NEO-CL3D.git"
+  }
 }
